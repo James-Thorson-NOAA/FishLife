@@ -147,7 +147,7 @@ Fit_model = function( Y_ij, Z_ik, Version="Taxon_v1_1_0", N_obsfactors=-2, N_fac
   Prec_zz = Prec_zz[ , grep("beta_gj",names(unlist(Params))) ]
   PartialCorr_gjj = Corr_gjj = Cov_gjj = Prec_gjj = array(NA, dim=c(n_g,n_j,n_j), dimnames=list(ParentChild_gz[,'ChildName'],colnames(Y_ij),colnames(Y_ij)) )
   for( gI in 1:n_g ){
-    Indices = as.vector( outer(seq(1,n_g*8,by=n_g)-1, Find_ancestors(gI), FUN="+") )
+    Indices = as.vector( outer(seq(1,n_g*8,by=n_g)-1, Find_ancestors(child_num=gI, ParentChild_gz=ParentChild_gz), FUN="+") )
     Full_Precision = matrix(Prec_zz[Indices,Indices],length(Indices),length(Indices))
     Prec_gjj[gI,,] = Full_Precision[1:n_j,1:n_j]
     PartialCorr_gjj[gI,,] = -1*cov2cor( Prec_gjj[gI,,] )

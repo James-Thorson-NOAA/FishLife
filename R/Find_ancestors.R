@@ -1,6 +1,6 @@
 
 #' @export
-Find_ancestors = function( child_num ){
+Find_ancestors = function( child_num, ParentChild_gz ){
   family_nums = child_num
   while(TRUE){
     if( is.na(ParentChild_gz[rev(family_nums)[1],'ParentRowNumber'])==TRUE ) break()
