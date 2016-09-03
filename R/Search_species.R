@@ -47,7 +47,7 @@ Search_species = function( Class="predictive", Order="predictive", Family="predi
 
   # Pick out ancestors
   if( add_ancestors==TRUE ){
-    Group = Find_ancestors(Group)
+    Group = Find_ancestors(child_num=Group, ParentChild_gz=ParentChild_gz)
   }
 
   # Function to add predictive to taxon name
