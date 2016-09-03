@@ -6,7 +6,7 @@
 \usage{
 Fit_model(Y_ij, Z_ik, Version = "Taxon_v1_1_0", N_obsfactors = -2,
   N_factors = -2, Use_REML = TRUE, TmbDir = system.file("executables",
-  package = "VAST"), RunDir = getwd())
+  package = "FishTraits"), RunDir = getwd())
 }
 \arguments{
 \item{Y_ij}{a data frame of trait values (perhaps log-scaled) with rows for records, and tagged-columns for traits}
