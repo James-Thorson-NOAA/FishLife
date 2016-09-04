@@ -138,6 +138,7 @@ Fit_model = function( Y_ij, Z_ik, Version="Taxon_v1_1_0", N_obsfactors=-2, N_fac
   ParHat = Obj$env$parList()
   ParHat_SE = as.list( Opt$SD, what="Std" )
   colnames(ParHat$beta_gj) = colnames(ParHat_SE$beta_gj) = colnames(Y_ij)
+  dyn.load( paste0(RunDir,"/",TMB::dynlib(Version)) )          #
 
   ####################
   # Interpret results

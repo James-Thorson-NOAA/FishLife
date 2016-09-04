@@ -1,6 +1,6 @@
 
 #' @export
-Plot_taxa_panel = function( lowerTaxa, upperTaxa=lowerTaxa, prob=0.95, params=names(Y_ij), xlim=log(c(0.01,2)), ylim=xlim, ticks=c(1,2,5), partial_match=FALSE, ... ){
+Plot_taxa_panel = function( lowerTaxa, upperTaxa=lowerTaxa, prob=0.95, params=names(Y_ij), xlim=log(c(0.01,2)), ylim=xlim, ticks=c(1,2,5), partial_match=FALSE, verbose=FALSE, ... ){
   par( mfrow=c(length(params),length(params)), mar=c(2,2,0,0), mgp=c(1.75,0.25,0), tck=-0.02, oma=c(2,3,0,0))
   for( rowI in 1:length(params)){
   for( colI in 1:length(params)){
@@ -19,7 +19,7 @@ Plot_taxa_panel = function( lowerTaxa, upperTaxa=lowerTaxa, prob=0.95, params=na
       Params = c(params[colI], params[rowI]) # first: X, second: Y
       Taxa = list(lowerTaxa, upperTaxa)[[ifelse( rowI>colI, 1, 2 )]]
       for( uniqueI in 1:length(unique(Taxa)) ){
-        Plot_ellipse( Taxon=Taxa[uniqueI], params=Params, add=ifelse(uniqueI==1,FALSE,TRUE), xlim=NULL, lcol="black", lty="solid", lwd=1, partial_match=partial_match, main="" )
+        Plot_trait( Taxon=Taxa[uniqueI], params=Params, add=ifelse(uniqueI==1,FALSE,TRUE), xlim=NULL, lcol="black", lty="solid", lwd=1, partial_match=partial_match, main="", verbose=verbose, ... )
       }
     }
     if( colI==1 ) mtext(side=2, text=params[rowI], line=2, cex=1.3 )
