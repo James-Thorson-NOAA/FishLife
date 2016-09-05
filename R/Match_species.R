@@ -1,6 +1,6 @@
 
 #' @export
-Match_species = function( genus_species="Sebastes jordani" ){
+Match_species = function( genus_species="Sebastes jordani", ParentChild_gz=Estimate_database$ParentChild_gz ){
   # Match full taxonomy from fishbase
   data( fishbase, package="rfishbase")
   genus_species = strsplit( tolower(genus_species), split=c(" ","_"))[[1]]

@@ -1,7 +1,9 @@
 
 #' @export
 # Class="predictive"; Order="predictive"; Family="predictive"; Genus="predictive"; Species="predictive"
-Search_species = function( Class="predictive", Order="predictive", Family="predictive", Genus="predictive", Species="predictive", add_ancestors=TRUE ){
+Search_species = function( Class="predictive", Order="predictive", Family="predictive", Genus="predictive", Species="predictive",
+   add_ancestors=TRUE, ParentChild_gz=Estimate_database$ParentChild_gz ){
+
   # Match full taxonomy from fishbase
   data( fishbase, package="rfishbase")
   Match = 1:nrow(fishbase)

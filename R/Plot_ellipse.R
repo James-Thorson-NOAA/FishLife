@@ -1,6 +1,7 @@
 
 #' @export
-Plot_ellipse = function( Cov, Mean=rep(0,2), add=FALSE, prob=0.95, xlim=log(c(0.01,2)), ylim=xlim, logticks=c(1,2,5), ticks=c(0,5), whichlog="xy", main="", xlab="", ylab="", lcol="black", plot_lines=FALSE, ... ){
+Plot_ellipse = function( Cov, Mean=rep(0,2), add=FALSE, prob=0.95, xlim=log(c(0.01,2)), ylim=xlim, logticks=c(1,2,5), ticks=c(0,5),
+  whichlog="xy", main="", xlab="", ylab="", lcol="black", plot_lines=FALSE, ... ){
 
   # Calculate eigen-decomposition
   # http://www.visiondummy.com/2014/04/draw-error-ellipse-representing-covariance-matrix/

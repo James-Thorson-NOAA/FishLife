@@ -1,6 +1,8 @@
 
 #' @export
-Calculate_ratio = function( Cov_gjj, Mean_gj, params=c("K","M") ){
+Calculate_ratio = function( params=c("K","M"), Cov_gjj=Estimate_database$Cov_gjj, Mean_gj=Estimate_database$ParHat$beta_gj,
+  ParentChild_gz=Estimate_database$ParentChild_gz ){
+
   # Rotation matrix
   RotateM = function( angle ) matrix( c(cos(angle),sin(angle),-sin(angle),cos(angle)), 2,2 )
   # Rotate covariance matrix via eigen-decomposition
@@ -17,7 +19,7 @@ Calculate_ratio = function( Cov_gjj, Mean_gj, params=c("K","M") ){
     #Angle_hat = atan(eigen(Cov_hat)$vector[2,1] / eigen(Cov_hat)$vector[1,1])
     Cov = RotateCov(angle=-3/4*pi, Cov_hat)
     MargVar = sum(abs(eigen(Cov)$vectors[1,] * eigen(Cov)$values))
-    Median = ParHat$beta_gj[gI,params]
+    Median = Mean_gj[gI,params]
     Ratio_gz[gI,] = c( exp(Median[2]-Median[1]), sqrt(MargVar) )
   }
   return( Ratio_gz )
