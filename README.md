@@ -35,8 +35,8 @@ Plot_taxa( Taxa )
 library( TMB )
 
 # Re-run results with a different model configuration
-Fit = Fit_model( N_factors=-3, N_obsfactors=-3, Use_REML=TRUE, RunDir=temp )
+Estimate_database = Fit_model( N_factors=-3, N_obsfactors=-3, Use_REML=TRUE)
 
-# Extract estimates and load into local memory in `Estimate_database` as default for plotting
-Estimate_database = Fit[c("N_factors","N_obsfactors","Use_REML","Cov_gjj","ParentChild_gz","ParHat","g_i","Y_ij","Z_ik")]
+# Plot new results
+Plot_taxa( Search_species(Genus="Lutjanus",Species="campechanus")$match_taxonomy )
 ```
