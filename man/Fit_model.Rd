@@ -7,12 +7,13 @@
 Fit_model(N_factors, N_obsfactors, Use_REML = TRUE,
   Y_ij = Estimate_database$Y_ij, Z_ik = Estimate_database$Z_ik,
   Version = "Taxon_v1_1_0", TmbDir = system.file("executables", package =
-  "FishTraits"), RunDir = getwd())
+  "FishTraits"), RunDir = tempfile(pattern = "run_", tmpdir = tempdir(),
+  fileext = "/"))
 }
 \arguments{
-\item{N_factors}{Number of factors in decomposotion of covariance for random-walk along evolutionary tree (same format as \code{N_obsfactors})}
+\item{N_factors}{Number of factors in decomposition of covariance for random-walk along evolutionary tree (0 means a diagonal but unequal covariance; negative is the sum of a factor decomposition and a diagonal-but-unequal covariance)}
 
-\item{N_obsfactors}{Number of factors in decomposition of observation covariance (0 means a diagonal but unequal covariance; negative is the sum of a factor decomposition and a diagonal-but-unequal covariance)}
+\item{N_obsfactors}{Number of factors in decomposotion of observation covariance (same format as \code{N_obsfactors})}
 
 \item{Use_REML,}{OPTIONAL boolean whether to use maximum marginal likelihood or restricted maximum likelihood (termed "REML")}
 
@@ -27,13 +28,21 @@ Fit_model(N_factors, N_obsfactors, Use_REML = TRUE,
 \item{RunDir}{Directory to use when compiling and running TMB script (different to avoid problems with read-write restrictions)}
 }
 \value{
-Tagged list containing objects from FishTraits run
+Tagged list containing objects from FishTraits run (first 9 slots constitute list 'Estimate_database' for archiving results)
 \describe{
+  \item{N_factors}{\code{N_factors} from run}
+  \item{N_obsfactors}{\code{N_obsfactors} from run}
+  \item{Use_REML}{\code{Use_REML} from run}
+  \item{Cov_gjj}{Covariance among traits for every taxon in tree}
+  \item{ParentChild_gz}{Record of taxonomic tree}
+  \item{ParHat}{Parameter estimates and predictions}
+  \item{g_i}{Associates every observation with a level of the taxonomic tree}
+  \item{Y_ij}{\code{Y_ij} from run}
+  \item{Z_ik}{\code{Z_ik} from run}
   \item{Obj}{The built TMB object}
   \item{Opt}{Output from optimization}
   \item{Report}{tagged list of report-file from TMB}
   \item{ParHat_SE}{Estimated/predicted standard errors for fixed/random effects}
-  \item{Estimate_database}{Tagged list containing database of parameter estimates in format for other functions}
 }
 }
 \description{
