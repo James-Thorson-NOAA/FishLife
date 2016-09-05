@@ -31,5 +31,6 @@ Load_previous_results = function( results_dir=system.file("extdata",package="Fis
   message("###########################################################################################")
   message("Loading results from model run: list 'Estimate_database'")
   load( file.path(results_dir,"Estimate_database.RData") )
+  return( Estimate_database )
   message("###########################################################################################")
 }
