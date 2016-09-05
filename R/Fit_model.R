@@ -3,27 +3,26 @@
 #'
 #' \code{Fit_model} estimates parameters and predicts values from a multivariate random-walk model for fish traits
 #'
+#' @param N_factors Number of factors in decomposotion of covariance for random-walk along evolutionary tree (same format as \code{N_obsfactors})
+#' @param N_obsfactors Number of factors in decomposition of observation covariance (0 means a diagonal but unequal covariance; negative is the sum of a factor decomposition and a diagonal-but-unequal covariance)
+#' @param Use_REML, OPTIONAL boolean whether to use maximum marginal likelihood or restricted maximum likelihood (termed "REML")
 #' @param Y_ij a data frame of trait values (perhaps log-scaled) with rows for records, and tagged-columns for traits
 #' @param Z_ik a data frame of taxonomic classification for each row of \code{Y_ij}
 #' @param Version TMB version number
-#' @param N_obsfactors Number of factors in decomposition of observation covariance (0 means a diagonal but unequal covariance; negative is the sum of a factor decomposition and a diagonal-but-unequal covariance)
-#' @param N_factors Number of factors in decomposotion of covariance for random-walk along evolutionary tree (same format as \code{N_obsfactors})
-#' @param Use_REML, OPTIONAL boolean whether to use maximum marginal likelihood or restricted maximum likelihood (termed "REML")
+#' @param TmbDir Directory containing pre-compiled TMB script
+#' @param RunDir Directory to use when compiling and running TMB script (different to avoid problems with read-write restrictions)
 
 #' @return Tagged list containing objects from FishTraits run
 #' \describe{
 #'   \item{Obj}{The built TMB object}
 #'   \item{Opt}{Output from optimization}
 #'   \item{Report}{tagged list of report-file from TMB}
-#'   \item{ParHat}{Estimated values for fixed and random effects}
 #'   \item{ParHat_SE}{Estimated/predicted standard errors for fixed/random effects}
-#'   \item{ParentChild_gz}{Data frame giving taxonomy for each unique taxon}
-#'   \item{g_i}{vector associating each row of \code{Y_ij} with each row of \code{ParentChild_gz}}
-#'   \item{Cov_gjj}{Array containing estimated covariance for every }
+#'   \item{Estimate_database}{Tagged list containing database of parameter estimates in format for other functions}
 #' }
 
 #' @export
-Fit_model = function( N_obsfactors, N_factors, Use_REML=TRUE, Y_ij=Estimate_database$Y_ij, Z_ik=Estimate_database$Z_ik,
+Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=Estimate_database$Y_ij, Z_ik=Estimate_database$Z_ik,
   Version="Taxon_v1_1_0", TmbDir=system.file("executables",package="FishTraits"), RunDir=getwd() ){
 
   #####################
@@ -157,6 +156,7 @@ Fit_model = function( N_obsfactors, N_factors, Use_REML=TRUE, Y_ij=Estimate_data
   }
 
   # Return stuff
-  Return = list("Obj"=Obj, "Opt"=Opt, "Report"=Report, "ParHat"=ParHat, "ParHat_SE"=ParHat_SE, "ParentChild_gz"=ParentChild_gz, "g_i"=g_i, "Cov_gjj"=Cov_gjj)
+  Estimate_database = list("N_factors"=N_factors, "N_obsfactors"=N_obsfactors, "Use_REML"=Use_REML, "Cov_gjj"=Cov_gjj, "ParentChild_gz"=ParentChild_gz, "ParHat"=ParHat, "g_i"=g_i, "Y_ij"=Y_ij, "Z_ik"=Z_ik)
+  Return = list("Obj"=Obj, "Opt"=Opt, "Report"=Report, "ParHat_SE"=ParHat_SE, "Estimate_database"=Estimate_database)
   return( Return )
 }

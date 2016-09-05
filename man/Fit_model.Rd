@@ -4,22 +4,27 @@
 \alias{Fit_model}
 \title{Fit and predict fish traits}
 \usage{
-Fit_model(Y_ij, Z_ik, Version = "Taxon_v1_1_0", N_obsfactors = -2,
-  N_factors = -2, Use_REML = TRUE, TmbDir = system.file("executables",
-  package = "FishTraits"), RunDir = getwd())
+Fit_model(N_factors, N_obsfactors, Use_REML = TRUE,
+  Y_ij = Estimate_database$Y_ij, Z_ik = Estimate_database$Z_ik,
+  Version = "Taxon_v1_1_0", TmbDir = system.file("executables", package =
+  "FishTraits"), RunDir = getwd())
 }
 \arguments{
+\item{N_factors}{Number of factors in decomposotion of covariance for random-walk along evolutionary tree (same format as \code{N_obsfactors})}
+
+\item{N_obsfactors}{Number of factors in decomposition of observation covariance (0 means a diagonal but unequal covariance; negative is the sum of a factor decomposition and a diagonal-but-unequal covariance)}
+
+\item{Use_REML,}{OPTIONAL boolean whether to use maximum marginal likelihood or restricted maximum likelihood (termed "REML")}
+
 \item{Y_ij}{a data frame of trait values (perhaps log-scaled) with rows for records, and tagged-columns for traits}
 
 \item{Z_ik}{a data frame of taxonomic classification for each row of \code{Y_ij}}
 
 \item{Version}{TMB version number}
 
-\item{N_obsfactors}{Number of factors in decomposition of observation covariance (0 means a diagonal but unequal covariance; negative is the sum of a factor decomposition and a diagonal-but-unequal covariance)}
+\item{TmbDir}{Directory containing pre-compiled TMB script}
 
-\item{N_factors}{Number of factors in decomposotion of covariance for random-walk along evolutionary tree (same format as \code{N_obsfactors})}
-
-\item{Use_REML,}{OPTIONAL boolean whether to use maximum marginal likelihood or restricted maximum likelihood (termed "REML")}
+\item{RunDir}{Directory to use when compiling and running TMB script (different to avoid problems with read-write restrictions)}
 }
 \value{
 Tagged list containing objects from FishTraits run
@@ -27,11 +32,8 @@ Tagged list containing objects from FishTraits run
   \item{Obj}{The built TMB object}
   \item{Opt}{Output from optimization}
   \item{Report}{tagged list of report-file from TMB}
-  \item{ParHat}{Estimated values for fixed and random effects}
   \item{ParHat_SE}{Estimated/predicted standard errors for fixed/random effects}
-  \item{ParentChild_gz}{Data frame giving taxonomy for each unique taxon}
-  \item{g_i}{vector associating each row of \code{Y_ij} with each row of \code{ParentChild_gz}}
-  \item{Cov_gjj}{Array containing estimated covariance for every }
+  \item{Estimate_database}{Tagged list containing database of parameter estimates in format for other functions}
 }
 }
 \description{

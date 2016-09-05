@@ -1,8 +1,8 @@
 
 #' @export
 Plot_taxa = function( Taxa, prob=0.95, params=matrix(c("K","M","Winfinity","Loo","tmax","tm","Lm","Temperature"),ncol=2,byrow=TRUE),
-  xlim=log(c(0.01,2)), ylim=xlim, ticks=c(0,5), logticks=c(1,2,5), partial_match=FALSE, drop_pred=TRUE, mfrow=c(nrow(params),1),
-  legendnum=2, verbose=FALSE, plot_lines=FALSE, ... ){
+  Y_ij=Estimate_database$Y_ij, xlim=log(c(0.01,2)), ylim=xlim, ticks=c(0,5), logticks=c(1,2,5), partial_match=FALSE, drop_pred=TRUE,
+  mfrow=c(nrow(params),1), legendnum=2, verbose=FALSE, plot_lines=FALSE, ... ){
 
   # Loop through parameter-pairs
   par( mfrow=mfrow, mar=c(3,3,0,0), mgp=c(1.75,0.25,0), tck=-0.02, oma=c(0,0,0,0))
