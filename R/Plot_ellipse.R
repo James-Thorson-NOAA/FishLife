@@ -1,4 +1,26 @@
 
+#' Plot an ellipse
+#'
+#' Plots an ellipse representing the bivariate predictive inteval
+#'
+#' @param Cov 2x2 matrix representing covariance
+#' @param Mean numeric vector (length of 2) representing Empirical Bayes prediction of median
+#' @param add Boolean whether to add ellipse to existing plot
+#' @param probability for defining predictive interval
+#' @param xlim x-limits if \code{add=FALSE}
+#' @param ylim y-limits if \code{add=FALSE}
+#' @param logticks ticks to use if plotting on a log-scale
+#' @param ticks ticks to use if plotting on a natural-scale
+#' @param whichlog which axes are log-scale
+#' @param main legend for each panel
+#' @param xlab x-axis label
+#' @param ylab y-axis label
+#' @param lcol line color for ellipse
+#' @param plot_lines whether to plot lines representing "major axis" and "OLS" regression parameters
+#'
+
+#' @return integer of row numbers of \code{ParentChild_gz} matching \code{genus_species}
+
 #' @export
 Plot_ellipse = function( Cov, Mean=rep(0,2), add=FALSE, prob=0.95, xlim=log(c(0.01,2)), ylim=xlim, logticks=c(1,2,5), ticks=c(0,5),
   whichlog="xy", main="", xlab="", ylab="", lcol="black", plot_lines=FALSE, ... ){

@@ -1,6 +1,24 @@
 
+#' Search species
+#'
+#' Match taxonomic inputs to a given row of \code{ParentChild_gz} or its closest ancestor
+#'
+#' @param Class Character input for taxonomic class
+#' @param Order Character input for taxonomic class
+#' @param Family Character input for taxonomic class
+#' @param Genus Character input for taxonomic class
+#' @param Species Character input for taxonomic class
+#' @param add_ancestors Boolean whether to add ancestors for matching species or not
+#' @inheritParams Calculate_ratio
+
+#' This function attempts to do a smart match to elements of \code{ParentChild_gz}.  It sweeps from Order to Species
+#' and ignores any taxonomic input listed as \code{"predictive"} until it finds something else.  It then appends
+#' \code{"predictive"} to any lower taxonomic level that is missing, and checks whether this specification yields a single,
+#' unique taxon.  If it does, it then returns the row number and potentially any ancestors (higher taxonomic levels)
+
+#' @return integer of row numbers of \code{ParentChild_gz} matching \code{genus_species}
+
 #' @export
-# Class="predictive"; Order="predictive"; Family="predictive"; Genus="predictive"; Species="predictive"
 Search_species = function( Class="predictive", Order="predictive", Family="predictive", Genus="predictive", Species="predictive",
    add_ancestors=TRUE, ParentChild_gz=Estimate_database$ParentChild_gz ){
 

@@ -1,4 +1,13 @@
 
+#' Match species
+#'
+#' Match \code{genus_species} to a given row of \code{ParentChild_gz}
+#'
+#' @param genus_species Character vector for Genus_species (separated by underscore character)
+#' @inheritParams Calculate_ratio
+
+#' @return integer of row numbers of \code{ParentChild_gz} matching \code{genus_species}
+
 #' @export
 Match_species = function( genus_species="Sebastes jordani", ParentChild_gz=Estimate_database$ParentChild_gz ){
   # Match full taxonomy from fishbase

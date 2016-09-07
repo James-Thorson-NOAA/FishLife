@@ -1,4 +1,13 @@
 
+#' Find ancestors
+#'
+#' Find higher taxonomic levels for a given taxon (e.g., Class and Order for a given Family)
+#'
+#' @param child_num row number of \code{ParentChild_gz} for which to find ancestors
+#' @inheritParams Calculate_ratio
+
+#' @return vector of row numbers of \code{ParentChild_gz} for ancestors (including \code{child_num})
+
 #' @export
 Find_ancestors = function( child_num, ParentChild_gz=Estimate_database$ParentChild_gz ){
 

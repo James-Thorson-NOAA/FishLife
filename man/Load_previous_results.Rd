@@ -8,7 +8,10 @@ Load_previous_results(results_dir = system.file("extdata", package =
   "FishTraits"))
 }
 \arguments{
-\item{results_dir}{Directory containing object \code{Estimate_database.RData}, archiving previous results}
+\item{results_dir}{Directory containing object \code{Estimate_database.RData}, archiving previous results
+This function loads and returns previous results.  All plots are defined by default to look for
+object \code{Estimate_database} in global memory for a record of results.  New results can be
+used instead by saving hte output of \code{Fit_model} to object \code{Estimate_database}.}
 }
 \description{
 \code{Load_previous_results} loads previous results distributed with package

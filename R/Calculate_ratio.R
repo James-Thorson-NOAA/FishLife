@@ -1,4 +1,19 @@
 
+#' Calculate ratio of two modeled traits
+#'
+#' \code{Calculate_ratio} projects the covariance among traits onto a single difference (interpreted as a ratio for log-scaled traits)
+#'
+#' @param params Parameter names to use in calculation
+#' @param Cov_gjj Array of estimated covariance for each taxonomic group \code{g} and trait \code{j}
+#' @param Mean_gj Matrix of Empirical Bayes predictions of traits for each taxonomic group
+#' @param ParentChild_gz Matrix representing taxonomic tree for analyzed data
+
+#' @return Matrix of exponentiated-differences (ratios) and log-standard deviations for projection
+#' \describe{
+#'   \item{median}{median difference for taxonomic group}
+#'   \item{N_obsfactors}{log-standard deviation of difference for taxonomic group}
+#' }
+
 #' @export
 Calculate_ratio = function( params=c("K","M"), Cov_gjj=Estimate_database$Cov_gjj, Mean_gj=Estimate_database$ParHat$beta_gj,
   ParentChild_gz=Estimate_database$ParentChild_gz ){

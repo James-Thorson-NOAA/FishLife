@@ -30,7 +30,6 @@
 #' }
 
 #' @export
-  #N_factors=-2; N_obsfactors=-2; Use_REML=TRUE; Y_ij=Estimate_database$Y_ij; Z_ik=Estimate_database$Z_ik; Version="Taxon_v1_1_0"; TmbDir=system.file("executables",package="FishTraits"); RunDir=tempfile(pattern="run_",tmpdir=tempdir(),fileext="/")
 Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=Estimate_database$Y_ij, Z_ik=Estimate_database$Z_ik,
   Version="Taxon_v1_1_0", TmbDir=system.file("executables",package="FishTraits"), RunDir=tempfile(pattern="run_",tmpdir=tempdir(),fileext="/") ){
 

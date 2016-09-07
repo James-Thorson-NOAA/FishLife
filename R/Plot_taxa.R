@@ -1,4 +1,18 @@
 
+#' Plots trait predictions for taxa
+#'
+#' Plots bivariate predictive intervals for specified parameters and taxa
+#'
+#' @param Taxa One or more taxonomic names (matching rows from \code{ParentChild_gz[,'ChildName']})
+#' @param params matrix (2 columns) of parameters to plot, where each row gives parameter names for a given plot
+#' @param drop_pred Boolean whether to drop "_predictive" from legend
+#' @param mfrow numeric vector giving number of rows and columns for panel figure
+#' @param legendnum which panel to use for legend
+#' @inheritParams Plot_ellipse
+#' @inheritParams Calculate_ratio
+#' @inheritParams Fit_model
+#' @inheritParams Plot_trait
+
 #' @export
 Plot_taxa = function( Taxa, prob=0.95, params=matrix(c("K","M","Winfinity","Loo","tmax","tm","Lm","Temperature"),ncol=2,byrow=TRUE),
   Cov_gjj=Estimate_database$Cov_gjj, Mean_gj=Estimate_database$ParHat$beta_gj, ParentChild_gz=Estimate_database$ParentChild_gz,
@@ -14,7 +28,7 @@ Plot_taxa = function( Taxa, prob=0.95, params=matrix(c("K","M","Winfinity","Loo"
       mtext( side=1:2, text=params[rowI,], line=1.5 )
     }
     # Add legend
-    if( rowI==legendnum ){
+    if( rowI%in%legendnum ){
       Legend = Taxa
       if( drop_pred==TRUE ) Legend = gsub(x=Taxa, pattern="_predictive", replacement="")
       legend("topleft", legend=Legend, fill=rainbow(length(Taxa)), bty="n")

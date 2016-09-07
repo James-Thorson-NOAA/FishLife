@@ -1,5 +1,4 @@
 
-#' @export
 Plot_taxa_panel = function( lowerTaxa, upperTaxa=lowerTaxa, prob=0.95, params=names(Estimate_database$Y_ij),
   Mean_gj=Estimate_database$ParHat$beta_gj, xlim=log(c(0.01,2)), ylim=xlim, ticks=c(1,2,5), partial_match=FALSE, verbose=FALSE, ... ){
 
