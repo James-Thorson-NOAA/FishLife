@@ -1,9 +1,5 @@
 library(shiny)
 
-if( !"FishTraits" %in% installed.packages()[,1]){
-  library(devtools)
-  devtools::install_github( "james-thorson/FishTraits", auth_token="95761aae7dfc63afb6d2682c3c5254246e27d6d9" )
-}
 library(FishTraits)
 Estimate_database = Load_previous_results()
 

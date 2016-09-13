@@ -13,6 +13,7 @@ Imports:
     utils,
     stats,
     devtools,
+    TMB,
     shape,
     rfishbase
 Depends:
