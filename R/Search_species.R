@@ -30,7 +30,7 @@ Search_species = function( Class="predictive", Order="predictive", Family="predi
   if( Family!="predictive" ) Match = Match[ which(tolower(fishbase[Match,'Family'])==tolower(Family)) ]
   if( Genus!="predictive" ) Match = Match[ which(tolower(fishbase[Match,'Genus'])==tolower(Genus)) ]
   if( Species!="predictive" ) Match = Match[ which(tolower(fishbase[Match,'Species'])==tolower(Species)) ]
-  if( length(Match)==0 ) stop("Inputs not found in FishBase, please check spelling")
+  if( length(Match)==0 ) stop( paste("Inputs not found in FishBase, please check spelling of",tolower(Class),tolower(Order),tolower(Family),tolower(Genus),tolower(Species)) )
 
   # add missing taxonomic levels from FishBase if uniquely defined (and throw error if not)
   full_taxonomy = c(Class, Order, Family, Genus, Species)
