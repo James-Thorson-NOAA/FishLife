@@ -13,12 +13,12 @@ Imports:
     utils,
     stats,
     devtools,
-    TMB,
     shape,
     rfishbase
 Depends:
     R (>= 3.1.0),
 Suggests:
+    TMB,
     testthat
 License: GPL-2
 LazyData: yes

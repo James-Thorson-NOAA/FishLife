@@ -1,0 +1,57 @@
+library(shiny)
+
+if( !"FishTraits" %in% installed.packages()[,1]){
+  library(devtools)
+  devtools::install_github( "james-thorson/FishTraits", auth_token="95761aae7dfc63afb6d2682c3c5254246e27d6d9" )
+}
+library(FishTraits)
+Estimate_database = Load_previous_results()
+
+# Function containing things to display
+function(input, output, session){
+
+  #### Dynamic user inputs
+  # The following reactive function returns orders from a selected class
+  order_subset <- reactive({ sort(unique(Estimate_database$Z_ik[which(Estimate_database$Z_ik[,'Class']==input$Class),'Order'])) })
+  output$orderSelex <- renderUI({
+    selectInput(inputId="Order", label="Taxonomic order", choices=order_subset(), multiple=FALSE, selected=order_subset()[1])
+  })
+  # The following reactive function returns family from a selected order
+  family_subset <- reactive({ sort(unique(Estimate_database$Z_ik[which(Estimate_database$Z_ik[,'Class']==input$Class & Estimate_database$Z_ik[,'Order']==input$Order),'Family'])) })
+  output$familySelex <- renderUI({
+    selectInput(inputId="Family", label="Family", choices=family_subset(), multiple=FALSE, selected=family_subset()[1])
+  })
+  # The following reactive function returns genus from a selected fanily
+  genus_subset <- reactive({ sort(unique(Estimate_database$Z_ik[which(Estimate_database$Z_ik[,'Order']==input$Order & Estimate_database$Z_ik[,'Family']==input$Family),'Genus'])) })
+  output$genusSelex <- renderUI({
+    selectInput(inputId="Genus", label="Genus", choices=genus_subset(), multiple=FALSE, selected=genus_subset()[1])
+  })
+  # The following reactive function returns species from a selected genus
+  species_subset <- reactive({ sort(unique(Estimate_database$Z_ik[which(Estimate_database$Z_ik[,'Family']==input$Family & Estimate_database$Z_ik[,'Genus']==input$Genus),'Species'])) })
+  output$speciesSelex <- renderUI({
+    selectInput(inputId="Species", label="Species", choices=species_subset(), multiple=FALSE, selected=species_subset()[1])
+  })
+
+  # Match species from text
+  Match_taxonomy <- reactive({
+    Search_species(Class=input$Class, Order=input$Order, Family=input$Family, Genus=input$Genus, Species=input$Species, add_ancestors=input$plotAncestors, ParentChild_gz=Estimate_database$ParentChild_gz)$match_taxonomy
+  })
+
+  # Disply species
+  output$debug_text1 <- renderPrint({
+    paste0( c(input$Class,input$Order,input$Family,input$Genus,input$Species), collapse="_" )
+  })
+  output$debug_text2 <- renderPrint({
+    Match_taxonomy()
+  })
+
+  #### Plots
+  # Plot taxa
+  output$plot1 <- renderPlot({
+    #input$activate
+    #isolate({
+    Plot_taxa( Taxa=Match_taxonomy(), Cov_gjj=Estimate_database$Cov_gjj, Mean_gj=Estimate_database$ParHat$beta_gj, ParentChild_gz=Estimate_database$ParentChild_gz, Y_ij=Estimate_database$Y_ij )
+    #})
+  })
+
+}
