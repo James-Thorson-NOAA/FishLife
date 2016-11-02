@@ -40,3 +40,17 @@ Estimate_database = Fit_model( N_factors=-3, N_obsfactors=-3, Use_REML=TRUE)
 # Plot new results
 Plot_taxa( Search_species(Genus="Lutjanus",Species="campechanus")$match_taxonomy )
 ```
+
+### Update predictions for a single taxon using user-supplied data
+
+Format new data in `Ynew_ij`, which can contain one or more parameters
+```R
+Ynew_ij = matrix( c("Loo"=log(40),"K"=NA,"Winfinity"=NA,"tmax"=NA,"tm"=NA,"M"=NA,"Lm"=NA,"Temperature"=NA), nrow=1)
+```
+
+Then run an updating function
+```R
+library(TMB)
+Update = Update_prediction( Taxon=Search_species(Genus="Sebastes",Species="cortezi",add_ancestors=FALSE)$match_taxonomy, Ynew_ij=Ynew_ij)
+```
+
