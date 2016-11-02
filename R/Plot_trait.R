@@ -35,5 +35,5 @@ Plot_trait = function( Taxon, params=c('K','M'), Cov_gjj=Estimate_database$Cov_g
   }
 
   # insibile return
-  return( invisible(list("Cov_pred"=Cov_gjj[Which,,])) )
+  return( invisible(list("Cov_pred"=Cov_gjj[Which,,],"Mean_pred"=Mean_gj[Which,])) )
 }

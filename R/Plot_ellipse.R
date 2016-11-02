@@ -1,4 +1,3 @@
-
 #' Plot an ellipse
 #'
 #' Plots an ellipse representing the bivariate predictive inteval
@@ -18,9 +17,8 @@
 #' @param lcol line color for ellipse
 #' @param plot_lines whether to plot lines representing "major axis" and "OLS" regression parameters
 #'
-
 #' @return integer of row numbers of \code{ParentChild_gz} matching \code{genus_species}
-
+#'
 #' @export
 Plot_ellipse = function( Cov, Mean=rep(0,2), add=FALSE, prob=0.95, xlim=log(c(0.01,2)), ylim=xlim, logticks=c(1,2,5), ticks=c(0,5),
   whichlog="xy", main="", xlab="", ylab="", lcol="black", plot_lines=FALSE, ... ){

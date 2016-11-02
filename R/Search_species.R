@@ -9,7 +9,6 @@
 #' @param Genus Character input for taxonomic class
 #' @param Species Character input for taxonomic class
 #' @param add_ancestors Boolean whether to add ancestors for matching species or not
-#' @inheritParams Calculate_ratio
 
 #' This function attempts to do a smart match to elements of \code{ParentChild_gz}.  It sweeps from Order to Species
 #' and ignores any taxonomic input listed as \code{"predictive"} until it finds something else.  It then appends

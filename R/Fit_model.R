@@ -165,6 +165,6 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=Estimate_data
   }
 
   # Return stuff
-  Return = list("N_factors"=N_factors, "N_obsfactors"=N_obsfactors, "Use_REML"=Use_REML, "Cov_gjj"=Cov_gjj, "ParentChild_gz"=ParentChild_gz, "ParHat"=ParHat, "g_i"=g_i, "Y_ij"=Y_ij, "Z_ik"=Z_ik, "Obj"=Obj, "Opt"=Opt, "Report"=Report, "ParHat_SE"=ParHat_SE)
+  Return = list("N_factors"=N_factors, "N_obsfactors"=N_obsfactors, "Use_REML"=Use_REML, "Cov_gjj"=Cov_gjj, "ParentChild_gz"=ParentChild_gz, "ParHat"=ParHat, "g_i"=g_i, "Y_ij"=Y_ij, "Z_ik"=Z_ik, "Obj"=Obj, "Opt"=Opt, "Report"=Report, "ParHat_SE"=ParHat_SE, "obsCov_jj"=Report$obsCov_jj)
   return( Return )
 }
