@@ -139,7 +139,7 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=Estimate_data
   Report = Obj$report()
 
   # Optimize                         #  , startpar=opt$par[-grep("alpha",names(opt$par))]
-  Opt = TMBhelper::Optimize( obj=Obj, savedir=RunDir, getJointPrecision=TRUE ) # jointPrecision is used below, and is too big to invert whole
+  Opt = TMBhelper::Optimize( obj=Obj, savedir=RunDir, getJointPrecision=TRUE, loopnum=3, newtonsteps=3 ) # jointPrecision is used below, and is too big to invert whole
   Report = Obj$report()
 
   # SE
