@@ -60,7 +60,10 @@ Search_species = function( Class="predictive", Order="predictive", Family="predi
   Group = NA
   while( is.na(Group) ){
     Group = match( paste(tolower(match_taxonomy),collapse="_"), tolower(ParentChild_gz[,'ChildName']) )
-    if( is.na(Group) ) match_taxonomy[length(match_taxonomy)-Count+1] = "predictive"
+    if( is.na(Group) ){
+      match_taxonomy[length(match_taxonomy)-Count+1] = "predictive"
+      Count = Count+1
+    }
   }
   message( "Closest match: ", as.character(ParentChild_gz[Group,'ChildName']) )
 
