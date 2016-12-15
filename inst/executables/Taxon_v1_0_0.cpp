@@ -33,7 +33,7 @@ matrix<Type> cov_matrix( vector<Type> L_val, int n_rows, int n_cols ){
   // Diagonal matrix
   if( n_cols<=0 ){
     for(int r=0; r<n_rows; r++){
-      Cov_rr(r,r) = L_val(Count)*L_val(Count);
+      Cov_rr(r,r) += L_val(Count)*L_val(Count);
       Count++;
     }
   }

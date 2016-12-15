@@ -61,6 +61,7 @@ Type objective_function<Type>::operator() ()
   PARAMETER_VECTOR( alpha_j );
   PARAMETER_VECTOR( L_z );
   PARAMETER_VECTOR( obsL_z );
+  PARAMETER_VECTOR( cov_logmult_z ); // log-multiplier for process-error covariance for different taxonomic levels
 
   // Taxonomic random effects
   PARAMETER_MATRIX( beta_gj );
@@ -100,12 +101,14 @@ Type objective_function<Type>::operator() ()
 
   // Probability of random effects
   vector<Type> Tmp_j( n_j );
+  matrix<Type> tmpCov_jj( n_j, n_j );
   for( int g=0; g<n_g; g++ ){
     for( int j=0; j<n_j; j++ ){
       if( PC_gz(g,1)==0 ) Tmp_j(j) = beta_gj(g,j) - alpha_j(j);
       if( PC_gz(g,1)>=1 ) Tmp_j(j) = beta_gj(g,j) - beta_gj(PC_gz(g,0),j);
     }
-    jnll_comp(PC_gz(g,1)) += MVNORM( Cov_jj )( Tmp_j );
+    tmpCov_jj = Cov_jj * exp(cov_logmult_z(PC_gz(g,1)));
+    jnll_comp(PC_gz(g,1)) += MVNORM( tmpCov_jj )( Tmp_j );
   }
 
   // Probability of data
@@ -114,6 +117,7 @@ Type objective_function<Type>::operator() ()
     Yhat_ij.row( i ) = beta_gj.row( g_i(i) );
     jnll_comp(5) += MVNORM( obsCov_jj )( Ycomplete_ij.row(i) - Yhat_ij.row(i) );
   }
+  jnll = jnll_comp.sum();
 
   // Return stuff
   REPORT( obsCov_jj );
@@ -128,6 +132,5 @@ Type objective_function<Type>::operator() ()
   // ADREPORT( beta_gj );
 
   // Return jnll
-  jnll = jnll_comp.sum();
   return jnll;
 }

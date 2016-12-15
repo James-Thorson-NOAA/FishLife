@@ -9,8 +9,12 @@
 #' @param Y_ij a data frame of trait values (perhaps log-scaled) with rows for records, and tagged-columns for traits
 #' @param Z_ik a data frame of taxonomic classification for each row of \code{Y_ij}
 #' @param Version TMB version number
+#' @param Process_cov Whether process-error covariance is equal or differs multiplicatively for different taxonomic levels (Options:  "Equal" or "Unequal")
 #' @param TmbDir Directory containing pre-compiled TMB script
 #' @param RunDir Directory to use when compiling and running TMB script (different to avoid problems with read-write restrictions)
+#' @param Params optional list of parameter estimates to use as starting values (Default \code{Params="Generate"} starts from random values)
+#' @param verbose Boolean whether to print diagnostics to terminal
+#' @param ... other paramers passed to \code{TMBhelper::Optimize}
 
 #' @return Tagged list containing objects from FishTraits run (first 9 slots constitute list 'Estimate_database' for archiving results)
 #' \describe{
@@ -31,7 +35,8 @@
 
 #' @export
 Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=Estimate_database$Y_ij, Z_ik=Estimate_database$Z_ik,
-  Version="Taxon_v1_1_0", TmbDir=system.file("executables",package="FishTraits"), RunDir=tempfile(pattern="run_",tmpdir=tempdir(),fileext="/") ){
+  Version="Taxon_v1_2_0", Process_cov="Equal", TmbDir=system.file("executables",package="FishTraits"),
+  RunDir=tempfile(pattern="run_",tmpdir=tempdir(),fileext="/"), Params="Generate", verbose=FALSE, ... ){
 
   #####################
   # Pre-process data
@@ -103,24 +108,34 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=Estimate_data
 
   # Data
   if(Version%in%"Taxon_v1_0_0") Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors), "Z_ik"=as.matrix(Z_ik)-1, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1)
-  if(Version%in%"Taxon_v1_1_0") Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors), "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=as.matrix(ParentChild_gz[,c('ParentRowNumber','ChildTaxon')])-1, "g_i"=g_i-1)
+  if(Version%in%c("Taxon_v1_2_0","Taxon_v1_1_0")) Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors), "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=as.matrix(ParentChild_gz[,c('ParentRowNumber','ChildTaxon')])-1, "g_i"=g_i-1)
 
   # Parameters
-  rmatrix = function( nrow, ncol, mean=0, sd=1 ) matrix( rnorm(nrow*ncol,mean=mean,sd=sd), nrow=nrow, ncol=ncol )
-  rloadings = function( n_row, n_col ){
-    param = vector(length=0)
-    if( n_col!=0 ) param = c(param, rnorm(sum(n_row:(n_row-abs(n_col)+1))))
-    if( n_col<=0 ) param = c(param, rnorm(n_row))
-    #if( n_row == -1*n_col ) stop("Illogical inputs")
-    return(param)
+  if( Params[1]=="Generate" ){
+    rmatrix = function( nrow, ncol, mean=0, sd=1 ) matrix( rnorm(nrow*ncol,mean=mean,sd=sd), nrow=nrow, ncol=ncol )
+    rloadings = function( n_row, n_col ){
+      param = vector(length=0)
+      if( n_col!=0 ) param = c(param, rnorm(sum(n_row:(n_row-abs(n_col)+1))))
+      if( n_col<=0 ) param = c(param, rnorm(n_row))
+      #if( n_row == -1*n_col ) stop("Illogical inputs")
+      return(param)
+    }
+    if(Version%in%"Taxon_v1_0_0") Params = list( "alpha_j"=rep(0,n_j), "obsL_z"=rloadings(n_row=n_j, n_col=Data$Options_vec['n_obsfactors']), "Y_a"=rnorm(nrow(Data$Missing_az)) )
+    if(Version%in%"Taxon_v1_1_0") Params = list( "alpha_j"=rep(0,n_j), "L_z"=rloadings(n_row=n_j, n_col=Data$Options_vec['n_factors']), "obsL_z"=rloadings(n_row=n_j, n_col=Data$Options_vec['n_obsfactors']), "beta_gj"=rmatrix(nrow=n_g,ncol=n_j), "Y_a"=rnorm(nrow(Data$Missing_az)) )
+    if(Version%in%"Taxon_v1_2_0") Params = list( "alpha_j"=rep(0,n_j), "L_z"=rloadings(n_row=n_j, n_col=Data$Options_vec['n_factors']), "obsL_z"=rloadings(n_row=n_j, n_col=Data$Options_vec['n_obsfactors']), "cov_logmult_z"=rep(0,max(Data$PC_gz[,'ChildTaxon'])+1), "beta_gj"=rmatrix(nrow=n_g,ncol=n_j), "Y_a"=rnorm(nrow(Data$Missing_az)) )
   }
-  if(Version%in%"Taxon_v1_0_0") Params = list( "alpha_j"=rep(0,n_j), "obsL_z"=rloadings(n_row=n_j, n_col=Data$Options_vec['n_obsfactors']), "Y_a"=rnorm(nrow(Data$Missing_az)) )
-  if(Version%in%"Taxon_v1_1_0") Params = list( "alpha_j"=rep(0,n_j), "L_z"=rloadings(n_row=n_j, n_col=Data$Options_vec['n_factors']), "obsL_z"=rloadings(n_row=n_j, n_col=Data$Options_vec['n_obsfactors']), "beta_gj"=rmatrix(nrow=n_g,ncol=n_j), "Y_a"=rnorm(nrow(Data$Missing_az)) )
 
   # Random
   if(Version%in%"Taxon_v1_0_0") Random = c("Y_a")
-  if(Version%in%"Taxon_v1_1_0") Random = c("Y_a", "beta_gj")
+  if(Version%in%c("Taxon_v1_2_0","Taxon_v1_1_0")) Random = c("Y_a", "beta_gj")
   if(Use_REML==TRUE) Random = c(Random, "alpha_j")
+
+  # Map
+  Map = list()
+  if(Version%in%"Taxon_v1_2_0"){
+    if(Process_cov=="Equal") Map[["cov_logmult_z"]] = factor( rep(NA,length(Params[["cov_logmult_z"]])) )
+    if(Process_cov=="Unequal") Map[["cov_logmult_z"]] = factor( c(NA,1:(length(Params[["cov_logmult_z"]])-1)) )
+  }
 
   #####################
   # Build and run
@@ -135,36 +150,53 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=Estimate_data
 
   # Build
   dyn.load( paste0(RunDir,"/",TMB::dynlib(Version)) )          #
-  Obj = MakeADFun( data=Data, parameters=Params, random=Random, DLL=Version )
+  Obj = MakeADFun( data=Data, parameters=Params, random=Random, DLL=Version, map=Map )
   Report = Obj$report()
 
+  # Print to screen
+  if( verbose==TRUE ){
+    print( "Numer of fixed effects:")
+    print( table(names(Obj$par)) )
+    print( "Numer of random effects:")
+    print( table(names(Obj$env$last.par[Obj$env$random])) )
+  }
+
   # Optimize                         #  , startpar=opt$par[-grep("alpha",names(opt$par))]
-  Opt = TMBhelper::Optimize( obj=Obj, savedir=RunDir, getJointPrecision=TRUE, loopnum=3, newtonsteps=3 ) # jointPrecision is used below, and is too big to invert whole
+  Opt = TMBhelper::Optimize( obj=Obj, savedir=RunDir, getJointPrecision=TRUE, ... ) # jointPrecision is used below, and is too big to invert whole
   Report = Obj$report()
 
   # SE
   ParHat = Obj$env$parList()
   ParHat_SE = as.list( Opt$SD, what="Std" )
   colnames(ParHat$beta_gj) = colnames(ParHat_SE$beta_gj) = colnames(Y_ij)
-  dyn.load( paste0(RunDir,"/",TMB::dynlib(Version)) )          #
+  dyn.unload( paste0(RunDir,"/",TMB::dynlib(Version)) )          #
 
   ####################
   # Interpret results
   ####################
-  # Approximate joint precision
-  Prec_zz = Opt$SD$jointPrecision[ grep("beta_gj",names(unlist(Params))), ]
-  Prec_zz = Prec_zz[ , grep("beta_gj",names(unlist(Params))) ]
+
+  ### Approximate joint precision
+  # Extract predictive covariance for species-specific traits (necessary to do separately for rows and columns)
+  Prec_zz = Opt$SD$jointPrecision[ , grep("beta_gj",colnames(Opt$SD$jointPrecision)) ]
+    Prec_zz = Prec_zz[ grep("beta_gj",rownames(Opt$SD$jointPrecision)), ]
+  # Extract and invert
   PartialCorr_gjj = Corr_gjj = Cov_gjj = Prec_gjj = array(NA, dim=c(n_g,n_j,n_j), dimnames=list(ParentChild_gz[,'ChildName'],colnames(Y_ij),colnames(Y_ij)) )
   for( gI in 1:n_g ){
+    # Extract precision for species and ancestors
     Indices = as.vector( outer(seq(1,n_g*8,by=n_g)-1, Find_ancestors(child_num=gI, ParentChild_gz=ParentChild_gz), FUN="+") )
     Full_Precision = matrix(Prec_zz[Indices,Indices],length(Indices),length(Indices))
+    # Record
     Prec_gjj[gI,,] = Full_Precision[1:n_j,1:n_j]
     PartialCorr_gjj[gI,,] = -1*cov2cor( Prec_gjj[gI,,] )
+    # Invert approximate cov and corr
     Cov_gjj[gI,,] = solve( Full_Precision )[1:n_j,1:n_j]
     Corr_gjj[gI,,] = cov2cor( Cov_gjj[gI,,] )
   }
 
   # Return stuff
   Return = list("N_factors"=N_factors, "N_obsfactors"=N_obsfactors, "Use_REML"=Use_REML, "Cov_gjj"=Cov_gjj, "ParentChild_gz"=ParentChild_gz, "ParHat"=ParHat, "g_i"=g_i, "Y_ij"=Y_ij, "Z_ik"=Z_ik, "Obj"=Obj, "Opt"=Opt, "Report"=Report, "ParHat_SE"=ParHat_SE, "obsCov_jj"=Report$obsCov_jj)
+  if(Version %in% c("Taxon_v1_1_0","Taxon_v1_0_0")) Return = c(Return, list("obsCov_jj"=Report$obsCov_jj, "Cov_jj"=Report$Cov_jj))
+  if(Version %in% c("Taxon_v1_2_0")) Return = c(Return, list("obsCov_jj"=Report$obsCov_jj, "Cov_jjz"=Report$Cov_jj %o% exp(ParHat$cov_logmult_z)))
+
   return( Return )
 }
