@@ -183,7 +183,7 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=Estimate_data
   PartialCorr_gjj = Corr_gjj = Cov_gjj = Prec_gjj = array(NA, dim=c(n_g,n_j,n_j), dimnames=list(ParentChild_gz[,'ChildName'],colnames(Y_ij),colnames(Y_ij)) )
   for( gI in 1:n_g ){
     # Extract precision for species and ancestors
-    Indices = as.vector( outer(seq(1,n_g*8,by=n_g)-1, Find_ancestors(child_num=gI, ParentChild_gz=ParentChild_gz), FUN="+") )
+    Indices = as.vector( outer(seq(1,n_g*n_j,by=n_g)-1, Find_ancestors(child_num=gI, ParentChild_gz=ParentChild_gz), FUN="+") )
     Full_Precision = matrix(Prec_zz[Indices,Indices],length(Indices),length(Indices))
     # Record
     Prec_gjj[gI,,] = Full_Precision[1:n_j,1:n_j]
