@@ -39,6 +39,15 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=Estimate_data
   RunDir=tempfile(pattern="run_",tmpdir=tempdir(),fileext="/"), Params="Generate", verbose=FALSE, ... ){
 
   #####################
+  # Check for potential problems
+  #####################
+
+  # Code uses "_" so throw error if included in names
+  if( any(apply(Z_ik, MARGIN=2, FUN=function(vec){length(grep("_",vec))})>0) ){
+    stop("Please do not use character '_' in names included in 'Z_ik'")
+  }
+
+  #####################
   # Pre-process data
   #####################
 
@@ -115,14 +124,18 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=Estimate_data
     rmatrix = function( nrow, ncol, mean=0, sd=1 ) matrix( rnorm(nrow*ncol,mean=mean,sd=sd), nrow=nrow, ncol=ncol )
     rloadings = function( n_row, n_col ){
       param = vector(length=0)
-      if( n_col!=0 ) param = c(param, rnorm(sum(n_row:(n_row-abs(n_col)+1))))
-      if( n_col<=0 ) param = c(param, rnorm(n_row))
-      #if( n_row == -1*n_col ) stop("Illogical inputs")
+      if( is.na(n_col) ){
+        param = c(param, rep(0.0001,n_row))
+      }else{
+        if( n_col!=0 ) param = c(param, rnorm(sum(n_row:(n_row-abs(n_col)+1))))
+        if( n_col<=0 ) param = c(param, rnorm(n_row))
+        #if( n_row == -1*n_col ) stop("Illogical inputs")
+      }
       return(param)
     }
     if(Version%in%"Taxon_v1_0_0") Params = list( "alpha_j"=rep(0,n_j), "obsL_z"=rloadings(n_row=n_j, n_col=Data$Options_vec['n_obsfactors']), "Y_a"=rnorm(nrow(Data$Missing_az)) )
     if(Version%in%"Taxon_v1_1_0") Params = list( "alpha_j"=rep(0,n_j), "L_z"=rloadings(n_row=n_j, n_col=Data$Options_vec['n_factors']), "obsL_z"=rloadings(n_row=n_j, n_col=Data$Options_vec['n_obsfactors']), "beta_gj"=rmatrix(nrow=n_g,ncol=n_j), "Y_a"=rnorm(nrow(Data$Missing_az)) )
-    if(Version%in%"Taxon_v1_2_0") Params = list( "alpha_j"=rep(0,n_j), "L_z"=rloadings(n_row=n_j, n_col=Data$Options_vec['n_factors']), "obsL_z"=rloadings(n_row=n_j, n_col=Data$Options_vec['n_obsfactors']), "cov_logmult_z"=rep(0,max(Data$PC_gz[,'ChildTaxon'])+1), "beta_gj"=rmatrix(nrow=n_g,ncol=n_j), "Y_a"=rnorm(nrow(Data$Missing_az)) )
+    if(Version%in%c("Taxon_v1_2_0")) Params = list( "alpha_j"=rep(0,n_j), "L_z"=rloadings(n_row=n_j, n_col=Data$Options_vec['n_factors']), "obsL_z"=rloadings(n_row=n_j, n_col=Data$Options_vec['n_obsfactors']), "cov_logmult_z"=rep(0,max(Data$PC_gz[,'ChildTaxon'])+1), "beta_gj"=rmatrix(nrow=n_g,ncol=n_j), "Y_a"=rnorm(nrow(Data$Missing_az)) )
   }
 
   # Random
@@ -132,9 +145,17 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=Estimate_data
 
   # Map
   Map = list()
-  if(Version%in%"Taxon_v1_2_0"){
+  if(Version%in%c("Taxon_v1_2_0")){
     if(Process_cov=="Equal") Map[["cov_logmult_z"]] = factor( rep(NA,length(Params[["cov_logmult_z"]])) )
     if(Process_cov=="Unequal") Map[["cov_logmult_z"]] = factor( c(NA,1:(length(Params[["cov_logmult_z"]])-1)) )
+  }
+  if(is.na(Data$Options_vec['n_obsfactors'])){
+    Map[["obsL_z"]] = factor( rep(NA,length(Params[["obsL_z"]])) )
+  }
+
+  # Change
+  if( is.na(Data$Options_vec[1]) ){
+    Data$Options_vec[1] = 0
   }
 
   #####################
@@ -195,8 +216,12 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=Estimate_data
 
   # Return stuff
   Return = list("N_factors"=N_factors, "N_obsfactors"=N_obsfactors, "Use_REML"=Use_REML, "Cov_gjj"=Cov_gjj, "ParentChild_gz"=ParentChild_gz, "ParHat"=ParHat, "g_i"=g_i, "Y_ij"=Y_ij, "Z_ik"=Z_ik, "Obj"=Obj, "Opt"=Opt, "Report"=Report, "ParHat_SE"=ParHat_SE, "obsCov_jj"=Report$obsCov_jj)
+  dimnames(Return$obsCov_jj) = list(colnames(Y_ij),colnames(Y_ij))
   if(Version %in% c("Taxon_v1_1_0","Taxon_v1_0_0")) Return = c(Return, list("obsCov_jj"=Report$obsCov_jj, "Cov_jj"=Report$Cov_jj))
-  if(Version %in% c("Taxon_v1_2_0")) Return = c(Return, list("obsCov_jj"=Report$obsCov_jj, "Cov_jjz"=Report$Cov_jj %o% exp(ParHat$cov_logmult_z)))
+  if(Version %in% c("Taxon_v1_2_0")){
+    Return = c(Return, list("obsCov_jj"=Report$obsCov_jj, "Cov_jjz"=Report$Cov_jj %o% exp(ParHat$cov_logmult_z)))
+    dimnames(Return$Cov_jjz) = list(colnames(Y_ij),colnames(Y_ij),colnames(Z_ik))
+  }
 
   return( Return )
 }
