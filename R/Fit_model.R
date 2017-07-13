@@ -162,6 +162,11 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=Estimate_data
   # Build and run
   #####################
 
+  Test = require(TMB, quietly=TRUE)
+  if( Test==FALSE ){
+    stop("Please install package `TMB` from CRAN")
+  }
+
   # Compile TMB software
   #dyn.unload( paste0(RunDir,"/",dynlib(TMB:::getUserDLL())) ) # random=Random,
   dir.create( RunDir )

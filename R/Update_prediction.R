@@ -67,6 +67,11 @@ Update_prediction = function( Taxon, Ynew_ij, partial_match=TRUE, verbose=FALSE,
   # Build and run
   #####################
 
+  Test = require(TMB, quietly=TRUE)
+  if( Test==FALSE ){
+    stop("Please install package `TMB` from CRAN")
+  }
+
   # Compile TMB software
   dir.create( RunDir )
   #dyn.unload( paste0(RunDir,"/",TMB::dynlib(Version)) )          #

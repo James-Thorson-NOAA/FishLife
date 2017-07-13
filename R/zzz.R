@@ -4,8 +4,8 @@
 
 .onAttach <- function(libname, pkgname) {
   packageStartupMessage("###########################################################################################")
-  packageStartupMessage("Loading package FishTraits, developed by James Thorson for the Northwest Fisheries Science Center")
-  packageStartupMessage("For details and citation guidance, please see http://github.com/james-thorson/FishTraits/")
+  packageStartupMessage("Loading package FishLife, developed by James Thorson for the Northwest Fisheries Science Center")
+  packageStartupMessage("For details and citation guidance, please see http://github.com/james-thorson/FishLife/")
   packageStartupMessage("###########################################################################################")
 
   if( !"ThorsonUtilities" %in% utils::installed.packages()[,1] ){

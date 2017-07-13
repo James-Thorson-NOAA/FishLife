@@ -1,11 +1,11 @@
-Package: FishTraits
+Package: FishLife
 Type: Package
 Title: Predictive life history traits for any marine fish
-Version: 1.1.0
-Date: 2016-08-09
+Version: 1.0.1
+Date: 2017-07-13
 Author: James Thorson
 Maintainer: James Thorson <James.Thorson@noaa.gov>
-Description: FishTraits is an R package for estimating life history traits
+Description: FishLife is an R package for estimating life history traits
     from a multivariate random-walk process on a taxonomic tree.  It then 
     predicts traits for any marine fish scientific (Genus-species) name.
 Imports:
@@ -13,16 +13,16 @@ Imports:
     utils,
     stats,
     devtools,
-    TMB,
     shape,
     rfishbase
 Depends:
     R (>= 3.1.0),
 Suggests:
+    TMB,
     testthat
 License: GPL-2
 LazyData: yes
 BuildVignettes: yes
 RoxygenNote: 5.0.1
-URL: http://github.com/James-Thorson/FishTraits
-BugReports: http://github.com/James-Thorson/Thorson/FishTraits/issues
+URL: http://github.com/James-Thorson/FishLife
+BugReports: http://github.com/James-Thorson/Thorson/FishLife/issues
