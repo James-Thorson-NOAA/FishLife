@@ -3,6 +3,10 @@ Estimate fish traits for all marine fish species globally
 
 [![DOI](https://zenodo.org/badge/67250650.svg)](https://zenodo.org/badge/latestdoi/67250650)
 
+# Visualize predictions
+
+A graphical user interface (GUI) is available [online](https://james-thorson.shinyapps.io/FishLife/)
+
 # Example usage
 
 ### Load the package
