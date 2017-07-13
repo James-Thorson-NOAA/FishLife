@@ -25,7 +25,7 @@ Plot_trait = function( Taxon, params=c('K','M'), Cov_gjj=Estimate_database$Cov_g
   if(verbose==TRUE) print( ParentChild_gz[Which,] )
 
   # Plot ellipse
-  Plot_ellipse( Cov=Cov_gjj[Which,params,params], Mean=Mean_gj[Which,params], add=add, whichlog=paste(c("x","y")["Temperature"!=params],collapse=""), xlim=xlim, ylim=ylim, main=main, xlab=xlab, lcol=lcol, plot_lines=plot_lines, ticks=ticks, logticks=logticks, ... )
+  Plot_ellipse( Cov=Cov_gjj[Which,params,params], Mean=Mean_gj[Which,params], add=add, whichlog=paste(c("x","y")["Temperature"!=params],collapse=""), xlim=xlim, ylim=ylim, main=main, xlab=xlab, lcol=lcol, plot_lines=plot_lines, ticks=ticks, logticks=logticks, prob=prob, ... )
 
   # Plot observations
   if( !is.null(SpeciesMatch) ){
