@@ -1,4 +1,4 @@
-# FishTraits
+# FishLife
 Estimate fish traits for all marine fish species globally
 
 [![DOI](https://zenodo.org/badge/67250650.svg)](https://zenodo.org/badge/latestdoi/67250650)
@@ -8,8 +8,8 @@ Estimate fish traits for all marine fish species globally
 ### Load the package
 ```R
 # Install and load package
-devtools::install_github("james-thorson/FishTraits")
-library( FishTraits )
+devtools::install_github("james-thorson/FishLife")
+library( FishLife )
 Estimate_database = Load_previous_results()
 ```
 
