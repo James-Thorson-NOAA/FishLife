@@ -1,6 +1,6 @@
 library(shiny)
 
-library(FishTraits)
+library(FishLife)
 Estimate_database = Load_previous_results()
 
 # Function containing things to display

@@ -30,7 +30,7 @@
 #' used instead by saving hte output of \code{Fit_model} to object \code{Estimate_database}.
 
 #' @export
-Load_previous_results = function( results_dir=system.file("extdata",package="FishTraits") ){
+Load_previous_results = function( results_dir=system.file("extdata",package="FishLife") ){
   # Load existing dataabase
   message("###########################################################################################")
   message("Loading results from model run: list 'Estimate_database'")

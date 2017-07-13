@@ -32,10 +32,10 @@
 # http://stackoverflow.com/questions/20637248/shiny-4-small-textinput-boxes-side-by-side
 
 # REAL VERSION -- DO NOT USE FOR TESTING
-setwd( "C:/Users/James.Thorson/Desktop/Project_git/FishTraits/Shiny_FishTraits" )
+setwd( "C:/Users/James.Thorson/Desktop/Project_git/FishLife/shiny" )
 
 # DEVELOPMENT VERSION -- USE FOR TESTING
-setwd( "C:/Users/James.Thorson/Desktop/Project_git/FishTraits/Shiny_FishTraits/testing" )
+setwd( "C:/Users/James.Thorson/Desktop/Project_git/FishLife/shiny/testing" )
 
 ##############
 # Test locally
@@ -50,4 +50,4 @@ runApp()
 #  .. currently working with Revolution Open R v3.2.2
 ##############
 library(rsconnect)
-deployApp()
+deployApp( appName="FishLife" )
