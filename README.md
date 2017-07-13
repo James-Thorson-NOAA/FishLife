@@ -1,6 +1,8 @@
 # FishTraits
 Estimate fish traits for all marine fish species globally
 
+[![DOI](https://zenodo.org/badge/67250650.svg)](https://zenodo.org/badge/latestdoi/67250650)
+
 # Example usage
 
 ### Load the package
@@ -53,4 +55,14 @@ Then run an updating function
 library(TMB)
 Update = Update_prediction( Taxon=Search_species(Genus="Sebastes",Species="cortezi",add_ancestors=FALSE)$match_taxonomy, Ynew_ij=Ynew_ij)
 ```
+
+Description of package
+=============
+### Please cite if using the software
+* Thorson, J. T., S. B. Munch, J. M. Cope, and J. Gao. In press. Predicting life history parameters for all fishes worldwide. Ecological Applications.
+
+Further reading
+=============
+### Evaluating accuracy of data and life-history predictions in FishBase
+* Thorson, J. T., J. M. Cope, and W. S. Patrick. 2014. Assessing the quality of life history information in publicly available databases. Ecological Applications 24:217–226.
 
