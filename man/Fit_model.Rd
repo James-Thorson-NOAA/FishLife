@@ -6,9 +6,10 @@
 \usage{
 Fit_model(N_factors, N_obsfactors, Use_REML = TRUE,
   Y_ij = Estimate_database$Y_ij, Z_ik = Estimate_database$Z_ik,
-  Version = "Taxon_v1_1_0", TmbDir = system.file("executables", package =
-  "FishTraits"), RunDir = tempfile(pattern = "run_", tmpdir = tempdir(),
-  fileext = "/"))
+  Version = "Taxon_v1_2_0", Process_cov = "Equal",
+  TmbDir = system.file("executables", package = "FishLife"),
+  RunDir = tempfile(pattern = "run_", tmpdir = tempdir(), fileext = "/"),
+  Params = "Generate", verbose = FALSE, ...)
 }
 \arguments{
 \item{N_factors}{Number of factors in decomposition of covariance for random-walk along evolutionary tree (0 means a diagonal but unequal covariance; negative is the sum of a factor decomposition and a diagonal-but-unequal covariance)}
@@ -23,12 +24,20 @@ Fit_model(N_factors, N_obsfactors, Use_REML = TRUE,
 
 \item{Version}{TMB version number}
 
+\item{Process_cov}{Whether process-error covariance is equal or differs multiplicatively for different taxonomic levels (Options:  "Equal" or "Unequal")}
+
 \item{TmbDir}{Directory containing pre-compiled TMB script}
 
 \item{RunDir}{Directory to use when compiling and running TMB script (different to avoid problems with read-write restrictions)}
+
+\item{Params}{optional list of parameter estimates to use as starting values (Default \code{Params="Generate"} starts from random values)}
+
+\item{verbose}{Boolean whether to print diagnostics to terminal}
+
+\item{...}{other paramers passed to \code{TMBhelper::Optimize}}
 }
 \value{
-Tagged list containing objects from FishTraits run (first 9 slots constitute list 'Estimate_database' for archiving results)
+Tagged list containing objects from FishLife run (first 9 slots constitute list 'Estimate_database' for archiving results)
 \describe{
   \item{N_factors}{\code{N_factors} from run}
   \item{N_obsfactors}{\code{N_obsfactors} from run}

@@ -48,6 +48,8 @@ Plot_trait(Taxon, params = c("K", "M"), Cov_gjj = Estimate_database$Cov_gjj,
 \item{ticks}{ticks to use if plotting on a natural-scale}
 
 \item{logticks}{ticks to use if plotting on a log-scale}
+
+\item{...}{other paramers passed to \code{TMBhelper::Optimize}}
 }
 \description{
 Plots predictive interval for a given taxon and trait-pair

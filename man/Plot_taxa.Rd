@@ -43,9 +43,11 @@ Plot_taxa(Taxa, prob = 0.95, params = matrix(c("K", "M", "Winfinity", "Loo",
 
 \item{legendnum}{which panel to use for legend}
 
-\item{verbose}{Boolean whether to print name matches or not}
+\item{verbose}{Boolean whether to print diagnostics to terminal}
 
 \item{plot_lines}{whether to plot lines representing "major axis" and "OLS" regression parameters}
+
+\item{...}{other paramers passed to \code{TMBhelper::Optimize}}
 }
 \description{
 Plots bivariate predictive intervals for specified parameters and taxa

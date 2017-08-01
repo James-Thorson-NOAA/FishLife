@@ -20,7 +20,7 @@
 #' @export
 Update_prediction = function( Taxon, Ynew_ij, partial_match=TRUE, verbose=FALSE, ParentChild_gz=Estimate_database$ParentChild_gz,
   Cov_gjj=Estimate_database$Cov_gjj, Mean_gj=Estimate_database$ParHat$beta_gj, obsCov_jj=Estimate_database$obsCov_jj,
-  Version="Update_v1_0_0", TmbDir=system.file("executables",package="FishTraits"), RunDir=tempfile(pattern="run_",tmpdir=tempdir(),fileext="/")){
+  Version="Update_v1_0_0", TmbDir=system.file("executables",package="FishLife"), RunDir=tempfile(pattern="run_",tmpdir=tempdir(),fileext="/")){
 
   # Match taxon
   if(partial_match==TRUE) Which = grep(Taxon, ParentChild_gz[,'ChildName'])

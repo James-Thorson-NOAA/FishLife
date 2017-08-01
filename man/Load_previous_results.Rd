@@ -5,7 +5,7 @@
 \title{Load previous results}
 \usage{
 Load_previous_results(results_dir = system.file("extdata", package =
-  "FishTraits"))
+  "FishLife"))
 }
 \arguments{
 \item{results_dir}{Directory containing object \code{Estimate_database.RData}, archiving previous results

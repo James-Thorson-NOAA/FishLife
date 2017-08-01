@@ -16,7 +16,7 @@
 #' @param verbose Boolean whether to print diagnostics to terminal
 #' @param ... other paramers passed to \code{TMBhelper::Optimize}
 
-#' @return Tagged list containing objects from FishTraits run (first 9 slots constitute list 'Estimate_database' for archiving results)
+#' @return Tagged list containing objects from FishLife run (first 9 slots constitute list 'Estimate_database' for archiving results)
 #' \describe{
 #'   \item{N_factors}{\code{N_factors} from run}
 #'   \item{N_obsfactors}{\code{N_obsfactors} from run}
@@ -35,7 +35,7 @@
 
 #' @export
 Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=Estimate_database$Y_ij, Z_ik=Estimate_database$Z_ik,
-  Version="Taxon_v1_2_0", Process_cov="Equal", TmbDir=system.file("executables",package="FishTraits"),
+  Version="Taxon_v1_2_0", Process_cov="Equal", TmbDir=system.file("executables",package="FishLife"),
   RunDir=tempfile(pattern="run_",tmpdir=tempdir(),fileext="/"), Params="Generate", verbose=FALSE, ... ){
 
   #####################

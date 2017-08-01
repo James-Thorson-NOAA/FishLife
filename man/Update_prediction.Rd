@@ -9,13 +9,16 @@ Update_prediction(Taxon, Ynew_ij, partial_match = TRUE, verbose = FALSE,
   Cov_gjj = Estimate_database$Cov_gjj,
   Mean_gj = Estimate_database$ParHat$beta_gj,
   obsCov_jj = Estimate_database$obsCov_jj, Version = "Update_v1_0_0",
-  TmbDir = system.file("executables", package = "FishTraits"),
+  TmbDir = system.file("executables", package = "FishLife"),
   RunDir = tempfile(pattern = "run_", tmpdir = tempdir(), fileext = "/"))
 }
 \arguments{
 \item{Ynew_ij}{a data frame of new trait values (perhaps log-scaled) with rows for records, and tagged-columns for traits}
 
-\item{obsCov_jj}{a matrix of the observation covariance for new data}
+\item{obsCov_jj}{a matrix of the observation covariance for new data
+
+This function allows the user to update predictions using new data from one or more studies.  A study for a single parameter is entered as a new
+row of \code{Ynew_ij}, where all elements are \code{NA} except for the parameter of interest.}
 }
 \value{
 Tagged list containing old and new distribution for the \code{Taxon}
