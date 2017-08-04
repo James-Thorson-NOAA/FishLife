@@ -1,8 +1,8 @@
 Package: FishLife
 Type: Package
 Title: Predictive life history traits for any marine fish
-Version: 1.0.1
-Date: 2017-07-13
+Version: 1.0.2
+Date: 2017-08-04
 Author: James Thorson
 Maintainer: James Thorson <James.Thorson@noaa.gov>
 Description: FishLife is an R package for estimating life history traits
@@ -20,7 +20,7 @@ Depends:
 Suggests:
     TMB,
     testthat
-License: GPL-2
+License: GPL-3
 LazyData: yes
 BuildVignettes: yes
 RoxygenNote: 5.0.1
