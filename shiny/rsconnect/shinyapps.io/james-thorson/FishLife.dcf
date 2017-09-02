@@ -2,6 +2,6 @@ name: FishLife
 account: james-thorson
 server: shinyapps.io
 appId: 196624
-bundleId: 902840
+bundleId: 902851
 url: https://james-thorson.shinyapps.io/FishLife/
-when: 1499967130.10081
+when: 1499967569.70177

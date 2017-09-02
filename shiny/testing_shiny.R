@@ -42,6 +42,9 @@ setwd( "C:/Users/James.Thorson/Desktop/Project_git/FishLife/shiny/testing" )
 ##############
 library(shiny)
 runApp()
+#library(FishLife)
+#Search_species( Class="actinopterygii", Order="acipenseriformes", Family="acipenseridae", Genus="acipenser", Species="baerii", add_ancestors=TRUE, ParentChild_gz=Estimate_database$ParentChild_gz )
+#Search_species( Genus="acipenser", Species="baerii", add_ancestors=TRUE, ParentChild_gz=Estimate_database$ParentChild_gz )
 
 ##############
 # Push to server

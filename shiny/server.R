@@ -2,28 +2,32 @@ library(shiny)
 
 library(FishLife)
 Estimate_database = Load_previous_results()
+library(rfishbase)
 
 # Function containing things to display
 function(input, output, session){
 
   #### Dynamic user inputs
   # The following reactive function returns orders from a selected class
-  order_subset <- reactive({ sort(unique(Estimate_database$Z_ik[which(Estimate_database$Z_ik[,'Class']==input$Class),'Order'])) })
+  order_subset <- reactive({ sort(unique(fishbase$Order[which(fishbase$Class==input$Class)])) })
   output$orderSelex <- renderUI({
     selectInput(inputId="Order", label="Taxonomic order", choices=order_subset(), multiple=FALSE, selected=order_subset()[1])
   })
   # The following reactive function returns family from a selected order
-  family_subset <- reactive({ sort(unique(Estimate_database$Z_ik[which(Estimate_database$Z_ik[,'Class']==input$Class & Estimate_database$Z_ik[,'Order']==input$Order),'Family'])) })
+  #family_subset <- reactive({ sort(unique(Estimate_database$Z_ik[which(Estimate_database$Z_ik[,'Class']==input$Class & Estimate_database$Z_ik[,'Order']==input$Order),'Family'])) })
+  family_subset <- reactive({ sort(unique(fishbase$Family[which(fishbase$Class==input$Class & fishbase$Order==input$Order)])) })
   output$familySelex <- renderUI({
     selectInput(inputId="Family", label="Family", choices=family_subset(), multiple=FALSE, selected=family_subset()[1])
   })
   # The following reactive function returns genus from a selected fanily
-  genus_subset <- reactive({ sort(unique(Estimate_database$Z_ik[which(Estimate_database$Z_ik[,'Order']==input$Order & Estimate_database$Z_ik[,'Family']==input$Family),'Genus'])) })
+  #genus_subset <- reactive({ sort(unique(Estimate_database$Z_ik[which(Estimate_database$Z_ik[,'Order']==input$Order & Estimate_database$Z_ik[,'Family']==input$Family),'Genus'])) })
+  genus_subset <- reactive({ sort(unique(fishbase$Genus[which(fishbase$Order==input$Order & fishbase$Family==input$Family)])) })
   output$genusSelex <- renderUI({
     selectInput(inputId="Genus", label="Genus", choices=genus_subset(), multiple=FALSE, selected=genus_subset()[1])
   })
   # The following reactive function returns species from a selected genus
-  species_subset <- reactive({ sort(unique(Estimate_database$Z_ik[which(Estimate_database$Z_ik[,'Family']==input$Family & Estimate_database$Z_ik[,'Genus']==input$Genus),'Species'])) })
+  #species_subset <- reactive({ sort(unique(Estimate_database$Z_ik[which(Estimate_database$Z_ik[,'Family']==input$Family & Estimate_database$Z_ik[,'Genus']==input$Genus),'Species'])) })
+  species_subset <- reactive({ sort(unique(fishbase$Species[which(fishbase$Family==input$Family & fishbase$Genus==input$Genus)])) })
   output$speciesSelex <- renderUI({
     selectInput(inputId="Species", label="Species", choices=species_subset(), multiple=FALSE, selected=species_subset()[1])
   })

@@ -2,6 +2,7 @@ library(shiny)
 
 library(FishLife)
 Estimate_database = Load_previous_results()
+library(rfishbase)
 
 # Load stuff
 # Page for user interface
@@ -24,7 +25,7 @@ fluidPage(
     #textInput(inputId="Family", label="Taxonomic family", value = "Predictive"),
     #textInput(inputId="Genus", label="Taxonomic genus", value = "Predictive"),
     #textInput(inputId="Species", label="Taxonomic species", value = "Predictive")
-    selectInput(inputId="Class", label="Taxonomic class", choices=sort(unique(Estimate_database$Z_ik[,'Class'])), multiple=FALSE, selected="Actinopterygii"),
+    selectInput(inputId="Class", label="Taxonomic class", choices=sort(unique(fishbase$Class)), multiple=FALSE, selected="Actinopterygii"),
     uiOutput("orderSelex"),
     uiOutput("familySelex"),
     uiOutput("genusSelex"),

@@ -24,11 +24,11 @@ Search_species = function( Class="predictive", Order="predictive", Family="predi
   # Match full taxonomy from fishbase
   data( fishbase, package="rfishbase")
   Match = 1:nrow(fishbase)
-  if( Class!="predictive" ) Match = Match[ which(tolower(fishbase[Match,'Class'])==tolower(Class)) ]
-  if( Order!="predictive" ) Match = Match[ which(tolower(fishbase[Match,'Order'])==tolower(Order)) ]
-  if( Family!="predictive" ) Match = Match[ which(tolower(fishbase[Match,'Family'])==tolower(Family)) ]
-  if( Genus!="predictive" ) Match = Match[ which(tolower(fishbase[Match,'Genus'])==tolower(Genus)) ]
-  if( Species!="predictive" ) Match = Match[ which(tolower(fishbase[Match,'Species'])==tolower(Species)) ]
+  if( Class!="predictive" ) Match = Match[ which(tolower(fishbase$Class[Match])==tolower(Class)) ]
+  if( Order!="predictive" ) Match = Match[ which(tolower(fishbase$Order[Match])==tolower(Order)) ]
+  if( Family!="predictive" ) Match = Match[ which(tolower(fishbase$Family[Match])==tolower(Family)) ]
+  if( Genus!="predictive" ) Match = Match[ which(tolower(fishbase$Genus[Match])==tolower(Genus)) ]
+  if( Species!="predictive" ) Match = Match[ which(tolower(fishbase$Species[Match])==tolower(Species)) ]
   if( length(Match)==0 ) stop( paste("Inputs not found in FishBase, please check spelling of",tolower(Class),tolower(Order),tolower(Family),tolower(Genus),tolower(Species)) )
 
   # add missing taxonomic levels from FishBase if uniquely defined (and throw error if not)
