@@ -14,7 +14,6 @@ A graphical user interface (GUI) is available [online](https://james-thorson.shi
 # Install and load package
 devtools::install_github("james-thorson/FishLife")
 library( FishLife )
-Estimate_database = Load_previous_results()
 ```
 
 ### Get predictions for a given taxon
