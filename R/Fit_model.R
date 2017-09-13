@@ -1,4 +1,3 @@
-
 #' Fit and predict fish traits
 #'
 #' \code{Fit_model} estimates parameters and predicts values from a multivariate random-walk model for fish traits
@@ -15,7 +14,7 @@
 #' @param Params optional list of parameter estimates to use as starting values (Default \code{Params="Generate"} starts from random values)
 #' @param verbose Boolean whether to print diagnostics to terminal
 #' @param ... other paramers passed to \code{TMBhelper::Optimize}
-
+#'
 #' @return Tagged list containing objects from FishLife run (first 9 slots constitute list 'Estimate_database' for archiving results)
 #' \describe{
 #'   \item{N_factors}{\code{N_factors} from run}
@@ -32,7 +31,7 @@
 #'   \item{Report}{tagged list of report-file from TMB}
 #'   \item{ParHat_SE}{Estimated/predicted standard errors for fixed/random effects}
 #' }
-
+#'
 #' @export
 Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=Estimate_database$Y_ij, Z_ik=Estimate_database$Z_ik,
   Version="Taxon_v1_2_0", Process_cov="Equal", TmbDir=system.file("executables",package="FishLife"),

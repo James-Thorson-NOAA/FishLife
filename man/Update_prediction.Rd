@@ -13,12 +13,27 @@ Update_prediction(Taxon, Ynew_ij, partial_match = TRUE, verbose = FALSE,
   RunDir = tempfile(pattern = "run_", tmpdir = tempdir(), fileext = "/"))
 }
 \arguments{
-\item{Ynew_ij}{a data frame of new trait values (perhaps log-scaled) with rows for records, and tagged-columns for traits}
+\item{Taxon}{Boolean, whether to require a partial match to a taxon-name \code{partial_match=TRUE} , or an exact match \code{partial_match=FALSE}}
 
-\item{obsCov_jj}{a matrix of the observation covariance for new data
+\item{Ynew_ij}{a data frame of new trait values, perhaps log-scaled, with rows for records and tagged-columns for traits}
 
-This function allows the user to update predictions using new data from one or more studies.  A study for a single parameter is entered as a new
-row of \code{Ynew_ij}, where all elements are \code{NA} except for the parameter of interest.}
+\item{partial_match}{Boolean, whether to require a partial match to a taxon-name \code{partial_match=TRUE} , or an exact match \code{partial_match=FALSE}}
+
+\item{verbose}{Boolean whether to print diagnostics to terminal}
+
+\item{ParentChild_gz}{vector providing index of parent-taxon for every child-taxa}
+
+\item{Cov_gjj}{Array of estimated covariance for each taxonomic group \code{g} and trait \code{j}}
+
+\item{Mean_gj}{Matrix of Empirical Bayes predictions of traits for each taxonomic group}
+
+\item{obsCov_jj}{a matrix of the observation covariance for new data}
+
+\item{Version}{TMB version number}
+
+\item{TmbDir}{Directory containing pre-compiled TMB script}
+
+\item{RunDir}{Directory to use when compiling and running TMB script (different to avoid problems with read-write restrictions)}
 }
 \value{
 Tagged list containing old and new distribution for the \code{Taxon}
@@ -31,5 +46,9 @@ Tagged list containing old and new distribution for the \code{Taxon}
 }
 \description{
 Combines the taxonomic predictions from FishBase with new user-supplied data
+}
+\details{
+This function allows the user to update predictions using new data from one or more studies.  A study for a single parameter is entered as a new
+row of \code{Ynew_ij}, where all elements are \code{NA} except for the parameter of interest.
 }
 

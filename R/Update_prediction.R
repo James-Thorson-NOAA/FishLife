@@ -1,13 +1,18 @@
-
 #' Update predictions with new data
 #'
 #' Combines the taxonomic predictions from FishBase with new user-supplied data
 #'
-#' @param Ynew_ij a data frame of new trait values (perhaps log-scaled) with rows for records, and tagged-columns for traits
-#' @param obsCov_jj a matrix of the observation covariance for new data
-#'
 #' This function allows the user to update predictions using new data from one or more studies.  A study for a single parameter is entered as a new
 #' row of \code{Ynew_ij}, where all elements are \code{NA} except for the parameter of interest.
+#'
+#' @param Ynew_ij a data frame of new trait values, perhaps log-scaled, with rows for records and tagged-columns for traits
+#' @param obsCov_jj a matrix of the observation covariance for new data
+#' @param partial_match Boolean, whether to require a partial match to a taxon-name \code{partial_match=TRUE} , or an exact match \code{partial_match=FALSE}
+#' @param Taxon Boolean, whether to require a partial match to a taxon-name \code{partial_match=TRUE} , or an exact match \code{partial_match=FALSE}
+#' @inheritParams Plot_ellipse
+#' @inheritParams Fit_model
+#' @inheritParams Search_species
+#' @inheritParams Calculate_ratio
 #'
 #' @return Tagged list containing old and new distribution for the \code{Taxon}
 #' \describe{
@@ -16,7 +21,7 @@
 #'   \item{updateMean_j}{Updated mean after assimilating new information in \code{Ynew_ij}}
 #'   \item{updateCov_jj}{Updated covariance after assimilating new information in \code{Ynew_ij}}
 #' }
-
+#'
 #' @export
 Update_prediction = function( Taxon, Ynew_ij, partial_match=TRUE, verbose=FALSE, ParentChild_gz=Estimate_database$ParentChild_gz,
   Cov_gjj=Estimate_database$Cov_gjj, Mean_gj=Estimate_database$ParHat$beta_gj, obsCov_jj=Estimate_database$obsCov_jj,
