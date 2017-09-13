@@ -3,7 +3,6 @@
 export(Calculate_ratio)
 export(Find_ancestors)
 export(Fit_model)
-export(Load_previous_results)
 export(Match_species)
 export(Plot_ellipse)
 export(Plot_taxa)
