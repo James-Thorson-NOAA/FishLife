@@ -19,7 +19,9 @@ Search_species(Class = "predictive", Order = "predictive",
 
 \item{Species}{Character input for taxonomic class}
 
-\item{add_ancestors}{Boolean whether to add ancestors for matching species or not
+\item{add_ancestors}{Boolean whether to add ancestors for matching species or not}
+
+\item{ParentChild_gz}{vector providing index of parent-taxon for every child-taxa
 This function attempts to do a smart match to elements of \code{ParentChild_gz}.  It sweeps from Order to Species
 and ignores any taxonomic input listed as \code{"predictive"} until it finds something else.  It then appends
 \code{"predictive"} to any lower taxonomic level that is missing, and checks whether this specification yields a single,

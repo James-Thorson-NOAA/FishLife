@@ -16,6 +16,8 @@ Plot_ellipse(Cov, Mean = rep(0, 2), add = FALSE, prob = 0.95,
 
 \item{add}{Boolean whether to add ellipse to existing plot}
 
+\item{prob}{for defining predictive interval}
+
 \item{xlim}{x-limits if \code{add=FALSE}}
 
 \item{ylim}{y-limits if \code{add=FALSE}}
@@ -36,7 +38,7 @@ Plot_ellipse(Cov, Mean = rep(0, 2), add = FALSE, prob = 0.95,
 
 \item{plot_lines}{whether to plot lines representing "major axis" and "OLS" regression parameters}
 
-\item{probability}{for defining predictive interval}
+\item{...}{additional arguments passed to \code{shape::plotellipse}}
 }
 \value{
 integer of row numbers of \code{ParentChild_gz} matching \code{genus_species}
