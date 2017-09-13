@@ -25,6 +25,8 @@ Plot_trait(Taxon, params = c("K", "M"), Cov_gjj = Estimate_database$Cov_gjj,
 
 \item{SpeciesMatch}{Species for which to plot data}
 
+\item{prob}{for defining predictive interval}
+
 \item{add}{Boolean whether to add ellipse to existing plot}
 
 \item{xlim}{x-limits if \code{add=FALSE}}
@@ -49,7 +51,7 @@ Plot_trait(Taxon, params = c("K", "M"), Cov_gjj = Estimate_database$Cov_gjj,
 
 \item{logticks}{ticks to use if plotting on a log-scale}
 
-\item{...}{other paramers passed to \code{TMBhelper::Optimize}}
+\item{...}{additional arguments passed to \code{shape::plotellipse}}
 }
 \description{
 Plots predictive interval for a given taxon and trait-pair

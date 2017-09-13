@@ -5,7 +5,7 @@
 #' @param Cov 2x2 matrix representing covariance
 #' @param Mean numeric vector (length of 2) representing Empirical Bayes prediction of median
 #' @param add Boolean whether to add ellipse to existing plot
-#' @param probability for defining predictive interval
+#' @param prob for defining predictive interval
 #' @param xlim x-limits if \code{add=FALSE}
 #' @param ylim y-limits if \code{add=FALSE}
 #' @param logticks ticks to use if plotting on a log-scale
@@ -16,6 +16,7 @@
 #' @param ylab y-axis label
 #' @param lcol line color for ellipse
 #' @param plot_lines whether to plot lines representing "major axis" and "OLS" regression parameters
+#' @param ... additional arguments passed to \code{shape::plotellipse}
 #'
 #' @return integer of row numbers of \code{ParentChild_gz} matching \code{genus_species}
 #'

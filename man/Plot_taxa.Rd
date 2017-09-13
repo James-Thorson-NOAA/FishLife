@@ -17,6 +17,8 @@ Plot_taxa(Taxa, prob = 0.95, params = matrix(c("K", "M", "Winfinity", "Loo",
 \arguments{
 \item{Taxa}{One or more taxonomic names (matching rows from \code{ParentChild_gz[,'ChildName']})}
 
+\item{prob}{for defining predictive interval}
+
 \item{params}{matrix (2 columns) of parameters to plot, where each row gives parameter names for a given plot}
 
 \item{Cov_gjj}{Array of estimated covariance for each taxonomic group \code{g} and trait \code{j}}
@@ -47,7 +49,7 @@ Plot_taxa(Taxa, prob = 0.95, params = matrix(c("K", "M", "Winfinity", "Loo",
 
 \item{plot_lines}{whether to plot lines representing "major axis" and "OLS" regression parameters}
 
-\item{...}{other paramers passed to \code{TMBhelper::Optimize}}
+\item{...}{additional arguments passed to \code{shape::plotellipse}}
 }
 \description{
 Plots bivariate predictive intervals for specified parameters and taxa

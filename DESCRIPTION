@@ -1,12 +1,12 @@
 Package: FishLife
 Type: Package
-Title: Predictive life history traits for any marine fish
+Title: Predict Life History Traits For Any Fish
 Version: 1.0.2
 Date: 2017-08-04
-Author: James Thorson
+Authors@R: person("James","Thorson", email="James.Thorson@noaa.gov", role=c("aut","cre"))
 Maintainer: James Thorson <James.Thorson@noaa.gov>
-Description: FishLife is an R package for estimating life history traits
-    from a multivariate random-walk process on a taxonomic tree.  It then 
+Description: Estimate life history traits from a multivariate 
+    random-walk process on a taxonomic tree, and use results to 
     predicts traits for any marine fish scientific (Genus-species) name.
 Imports:
     graphics,
