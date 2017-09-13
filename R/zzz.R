@@ -19,22 +19,3 @@
   }
 }
 
-#' Load previous results
-#'
-#' \code{Load_previous_results} loads previous results distributed with package
-#'
-#' @param results_dir Directory containing object \code{Estimate_database.RData}, archiving previous results
-
-#' This function loads and returns previous results.  All plots are defined by default to look for
-#' object \code{Estimate_database} in global memory for a record of results.  New results can be
-#' used instead by saving hte output of \code{Fit_model} to object \code{Estimate_database}.
-
-#' @export
-Load_previous_results = function( results_dir=system.file("extdata",package="FishLife") ){
-  # Load existing dataabase
-  message("###########################################################################################")
-  message("Loading results from model run: list 'Estimate_database'")
-  load( file.path(results_dir,"Estimate_database.RData") )
-  message("###########################################################################################")
-  return( Estimate_database )
-}
