@@ -1,7 +1,6 @@
 library(shiny)
 
 library(FishLife)
-Estimate_database = Load_previous_results()
 library(rfishbase)
 
 # Function containing things to display
@@ -34,7 +33,7 @@ function(input, output, session){
 
   # Match species from text
   Match_taxonomy <- reactive({
-    Search_species(Class=input$Class, Order=input$Order, Family=input$Family, Genus=input$Genus, Species=input$Species, add_ancestors=input$plotAncestors, ParentChild_gz=Estimate_database$ParentChild_gz)$match_taxonomy
+    Search_species(Class=input$Class, Order=input$Order, Family=input$Family, Genus=input$Genus, Species=input$Species, add_ancestors=input$plotAncestors)$match_taxonomy
   })
 
   # Disply species
@@ -50,7 +49,7 @@ function(input, output, session){
   output$plot1 <- renderPlot({
     #input$activate
     #isolate({
-    Plot_taxa( Taxa=Match_taxonomy(), Cov_gjj=Estimate_database$Cov_gjj, Mean_gj=Estimate_database$ParHat$beta_gj, ParentChild_gz=Estimate_database$ParentChild_gz, Y_ij=Estimate_database$Y_ij )
+    Plot_taxa( Taxa=Match_taxonomy() )
     #})
   })
 

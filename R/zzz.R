@@ -8,14 +8,14 @@
   packageStartupMessage("For details and citation guidance, please see http://github.com/james-thorson/FishLife/")
   packageStartupMessage("###########################################################################################")
 
-  if( !"ThorsonUtilities" %in% utils::installed.packages()[,1] ){
-    packageStartupMessage("Installing package: ThorsonUtilities...")
-    devtools::install_github("james-thorson/utilities")
-  }
+  #if( !"ThorsonUtilities" %in% utils::installed.packages()[,1] ){
+  #  packageStartupMessage("Installing package: ThorsonUtilities...")
+  #  devtools::install_github("james-thorson/utilities")
+  #}
 
-  if( !"TMBhelper" %in% utils::installed.packages()[,1] ){
-    packageStartupMessage("Installing package: TMBhelper...")
-    devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
-  }
+  #if( !"TMBhelper" %in% utils::installed.packages()[,1] ){
+  #  packageStartupMessage("Installing package: TMBhelper...")
+  #  devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
+  #}
 }
 

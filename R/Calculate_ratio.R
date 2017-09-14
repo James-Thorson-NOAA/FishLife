@@ -15,8 +15,8 @@
 #' }
 
 #' @export
-Calculate_ratio = function( params=c("K","M"), Cov_gjj=Estimate_database$Cov_gjj, Mean_gj=Estimate_database$ParHat$beta_gj,
-  ParentChild_gz=Estimate_database$ParentChild_gz ){
+Calculate_ratio = function( params=c("K","M"), Cov_gjj=FishLife::database$Cov_gjj, Mean_gj=FishLife::database$ParHat$beta_gj,
+  ParentChild_gz=FishLife::database$ParentChild_gz ){
 
   # Rotation matrix
   RotateM = function( angle ) matrix( c(cos(angle),sin(angle),-sin(angle),cos(angle)), 2,2 )

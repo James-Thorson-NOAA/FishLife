@@ -5,7 +5,7 @@
 \title{Match species}
 \usage{
 Match_species(genus_species = "Sebastes jordani",
-  ParentChild_gz = Estimate_database$ParentChild_gz)
+  ParentChild_gz = FishLife::database$ParentChild_gz)
 }
 \arguments{
 \item{genus_species}{Character vector for Genus_species (separated by underscore character)}

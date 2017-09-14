@@ -6,7 +6,7 @@
 \usage{
 Search_species(Class = "predictive", Order = "predictive",
   Family = "predictive", Genus = "predictive", Species = "predictive",
-  add_ancestors = TRUE, ParentChild_gz = Estimate_database$ParentChild_gz)
+  add_ancestors = TRUE, ParentChild_gz = FishLife::database$ParentChild_gz)
 }
 \arguments{
 \item{Class}{Character input for taxonomic class}
