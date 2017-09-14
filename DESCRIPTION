@@ -20,6 +20,9 @@ Depends:
 Suggests:
     TMB,
     testthat
+Remotes: 
+    james-thorson/utilities,
+    kaskr/TMB_contrib_R/TMBhelper
 License: GPL-3
 LazyData: yes
 BuildVignettes: yes

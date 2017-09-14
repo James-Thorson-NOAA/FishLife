@@ -4,9 +4,9 @@
 \alias{Calculate_ratio}
 \title{Calculate ratio of two modeled traits}
 \usage{
-Calculate_ratio(params = c("K", "M"), Cov_gjj = Estimate_database$Cov_gjj,
-  Mean_gj = Estimate_database$ParHat$beta_gj,
-  ParentChild_gz = Estimate_database$ParentChild_gz)
+Calculate_ratio(params = c("K", "M"), Cov_gjj = FishLife::database$Cov_gjj,
+  Mean_gj = FishLife::database$ParHat$beta_gj,
+  ParentChild_gz = FishLife::database$ParentChild_gz)
 }
 \arguments{
 \item{params}{Parameter names to use in calculation}

@@ -4,11 +4,13 @@
 \alias{Plot_trait}
 \title{Plots trait predictions}
 \usage{
-Plot_trait(Taxon, params = c("K", "M"), Cov_gjj = Estimate_database$Cov_gjj,
-  Mean_gj = Estimate_database$ParHat$beta_gj,
-  ParentChild_gz = Estimate_database$ParentChild_gz, SpeciesMatch = NULL,
-  prob = 0.95, add = FALSE, xlim = log(c(0.01, 2)), ylim = xlim,
-  partial_match = TRUE, main = "", xlab = "", ylab = "",
+Plot_trait(Taxon, params = c("K", "M"),
+  Cov_gjj = FishLife::database$Cov_gjj,
+  Mean_gj = FishLife::database$ParHat$beta_gj,
+  ParentChild_gz = FishLife::database$ParentChild_gz,
+  Y_ij = FishLife::database$Y_ij, g_i = FishLife::database$g_i,
+  SpeciesMatch = NULL, prob = 0.95, add = FALSE, xlim = log(c(0.01, 2)),
+  ylim = xlim, partial_match = TRUE, main = "", xlab = "", ylab = "",
   lcol = "black", plot_lines = FALSE, verbose = FALSE, ticks = c(0, 5),
   logticks = c(1, 2, 5), ...)
 }
@@ -22,6 +24,10 @@ Plot_trait(Taxon, params = c("K", "M"), Cov_gjj = Estimate_database$Cov_gjj,
 \item{Mean_gj}{Matrix of Empirical Bayes predictions of traits for each taxonomic group}
 
 \item{ParentChild_gz}{Matrix representing taxonomic tree for analyzed data}
+
+\item{Y_ij}{a data frame of trait values (perhaps log-scaled) with rows for records, and tagged-columns for traits}
+
+\item{g_i}{Vector that associates every observation with a level of the taxonomic tree}
 
 \item{SpeciesMatch}{Species for which to plot data}
 

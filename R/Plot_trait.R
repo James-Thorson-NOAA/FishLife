@@ -8,14 +8,15 @@
 #' @param SpeciesMatch Species for which to plot data
 #' @param partial_match Should \code{Taxon} be an partial match or not (exact match)
 #' @param verbose Boolean whether to print name matches or not
+#' @param g_i Vector that associates every observation with a level of the taxonomic tree
 #' @inheritParams Plot_ellipse
 #' @inheritParams Fit_model
 #' @inheritParams Calculate_ratio
 
 #' @export
-Plot_trait = function( Taxon, params=c('K','M'), Cov_gjj=Estimate_database$Cov_gjj, Mean_gj=Estimate_database$ParHat$beta_gj,
-  ParentChild_gz=Estimate_database$ParentChild_gz, SpeciesMatch=NULL, prob=0.95, add=FALSE,
-  xlim=log(c(0.01,2)), ylim=xlim, partial_match=TRUE, main="", xlab="", ylab="",
+Plot_trait = function( Taxon, params=c('K','M'), Cov_gjj=FishLife::database$Cov_gjj, Mean_gj=FishLife::database$ParHat$beta_gj,
+  ParentChild_gz=FishLife::database$ParentChild_gz, Y_ij=FishLife::database$Y_ij, g_i=FishLife::database$g_i,
+  SpeciesMatch=NULL, prob=0.95, add=FALSE, xlim=log(c(0.01,2)), ylim=xlim, partial_match=TRUE, main="", xlab="", ylab="",
   lcol="black", plot_lines=FALSE, verbose=FALSE, ticks=c(0,5), logticks=c(1,2,5), ... ){
 
   # Match taxon

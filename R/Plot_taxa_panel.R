@@ -1,6 +1,7 @@
 
-Plot_taxa_panel = function( lowerTaxa, upperTaxa=lowerTaxa, prob=0.95, params=names(Estimate_database$Y_ij),
-  Mean_gj=Estimate_database$ParHat$beta_gj, xlim=log(c(0.01,2)), ylim=xlim, ticks=c(1,2,5), partial_match=FALSE, verbose=FALSE, ... ){
+Plot_taxa_panel = function( lowerTaxa, upperTaxa=lowerTaxa, prob=0.95, params=names(FishLife::database$Y_ij),
+  Mean_gj=FishLife::database$ParHat$beta_gj, ParentChild_gz=FishLife::database$ParentChild_gz,
+  xlim=log(c(0.01,2)), ylim=xlim, ticks=c(1,2,5), partial_match=FALSE, verbose=FALSE, ... ){
 
   # Loop through all pairs of parameters
   par( mfrow=c(length(params),length(params)), mar=c(2,2,0,0), mgp=c(1.75,0.25,0), tck=-0.02, oma=c(2,3,0,0))

@@ -5,7 +5,7 @@
 \title{Fit and predict fish traits}
 \usage{
 Fit_model(N_factors, N_obsfactors, Use_REML = TRUE,
-  Y_ij = Estimate_database$Y_ij, Z_ik = Estimate_database$Z_ik,
+  Y_ij = FishLife::database$Y_ij, Z_ik = FishLife::database$Z_ik,
   Version = "Taxon_v1_2_0", Process_cov = "Equal",
   TmbDir = system.file("executables", package = "FishLife"),
   RunDir = tempfile(pattern = "run_", tmpdir = tempdir(), fileext = "/"),
@@ -39,15 +39,15 @@ Fit_model(N_factors, N_obsfactors, Use_REML = TRUE,
 \value{
 Tagged list containing objects from FishLife run (first 9 slots constitute list 'Estimate_database' for archiving results)
 \describe{
-  \item{N_factors}{\code{N_factors} from run}
-  \item{N_obsfactors}{\code{N_obsfactors} from run}
-  \item{Use_REML}{\code{Use_REML} from run}
+  \item{N_factors}{Number of factors used for evolution in life-history model}
+  \item{N_obsfactors}{Number of factors used for measurent-error in life-history model}
+  \item{Use_REML}{Boolean, whether REML was used for model}
   \item{Cov_gjj}{Covariance among traits for every taxon in tree}
   \item{ParentChild_gz}{Record of taxonomic tree}
   \item{ParHat}{Parameter estimates and predictions}
   \item{g_i}{Associates every observation with a level of the taxonomic tree}
-  \item{Y_ij}{\code{Y_ij} from run}
-  \item{Z_ik}{\code{Z_ik} from run}
+  \item{Y_ij}{Raw data}
+  \item{Z_ik}{Taxonomy for each datum}
   \item{Obj}{The built TMB object}
   \item{Opt}{Output from optimization}
   \item{Report}{tagged list of report-file from TMB}

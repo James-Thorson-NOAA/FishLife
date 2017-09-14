@@ -19,39 +19,38 @@
 
 #' @export
 Search_species = function( Class="predictive", Order="predictive", Family="predictive", Genus="predictive", Species="predictive",
-   add_ancestors=TRUE, ParentChild_gz=Estimate_database$ParentChild_gz ){
+   add_ancestors=TRUE, ParentChild_gz=FishLife::database$ParentChild_gz ){
 
   # Match full taxonomy from fishbase
-  data( fishbase, package="rfishbase")
-  Match = 1:nrow(fishbase)
-  if( Class!="predictive" ) Match = Match[ which(tolower(fishbase$Class[Match])==tolower(Class)) ]
-  if( Order!="predictive" ) Match = Match[ which(tolower(fishbase$Order[Match])==tolower(Order)) ]
-  if( Family!="predictive" ) Match = Match[ which(tolower(fishbase$Family[Match])==tolower(Family)) ]
-  if( Genus!="predictive" ) Match = Match[ which(tolower(fishbase$Genus[Match])==tolower(Genus)) ]
-  if( Species!="predictive" ) Match = Match[ which(tolower(fishbase$Species[Match])==tolower(Species)) ]
+  Match = 1:nrow(rfishbase::fishbase)
+  if( Class!="predictive" ) Match = Match[ which(tolower(rfishbase::fishbase$Class[Match])==tolower(Class)) ]
+  if( Order!="predictive" ) Match = Match[ which(tolower(rfishbase::fishbase$Order[Match])==tolower(Order)) ]
+  if( Family!="predictive" ) Match = Match[ which(tolower(rfishbase::fishbase$Family[Match])==tolower(Family)) ]
+  if( Genus!="predictive" ) Match = Match[ which(tolower(rfishbase::fishbase$Genus[Match])==tolower(Genus)) ]
+  if( Species!="predictive" ) Match = Match[ which(tolower(rfishbase::fishbase$Species[Match])==tolower(Species)) ]
   if( length(Match)==0 ) stop( paste("Inputs not found in FishBase, please check spelling of",tolower(Class),tolower(Order),tolower(Family),tolower(Genus),tolower(Species)) )
 
   # add missing taxonomic levels from FishBase if uniquely defined (and throw error if not)
   full_taxonomy = c(Class, Order, Family, Genus, Species)
   if( !all(c(Species)=="predictive") ){
-    if( length(unique(fishbase[Match,'Species']))!=1) stop("inputs are not unique")
-    if( length(unique(fishbase[Match,'Species']))==1) full_taxonomy[5] = unique(fishbase[Match,'Species'])[1]
+    if( length(unique(rfishbase::fishbase[Match,'Species']))!=1) stop("inputs are not unique")
+    if( length(unique(rfishbase::fishbase[Match,'Species']))==1) full_taxonomy[5] = unique(rfishbase::fishbase[Match,'Species'])[1]
   }
   if( !all(c(Species,Genus)=="predictive") ){
-    if( length(unique(fishbase[Match,'Genus']))!=1) stop("inputs are not unique")
-    if( length(unique(fishbase[Match,'Genus']))==1) full_taxonomy[4] = unique(fishbase[Match,'Genus'])[1]
+    if( length(unique(rfishbase::fishbase[Match,'Genus']))!=1) stop("inputs are not unique")
+    if( length(unique(rfishbase::fishbase[Match,'Genus']))==1) full_taxonomy[4] = unique(rfishbase::fishbase[Match,'Genus'])[1]
   }
   if( !all(c(Species,Genus,Family)=="predictive") ){
-    if( length(unique(fishbase[Match,'Family']))!=1) stop("inputs are not unique")
-    if( length(unique(fishbase[Match,'Family']))==1) full_taxonomy[3] = unique(fishbase[Match,'Family'])[1]
+    if( length(unique(rfishbase::fishbase[Match,'Family']))!=1) stop("inputs are not unique")
+    if( length(unique(rfishbase::fishbase[Match,'Family']))==1) full_taxonomy[3] = unique(rfishbase::fishbase[Match,'Family'])[1]
   }
   if( !all(c(Species,Genus,Family,Order)=="predictive") ){
-    if( length(unique(fishbase[Match,'Order']))!=1) stop("inputs are not unique")
-    if( length(unique(fishbase[Match,'Order']))==1) full_taxonomy[2] = unique(fishbase[Match,'Order'])[1]
+    if( length(unique(rfishbase::fishbase[Match,'Order']))!=1) stop("inputs are not unique")
+    if( length(unique(rfishbase::fishbase[Match,'Order']))==1) full_taxonomy[2] = unique(rfishbase::fishbase[Match,'Order'])[1]
   }
   if( !all(c(Species,Genus,Family,Order,Class)=="predictive") ){
-    if( length(unique(fishbase[Match,'Class']))!=1) stop("inputs are not unique")
-    if( length(unique(fishbase[Match,'Class']))==1) full_taxonomy[1] = unique(fishbase[Match,'Class'])[1]
+    if( length(unique(rfishbase::fishbase[Match,'Class']))!=1) stop("inputs are not unique")
+    if( length(unique(rfishbase::fishbase[Match,'Class']))==1) full_taxonomy[1] = unique(rfishbase::fishbase[Match,'Class'])[1]
   }
   match_taxonomy = full_taxonomy
 

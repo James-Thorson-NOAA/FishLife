@@ -1,7 +1,6 @@
 library(shiny)
 
 library(FishLife)
-Estimate_database = Load_previous_results()
 library(rfishbase)
 
 # Load stuff
