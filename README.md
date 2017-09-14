@@ -41,9 +41,6 @@ library( TMB )
 
 # Re-run results with a different model configuration
 Estimate_database = Fit_model( N_factors=-3, N_obsfactors=-3, Use_REML=TRUE)
-
-# Plot new results
-Plot_taxa( Search_species(Genus="Lutjanus",Species="campechanus")$match_taxonomy )
 ```
 
 ### Update predictions for a single taxon using user-supplied data
