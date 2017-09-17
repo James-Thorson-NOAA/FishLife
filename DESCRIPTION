@@ -21,8 +21,10 @@ Depends:
     R (>= 3.1.0),
 Suggests:
     TMB,
-    testthat
-Remotes: 
+    testthat,
+    knitr,
+    rmarkdown
+Remotes:
     james-thorson/utilities,
     kaskr/TMB_contrib_R/TMBhelper
 License: GPL-3
@@ -31,3 +33,4 @@ BuildVignettes: yes
 RoxygenNote: 5.0.1
 URL: http://github.com/James-Thorson/FishLife
 BugReports: http://github.com/James-Thorson/Thorson/FishLife/issues
+VignetteBuilder: knitr
