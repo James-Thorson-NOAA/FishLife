@@ -2,4 +2,4 @@
 *.dll
 *.so
 .Rhistory
-inst/doc
+
