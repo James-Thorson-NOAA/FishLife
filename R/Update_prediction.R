@@ -81,6 +81,8 @@ Update_prediction = function( Taxon, Ynew_ij, partial_match=TRUE, verbose=FALSE,
   dir.create( RunDir )
   #dyn.unload( paste0(RunDir,"/",TMB::dynlib(Version)) )          #
   file.copy( from=paste0(TmbDir,"/",Version,".cpp"), to=paste0(RunDir,"/",Version,".cpp"), overwrite=FALSE)
+  origwd = getwd()
+  on.exit(setwd(origwd),add=TRUE)
   setwd( RunDir )
   compile( paste0(Version,".cpp") )
 

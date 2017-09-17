@@ -170,6 +170,8 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=FishLife::dat
   #dyn.unload( paste0(RunDir,"/",dynlib(TMB:::getUserDLL())) ) # random=Random,
   dir.create( RunDir )
   file.copy( from=paste0(TmbDir,"/",Version,".cpp"), to=paste0(RunDir,"/",Version,".cpp"), overwrite=FALSE)
+  origwd = getwd()
+  on.exit(setwd(origwd),add=TRUE)
   setwd( RunDir )
   compile( paste0(Version,".cpp") )
 
