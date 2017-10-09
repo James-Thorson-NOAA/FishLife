@@ -16,7 +16,14 @@ devtools::install_github("james-thorson/FishLife")
 library( FishLife )
 ```
 
+### Vignette available
+Please see the `FishLife` vignette for details on how to extract predictions frmo the package, update predictions using new data, or replicate the analysis using a new data set.  
+```R
+vignette("tutorial","FishLife")
+```
+
 ### Get predictions for a given taxon
+I also show a few simple examples of life-history predictions using `FishLife`, as archived in the package.  
 ```R
 # Get basic plot for Lutjanus campechanus (in database, so prediction is informed by species-specific data)
 Plot_taxa( Search_species(Genus="Lutjanus",Species="campechanus")$match_taxonomy )
@@ -26,34 +33,6 @@ Plot_taxa( Search_species(Genus="Sebastes",Species="cortezi")$match_taxonomy )
 
 # Get basic plot for Family Scombridae 
 Plot_taxa( Search_species(Family="Scombridae")$match_taxonomy )
-
-# Compare two species
-Taxa = c( Search_species(Genus="Oncorhynchus",Species="mykiss",add_ancestors=FALSE)$match_taxonomy,
-  Search_species(Genus="Salmo",Species="Trutta",add_ancestors=FALSE)$match_taxonomy )
-Plot_taxa( Taxa )
-
-```
-
-### Re-run the model
-```R
-# Load TMB
-library( TMB )
-
-# Re-run results with a different model configuration
-Estimate_database = Fit_model( N_factors=-3, N_obsfactors=-3, Use_REML=TRUE)
-```
-
-### Update predictions for a single taxon using user-supplied data
-
-Format new data in `Ynew_ij`, which can contain one or more parameters
-```R
-Ynew_ij = matrix( c("Loo"=log(40),"K"=NA,"Winfinity"=NA,"tmax"=NA,"tm"=NA,"M"=NA,"Lm"=NA,"Temperature"=NA), nrow=1)
-```
-
-Then run an updating function
-```R
-library(TMB)
-Update = Update_prediction( Taxon=Search_species(Genus="Sebastes",Species="cortezi",add_ancestors=FALSE)$match_taxonomy, Ynew_ij=Ynew_ij)
 ```
 
 Description of package
