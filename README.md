@@ -38,10 +38,10 @@ Plot_taxa( Search_species(Family="Scombridae")$match_taxonomy )
 Description of package
 =============
 ### Please cite if using the software
-* Thorson, J. T., S. B. Munch, J. M. Cope, and J. Gao. In press. Predicting life history parameters for all fishes worldwide. Ecological Applications.
+* Thorson, J. T., S. B. Munch, J. M. Cope, and J. Gao. 2017. Predicting life history parameters for all fishes worldwide. Ecological Applications. 27(8): 2262–2276. http://onlinelibrary.wiley.com/doi/10.1002/eap.1606/full
 
 Further reading
 =============
 ### Evaluating accuracy of data and life-history predictions in FishBase
-* Thorson, J. T., J. M. Cope, and W. S. Patrick. 2014. Assessing the quality of life history information in publicly available databases. Ecological Applications 24:217–226.
+* Thorson, J. T., J. M. Cope, and W. S. Patrick. 2014. Assessing the quality of life history information in publicly available databases. Ecological Applications 24:217–226. http://onlinelibrary.wiley.com/doi/10.1890/12-1855.1/abstract
 
