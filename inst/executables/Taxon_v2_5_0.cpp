@@ -61,10 +61,11 @@ Type objective_function<Type>::operator() ()
   DATA_IVECTOR( Options_vec );
   // Slot 0:  Number of observation factors
   // Slot 1:  Number of process error factors
-  // Slot 2:
+  // Slot 2:  invertTF (whether to invert cov)
   DATA_VECTOR( Options )
   // Slot 0:  Additive constant for diagnonal of variance of obsCov_jj
   // Slot 1:  Additive constant for diagnonal of variance of Cov_jj
+  // Slot 2:  SD_b_stock
 
   // Data -- FishBase
   DATA_MATRIX( Y_ij );
@@ -186,7 +187,7 @@ Type objective_function<Type>::operator() ()
     ln_a_stock(StockI) = log( MLSPS_stock(StockI) / SPRF0_stock(StockI) );   // From Myers et al. 1998, Eq. 5:  MLSPS=a*SPRF0, MASPS=MLSPS*(1-exp(-M)) ->  MASPS=a*SPRF0*(1-exp(-M)) -> a=MASPS/SPRF0/(1-exp(-M))
     if( j_SR.size()==3 ){
       b_stock(StockI) = exp( ln_b_stock(StockI) );
-      jnll_comp(6) -= dnorm( ln_b_stock(StockI), Type(0.0), Type(10.0), true );
+      if( Options(2)>0 ) jnll_comp(6) -= dnorm( ln_b_stock(StockI), Type(0.0), Options(2), true );
     }
     if( j_SR.size()==4 ){
       b_stock(StockI) = exp( Ycomplete_ij(i_stock(StockI),j_SR(3)) );
