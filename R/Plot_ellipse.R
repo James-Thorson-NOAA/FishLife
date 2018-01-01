@@ -22,7 +22,7 @@
 #'
 #' @export
 Plot_ellipse = function( Cov, Mean=rep(0,2), add=FALSE, prob=0.95, xlim=log(c(0.01,2)), ylim=xlim, logticks=c(1,2,5), ticks=c(0,5),
-  whichlog="xy", main="", xlab="", ylab="", lcol="black", plot_lines=FALSE, ... ){
+  axis_scale=c("log","log"), main="", xlab="", ylab="", lcol="black", plot_lines=FALSE, lty="solid", xaxt="s", yaxt="s", ... ){
 
   # Calculate eigen-decomposition
   # http://www.visiondummy.com/2014/04/draw-error-ellipse-representing-covariance-matrix/
@@ -40,11 +40,16 @@ Plot_ellipse = function( Cov, Mean=rep(0,2), add=FALSE, prob=0.95, xlim=log(c(0.
     }
     plot( 1, type="n", xlim=xlim, ylim=ylim, xaxt="n", yaxt="n", main=main, xlab=xlab, ylab=ylab)    #
     Logticks = as.vector(outer(logticks,10^(-10:10),FUN="*"))
-    Ticks = as.vector(outer(ticks,10*(-10:10),FUN="+"))
-    if(length(grep("x",whichlog))==1){ axis(side=1, at=log(Logticks), labels=Logticks) }else{ axis(side=1, at=Ticks, labels=Ticks) }
-    if(length(grep("y",whichlog))==1){ axis(side=2, at=log(Logticks), labels=Logticks) }else{ axis(side=2, at=Ticks, labels=Ticks) }
+    #Ticks = as.vector(outer(ticks,10*(-10:10),FUN="+"))
+    for( aI in 1:2 ){
+      if( c(xaxt,yaxt)[aI] != "n" ){
+        if(axis_scale[aI]=="log") axis(side=aI, at=log(Logticks), labels=Logticks)
+        if(axis_scale[aI]=="natural") axis(side=aI)
+        if(axis_scale[aI]=="logit_0.2_1.0") axis(side=aI, at=qlogis((c(0.201,0.205,0.21,0.22,0.23,0.25,0.3,0.35,0.4,0.5,0.6,0.7,0.8,0.85,0.9,0.95,0.96,0.98,0.99,0.995,0.999)-0.20)*5/4), labels=c(0.201,0.205,0.21,0.22,0.23,0.25,0.3,0.35,0.4,0.5,0.6,0.7,0.8,0.85,0.9,0.95,0.96,0.98,0.99,0.995,0.999) )
+      }
+    }
   }
-  shape::plotellipse( rx=Major_radius, ry=Minor_radius, mid=Mean, angle=Angle, lcol=lcol, ...)
+  shape::plotellipse( rx=Major_radius, ry=Minor_radius, mid=Mean, angle=Angle, lcol=lcol, lty=lty, ...)
 
   # Plot lines for OLS and MA regression
   calc_coef = function( Mean, Cov, Type="Y|X" ){
