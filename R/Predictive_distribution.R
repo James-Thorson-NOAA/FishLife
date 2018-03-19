@@ -1,13 +1,13 @@
 
 #' @export
-Predictive_distribution = function( mean_vec, process_cov, obs_cov, include_obscov=FALSE, check_bounds=TRUE, check_names=FALSE, lowerbound_MLSPS=0 ){
+Predictive_distribution = function( mean_vec, process_cov, obs_cov, include_obscov=FALSE, check_bounds=TRUE, check_names=FALSE, lowerbound_MLSPS=0, rho_option=0 ){
 
   var_names = names(mean_vec)
   n_j = length(mean_vec)
 
   if( all(c("ln_var","rho","ln_MASPS") %in% var_names) ){
     # Define objects
-    var_names = c( var_names, c("ln_margsd", "h", "logitbound_h", "ln_Fmsy_over_M", "ln_Fmsy") )
+    var_names = union( var_names, c("rho", "ln_margsd", "h", "logitbound_h", "ln_Fmsy_over_M", "ln_Fmsy") )
   }
   if( check_names==TRUE ) return( var_names )
 
@@ -18,6 +18,9 @@ Predictive_distribution = function( mean_vec, process_cov, obs_cov, include_obsc
     # Sample
     Samp_zv = mvtnorm::rmvnorm( n=1000, sigma=process_cov + obs_cov*include_obscov, mean=mean_vec )
     MLSPS = lowerbound_MLSPS + exp(Samp_zv[,'ln_MASPS']) / (1-exp(-exp(Samp_zv[,'M'])))
+    if( rho_option %in% c(1,2) ){
+      Samp_zv = cbind( Samp_zv, "rho"=(2*plogis(Samp_zv[,'logit_rho']))-1 )
+    }
     Samp_zv = cbind( Samp_zv, "ln_margsd"=log(exp(Samp_zv[,'ln_var'])/( 1-ifelse(Samp_zv[,'rho']>0.99,NA,Samp_zv[,'rho'])^2 ))/2 )
     Samp_zv = cbind( Samp_zv, "h"=MLSPS/(4+MLSPS) )
     Samp_zv = cbind( Samp_zv, "logitbound_h"=qlogis((ifelse(Samp_zv[,'h']<0.2,NA,Samp_zv[,'h'])-0.2)*5/4) )
@@ -30,6 +33,8 @@ Predictive_distribution = function( mean_vec, process_cov, obs_cov, include_obsc
       if( mean(Samp_zv[,'h']<0.2)>0.9 ){ message("90% of sampled h is below upper bound of 0.20"); Stop = TRUE }
       if( Stop==TRUE ) return( Samp_zv )
     }
+    # Ensure that var_names and Samp_zv have same order
+    Samp_zv = Samp_zv[,var_names]
     # Save results
     pred_mean[1:n_j] = mean_vec
     pred_mean[n_j+1:(n_v-n_j)] = colMeans( Samp_zv[,n_j+1:(n_v-n_j)], na.rm=TRUE )

@@ -38,7 +38,7 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=FishLife::dat
   RunDir=tempfile(pattern="run_",tmpdir=tempdir(),fileext="/"), Params="Generate", verbose=FALSE, debug_mode=FALSE,
   SR_obs=NULL, StockData=NULL, j_SR=ncol(Y_ij)-3:1, zerocovTF_j=rep(FALSE,ncol(Y_ij)), additional_variance=c(0,0),
   invertTF=FALSE, SD_b_stock=10, b_type=0, Cov_design=NULL, Random="Generate", Cov_RAM=c("M"=FALSE), Turn_off_taxonomy=FALSE,
-  Pen_lowvar_lnRhat=0, lowerbound_MLSPS=1, Use_RAM_Mvalue_TF=TRUE, ... ){
+  Pen_lowvar_lnRhat=0, lowerbound_MLSPS=1, Use_RAM_Mvalue_TF=TRUE, rho_space="natural", ... ){
 
   #####################
   # Check for potential problems
@@ -68,6 +68,10 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=FishLife::dat
       StockData = cbind(StockData, "Rmax"=tapply(SR_obs[,'R_obs'], INDEX=SR_obs[,'StockNum'], FUN=max, na.rm=TRUE) )
     }
     if( any(is.na(StockData)) ) stop("Check `StockData`")
+    # Rename rho if necessary
+    if( rho_space%in%c("logit","logit_with_jacobian") & ("rho" %in% colnames(Y_ij)) ){
+      colnames(Y_ij) = sapply( 1:ncol(Y_ij), FUN=function(num){switch(colnames(Y_ij)[num], "rho"="logit_rho", colnames(Y_ij)[num])} )
+    }
   }
 
   if( is.null(Cov_design) ){
@@ -187,6 +191,10 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=FishLife::dat
     Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=invertTF,"b_type"=b_type,"Turn_off_taxonomy"=Turn_off_taxonomy,"Use_RAM_Mvalue_TF"=Use_RAM_Mvalue_TF), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock,"Pen_lowvar_lnRhat"=Pen_lowvar_lnRhat, "lowerbound_MLSPS"=lowerbound_MLSPS), "Cov_pz"=Cov_pz, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=as.matrix(ParentChild_gz[,c('ParentRowNumber','ChildTaxon')])-1, "g_i"=g_i-1)
     Data = c(Data, list("Nobs"=Nobs, "Nstock"=Nstock, "Obs2Stock"=SR_obs[,'StockNum']-1, "AR_Index"=SR_obs[,'AR_Index'], "ln_R_obs"=log(SR_obs[,'R_obs']), "SSB_obs"=SR_obs[,'SSB_obs'], "SPRF0_stock"=StockData[,'SPRF0'], "M_stock"=StockData[,'M'], "SSBmax_stock"=StockData[,'SSBmax'], "Rmax_stock"=StockData[,'Rmax'], "j_SR"=j_SR, "j_logM"=which(colnames(Y_ij)=="M")-1, "i_stock"=StockData[,'Stock_to_i']-1) )
   }
+  if(Version%in%c("Taxon_v2_13_0")){
+    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=invertTF,"b_type"=b_type,"Turn_off_taxonomy"=Turn_off_taxonomy,"Use_RAM_Mvalue_TF"=Use_RAM_Mvalue_TF,"rho_option"=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2)), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock,"Pen_lowvar_lnRhat"=Pen_lowvar_lnRhat, "lowerbound_MLSPS"=lowerbound_MLSPS), "Cov_pz"=Cov_pz, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=as.matrix(ParentChild_gz[,c('ParentRowNumber','ChildTaxon')])-1, "g_i"=g_i-1)
+    Data = c(Data, list("Nobs"=Nobs, "Nstock"=Nstock, "Obs2Stock"=SR_obs[,'StockNum']-1, "AR_Index"=SR_obs[,'AR_Index'], "ln_R_obs"=log(SR_obs[,'R_obs']), "SSB_obs"=SR_obs[,'SSB_obs'], "SPRF0_stock"=StockData[,'SPRF0'], "M_stock"=StockData[,'M'], "SSBmax_stock"=StockData[,'SSBmax'], "Rmax_stock"=StockData[,'Rmax'], "j_SR"=j_SR, "j_logM"=which(colnames(Y_ij)=="M")-1, "i_stock"=StockData[,'Stock_to_i']-1) )
+  }
 
   # Parameters
   if( Params[1]=="Generate" ){
@@ -230,7 +238,7 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=FishLife::dat
       Params = list( "alpha_j"=alpha_j, "L_z"=rloadings(n_row=n_j,n_col=Data$Options_vec['n_factors'],mean=0.1,sd=0.1), "obsL_z"=rloadings(n_row=n_j,n_col=Data$Options_vec['n_obsfactors'],mean=0.1,sd=0.1), "L_logmult_col"=rep(0,ifelse(N_factors==0,1,abs(N_factors))), "obsL_logmult_col"=rep(0,ifelse(N_obsfactors==0,1,abs(N_obsfactors))), "cov_logmult_z"=rep(0,max(Data$PC_gz[,'ChildTaxon'])+1), "beta_gj"=rmatrix(nrow=n_g,ncol=n_j), "Y_a"=Y_a )
       Params = c( Params, list("bparam_stock"=rep(0,ifelse(Nstock>0,Nstock,1)), "gamma_p"=rep(0,ifelse(n_p==0,1,n_p))) )
     }
-    if(Version%in%c("Taxon_v2_12_0","Taxon_v2_11_0","Taxon_v2_10_0","Taxon_v2_9_0","Taxon_v2_8_0")){
+    if(Version%in%c("Taxon_v2_13_0","Taxon_v2_12_0","Taxon_v2_11_0","Taxon_v2_10_0","Taxon_v2_9_0","Taxon_v2_8_0")){
       Params = list( "alpha_j"=alpha_j, "L_z"=rloadings(n_row=n_j,n_col=Data$Options_vec['n_factors'],mean=1,sd=0.1), "obsL_z"=rloadings(n_row=n_j,n_col=Data$Options_vec['n_obsfactors'],mean=1,sd=0.1), "L_logmult_col"=rep(0,ifelse(N_factors==0,1,abs(N_factors))), "obsL_logmult_col"=rep(0,ifelse(N_obsfactors==0,1,abs(N_obsfactors))), "cov_logmult_z"=rep(0,max(Data$PC_gz[,'ChildTaxon'])+1), "beta_gj"=rmatrix(nrow=n_g,ncol=n_j), "Y_a"=Y_a )
       Params = c( Params, list("bparam_stock"=rep(0,ifelse(Nstock>0,Nstock,1)), "gamma_p"=rep(0,ifelse(n_p==0,1,n_p)), "theta_q"=0) )
     }
@@ -239,7 +247,7 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=FishLife::dat
   # Random
   if( Random[1]=="Generate" ){
     if(Version%in%"Taxon_v1_0_0") Random = c("Y_a")
-    if(Version%in%c("Taxon_v2_12_0","Taxon_v2_11_0","Taxon_v2_10_0","Taxon_v2_9_0","Taxon_v2_8_0","Taxon_v2_7_0","Taxon_v2_6_0","Taxon_v2_5_0","Taxon_v2_4_0","Taxon_v2_3_0","Taxon_v2_2_0","Taxon_v2_1_0","Taxon_v2_0_0","Taxon_v1_2_0","Taxon_v1_1_0")) Random = c("Y_a", "beta_gj")
+    if(Version%in%c("Taxon_v2_13_0","Taxon_v2_12_0","Taxon_v2_11_0","Taxon_v2_10_0","Taxon_v2_9_0","Taxon_v2_8_0","Taxon_v2_7_0","Taxon_v2_6_0","Taxon_v2_5_0","Taxon_v2_4_0","Taxon_v2_3_0","Taxon_v2_2_0","Taxon_v2_1_0","Taxon_v2_0_0","Taxon_v1_2_0","Taxon_v1_1_0")) Random = c("Y_a", "beta_gj")
     if(Use_REML==TRUE){
       Random = c(Random, "alpha_j")
       if("ln_b_stock" %in% names(Params)) Random = union(Random, "ln_b_stock")
@@ -310,6 +318,11 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=FishLife::dat
     Map[["obsL_z"]] = 1:length(Params[["obsL_z"]])
     Map[["obsL_z"]][Which] = NA
     Map[["obsL_z"]] = factor(Map[["obsL_z"]])
+  }
+
+  # Check for problems
+  if( rho_space%in%c("logit","logit_with_jacobian") & !("rho_option"%in%names(Data$Options_vec)) ){
+    stop("Using non-default value for `rho_space` doesn't make sense with the version you are using")
   }
 
   #####################
@@ -403,7 +416,7 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=FishLife::dat
     PartialCorr_gjj[gI,1:n_j,1:n_j] = -1*cov2cor( Prec_gjj[gI,1:n_j,1:n_j] )
     # Invert approximate cov and corr
     Cov_gvv[gI,1:n_j,1:n_j] = solve( Full_Precision )[1:n_j,1:n_j]
-    Pred = Predictive_distribution( mean_vec=Report$beta_gj[gI,], process_cov=Cov_gvv[gI,1:n_j,1:n_j], obs_cov=Report$obsCov_jj[1:n_j,1:n_j], include_obscov=FALSE, check_bounds=FALSE, lowerbound_MLSPS=lowerbound_MLSPS )
+    Pred = Predictive_distribution( mean_vec=Report$beta_gj[gI,], process_cov=Cov_gvv[gI,1:n_j,1:n_j], obs_cov=Report$obsCov_jj[1:n_j,1:n_j], include_obscov=FALSE, check_bounds=FALSE, lowerbound_MLSPS=lowerbound_MLSPS, rho_option=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2) )
     beta_gv[gI,] = Pred$pred_mean
     Cov_gvv[gI,,] = Pred$pred_cov
     Corr_gvv[gI,,] = cov2cor( Cov_gvv[gI,,] )
