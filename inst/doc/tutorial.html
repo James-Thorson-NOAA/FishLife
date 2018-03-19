@@ -12,7 +12,7 @@
 
 <meta name="author" content="James Thorson" />
 
-<meta name="date" content="2017-09-17" />
+<meta name="date" content="2018-03-19" />
 
 <title>Tutorial</title>
 
@@ -52,7 +52,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 
 <h1 class="title toc-ignore">Tutorial</h1>
 <h4 class="author"><em>James Thorson</em></h4>
-<h4 class="date"><em>2017-09-17</em></h4>
+<h4 class="date"><em>2018-03-19</em></h4>
 
 
 
@@ -232,7 +232,81 @@ Predict =<span class="st"> </span><span class="kw">Plot_taxa</span>( <span class
 </tr>
 </tbody>
 </table>
-<p>… for life-history parameters.</p>
+<p>… for life-history parameters. These values are in log-space for all variables except Temperature, and converting to the predictive median can be accomplished by exponentiating those variables: :</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">Loo</td>
+<td align="right">38.009</td>
+</tr>
+<tr class="even">
+<td align="left">K</td>
+<td align="right">0.128</td>
+</tr>
+<tr class="odd">
+<td align="left">Winfinity</td>
+<td align="right">930.756</td>
+</tr>
+<tr class="even">
+<td align="left">tmax</td>
+<td align="right">45.574</td>
+</tr>
+<tr class="odd">
+<td align="left">tm</td>
+<td align="right">9.038</td>
+</tr>
+<tr class="even">
+<td align="left">M</td>
+<td align="right">0.100</td>
+</tr>
+<tr class="odd">
+<td align="left">Lm</td>
+<td align="right">26.409</td>
+</tr>
+<tr class="even">
+<td align="left">Temperature</td>
+<td align="right">10.793</td>
+</tr>
+</tbody>
+</table>
+<p>… or the predictive mean can be calculated by exponentiating and bias-correcting:</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">Loo</td>
+<td align="right">41.120</td>
+</tr>
+<tr class="even">
+<td align="left">K</td>
+<td align="right">0.139</td>
+</tr>
+<tr class="odd">
+<td align="left">Winfinity</td>
+<td align="right">1975.069</td>
+</tr>
+<tr class="even">
+<td align="left">tmax</td>
+<td align="right">49.718</td>
+</tr>
+<tr class="odd">
+<td align="left">tm</td>
+<td align="right">9.958</td>
+</tr>
+<tr class="even">
+<td align="left">M</td>
+<td align="right">0.110</td>
+</tr>
+<tr class="odd">
+<td align="left">Lm</td>
+<td align="right">28.368</td>
+</tr>
+<tr class="even">
+<td align="left">Temperature</td>
+<td align="right">10.793</td>
+</tr>
+</tbody>
+</table>
+<p>Please see code in “tutorial.Rmd” for details.</p>
 </div>
 <div id="high-level-scombridae" class="section level3">
 <h3>High-level: Scombridae</h3>
@@ -306,7 +380,7 @@ Update =<span class="st"> </span><span class="kw">Update_prediction</span>( <spa
 </tr>
 <tr class="even">
 <td align="left">Temperature</td>
-<td align="right">10.754</td>
+<td align="right">10.755</td>
 </tr>
 </tbody>
 </table>

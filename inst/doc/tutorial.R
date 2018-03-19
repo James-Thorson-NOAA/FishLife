@@ -17,6 +17,12 @@ knitr::kable(Predict[[1]]$Mean_pred, digits=3)
 ## ---- echo=FALSE, results='asis'-----------------------------------------
 knitr::kable(Predict[[1]]$Cov_pred, digits=3)
 
+## ---- echo=FALSE, results='asis'-----------------------------------------
+knitr::kable(c(exp(Predict[[1]]$Mean_pred[-8]),Predict[[1]]$Mean_pred['Temperature']), digits=3)
+
+## ---- echo=FALSE, results='asis'-----------------------------------------
+knitr::kable(c(exp(Predict[[1]]$Mean_pred[-8]+0.5*diag(Predict[[1]]$Cov_pred)[-8]),Predict[[1]]$Mean_pred['Temperature']), digits=3)
+
 ## ---- echo=TRUE, message=FALSE, fig.width=8, fig.height=8----------------
 # Get basic plot for Family Scombridae 
 Plot_taxa( Search_species(Family="Scombridae")$match_taxonomy, mfrow=c(2,2) )
