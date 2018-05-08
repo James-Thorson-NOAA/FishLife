@@ -27,4 +27,3 @@ Matrix of exponentiated-differences (ratios) and log-standard deviations for pro
 \description{
 \code{Calculate_ratio} projects the covariance among traits onto a single difference (interpreted as a ratio for log-scaled traits)
 }
-

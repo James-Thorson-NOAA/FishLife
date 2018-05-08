@@ -62,4 +62,3 @@ Plot_trait(Taxon, params = c("K", "M"),
 \description{
 Plots predictive interval for a given taxon and trait-pair
 }
-

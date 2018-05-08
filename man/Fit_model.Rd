@@ -57,4 +57,3 @@ Tagged list containing objects from FishLife run (first 9 slots constitute list 
 \description{
 \code{Fit_model} estimates parameters and predicts values from a multivariate random-walk model for fish traits
 }
-

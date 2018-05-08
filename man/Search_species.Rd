@@ -6,7 +6,8 @@
 \usage{
 Search_species(Class = "predictive", Order = "predictive",
   Family = "predictive", Genus = "predictive", Species = "predictive",
-  add_ancestors = TRUE, ParentChild_gz = FishLife::database$ParentChild_gz)
+  add_ancestors = TRUE, ParentChild_gz = FishLife::database$ParentChild_gz,
+  verbose = T)
 }
 \arguments{
 \item{Class}{Character input for taxonomic class}
@@ -22,6 +23,8 @@ Search_species(Class = "predictive", Order = "predictive",
 \item{add_ancestors}{Boolean whether to add ancestors for matching species or not}
 
 \item{ParentChild_gz}{vector providing index of parent-taxon for every child-taxa}
+
+\item{verbose}{logical where TRUE prints closest match, FALSE does not}
 }
 \value{
 integer of row numbers of \code{ParentChild_gz} matching \code{genus_species}
@@ -35,4 +38,3 @@ and ignores any taxonomic input listed as \code{"predictive"} until it finds som
 \code{"predictive"} to any lower taxonomic level that is missing, and checks whether this specification yields a single,
 unique taxon.  If it does, it then returns the row number and potentially any ancestors (higher taxonomic levels)
 }
-
