@@ -17,4 +17,3 @@ vector of row numbers of \code{ParentChild_gz} for ancestors (including \code{ch
 \description{
 Find higher taxonomic levels for a given taxon (e.g., Class and Order for a given Family)
 }
-

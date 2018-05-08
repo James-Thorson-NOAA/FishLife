@@ -54,4 +54,3 @@ Plot_taxa(Taxa, prob = 0.95, params = matrix(c("K", "M", "Winfinity", "Loo",
 \description{
 Plots bivariate predictive intervals for specified parameters and taxa
 }
-

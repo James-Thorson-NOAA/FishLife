@@ -25,4 +25,3 @@ Output from `Fit_model` applied to database scraped from www.FishBase.org
 using `rfishbase`
 }
 \keyword{datasets}
-

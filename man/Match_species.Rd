@@ -18,4 +18,3 @@ integer of row numbers of \code{ParentChild_gz} matching \code{genus_species}
 \description{
 Match \code{genus_species} to a given row of \code{ParentChild_gz}
 }
-

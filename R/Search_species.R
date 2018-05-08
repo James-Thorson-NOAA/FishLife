@@ -14,12 +14,13 @@
 #' @param Species Character input for taxonomic class
 #' @param add_ancestors Boolean whether to add ancestors for matching species or not
 #' @param ParentChild_gz vector providing index of parent-taxon for every child-taxa
-#'
+#' @param verbose logical where TRUE prints closest match, FALSE does not
 #' @return integer of row numbers of \code{ParentChild_gz} matching \code{genus_species}
 
 #' @export
+
 Search_species = function( Class="predictive", Order="predictive", Family="predictive", Genus="predictive", Species="predictive",
-   add_ancestors=TRUE, ParentChild_gz=FishLife::database$ParentChild_gz ){
+   add_ancestors=TRUE, ParentChild_gz=FishLife::database$ParentChild_gz, verbose = T){
 
   # Match full taxonomy from fishbase
   Match = 1:nrow(rfishbase::fishbase)
@@ -64,7 +65,9 @@ Search_species = function( Class="predictive", Order="predictive", Family="predi
       Count = Count+1
     }
   }
+  if (verbose == T){
   message( "Closest match: ", as.character(ParentChild_gz[Group,'ChildName']) )
+  }
 
   # Pick out ancestors
   if( add_ancestors==TRUE ){

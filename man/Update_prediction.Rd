@@ -51,4 +51,3 @@ Combines the taxonomic predictions from FishBase with new user-supplied data
 This function allows the user to update predictions using new data from one or more studies.  A study for a single parameter is entered as a new
 row of \code{Ynew_ij}, where all elements are \code{NA} except for the parameter of interest.
 }
-

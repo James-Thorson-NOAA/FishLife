@@ -46,4 +46,3 @@ integer of row numbers of \code{ParentChild_gz} matching \code{genus_species}
 \description{
 Plots an ellipse representing the bivariate predictive inteval
 }
-

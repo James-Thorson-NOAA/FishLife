@@ -13,4 +13,3 @@ or used to update predictions based on custom data for a single taxon.
 \details{
 Please see github README for examples \url{http://github.com/james-thorson/FishLife/}
 }
-
