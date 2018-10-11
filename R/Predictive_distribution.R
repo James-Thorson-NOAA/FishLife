@@ -1,6 +1,6 @@
 
 #' @export
-Predictive_distribution = function( mean_vec, process_cov, obs_cov, include_obscov=FALSE, check_bounds=TRUE, check_names=FALSE, lowerbound_MLSPS=0, rho_option=0 ){
+Predictive_distribution = function( mean_vec, process_cov, obs_cov, include_obscov=FALSE, check_bounds=TRUE, check_names=FALSE, lowerbound_MLSPS=0, rho_option=0, include_r=FALSE ){
 
   var_names = names(mean_vec)
   n_j = length(mean_vec)
@@ -8,6 +8,9 @@ Predictive_distribution = function( mean_vec, process_cov, obs_cov, include_obsc
   if( all(c("ln_var","rho","ln_MASPS") %in% var_names) ){
     # Define objects
     var_names = union( var_names, c("rho", "ln_margsd", "h", "logitbound_h", "ln_Fmsy_over_M", "ln_Fmsy") )
+    if( include_r==TRUE ){
+      var_names = union( var_names, c("intrinsic_growth_rate", "generation_time") )
+    }
   }
   if( check_names==TRUE ) return( var_names )
 
@@ -26,6 +29,11 @@ Predictive_distribution = function( mean_vec, process_cov, obs_cov, include_obsc
     Samp_zv = cbind( Samp_zv, "logitbound_h"=qlogis((ifelse(Samp_zv[,'h']<0.2,NA,Samp_zv[,'h'])-0.2)*5/4) )
     Samp_zv = cbind( Samp_zv, "ln_Fmsy_over_M"=log(sqrt((4*Samp_zv[,'h'])/(1-Samp_zv[,'h'])) - 1) )  #  From Mangel et al. 2013 Eq. 13
     Samp_zv = cbind( Samp_zv, "ln_Fmsy"=Samp_zv[,'ln_Fmsy_over_M'] + Samp_zv[,'M'] )
+
+    if( include_r==TRUE ){
+      Samp_zv = cbind( Samp_zv, t(apply( Samp_zv, MARGIN=1, FUN=get_r )) )
+    }
+
     # Check for problems
     if( check_bounds==TRUE ){
       Stop = FALSE
