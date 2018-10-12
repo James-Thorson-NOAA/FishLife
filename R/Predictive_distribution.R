@@ -31,6 +31,7 @@ Predictive_distribution = function( mean_vec, process_cov, obs_cov, include_obsc
     Samp_zv = cbind( Samp_zv, "ln_Fmsy"=Samp_zv[,'ln_Fmsy_over_M'] + Samp_zv[,'M'] )
 
     if( include_r==TRUE ){
+      # Linf=exp(vec['Loo']); K=exp(vec['K']); t0=-0.1; W_a=0.001; W_b=3.04; tm=exp(vec['tm']); dm=tm/4; minage=0; maxage=ceiling(min(100,2*exp(vec['tmax']))); h=vec['h']; M=exp(vec['M'])
       Samp_zv = cbind( Samp_zv, t(apply( Samp_zv, MARGIN=1, FUN=get_r )) )
     }
 
