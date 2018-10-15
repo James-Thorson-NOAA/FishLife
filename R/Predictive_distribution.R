@@ -9,7 +9,7 @@ Predictive_distribution = function( mean_vec, process_cov, obs_cov, include_obsc
     # Define objects
     var_names = union( var_names, c("rho", "ln_margsd", "h", "logitbound_h", "ln_Fmsy_over_M", "ln_Fmsy") )
     if( include_r==TRUE ){
-      var_names = union( var_names, c("intrinsic_growth_rate", "generation_time") )
+      var_names = union( var_names, c("ln_r", "r", "ln_G", "G") )
     }
   }
   if( check_names==TRUE ) return( var_names )
