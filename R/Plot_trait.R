@@ -28,7 +28,7 @@ Plot_trait = function( Taxon, params=c('K','M'), Cov_gjj=FishLife::database$Cov_
 
   # Plot ellipse
   #Plot_ellipse( Cov=Cov_gjj[Which,params,params], Mean=Mean_gj[Which,params], add=add, whichlog=paste(c("x","y")[which(!params%in%c("Temperature","h"))],collapse=""), xlim=xlim, ylim=ylim, main=main, xlab=xlab, lcol=lcol, plot_lines=plot_lines, ticks=ticks, logticks=logticks, prob=prob, ... )
-  Plot_ellipse( Cov=Cov_gjj[Which,params,params], Mean=Mean_gj[Which,params], add=add, axis_scale=sapply(params,FUN=switch,"Temperature"="natural","h"="natural","rho"="natural","logitbound_h"="logit_0.2_1.0","log"), xlim=xlim, ylim=ylim, main=main, xlab=xlab, lcol=lcol, plot_lines=plot_lines, ticks=ticks, logticks=logticks, prob=prob, lty=lty, xaxt=xaxt, yaxt=yaxt, ... )
+  Plot_ellipse( Cov=Cov_gjj[Which,params,params], Mean=Mean_gj[Which,params], add=add, axis_scale=sapply(params,FUN=switch,"Temperature"="natural","h"="natural","rho"="natural","G"="natural","r"="natural","logitbound_h"="logit_0.2_1.0","log"), xlim=xlim, ylim=ylim, main=main, xlab=xlab, lcol=lcol, plot_lines=plot_lines, ticks=ticks, logticks=logticks, prob=prob, lty=lty, xaxt=xaxt, yaxt=yaxt, ... )
 
   # Plot observations
   if( !is.null(SpeciesMatch) ){

@@ -33,7 +33,7 @@ Predictive_distribution = function( mean_vec, process_cov, obs_cov, include_obsc
     if( include_r==TRUE ){
       # Linf=exp(vec['Loo']); K=exp(vec['K']); t0=-0.1; W_a=0.001; W_b=3.04; tm=exp(vec['tm']); dm=tm/4; minage=0; maxage=ceiling(min(100,2*exp(vec['tmax']))); h=vec['h']; M=exp(vec['M'])
       Mat_zv = t(apply( Samp_zv, MARGIN=1, FUN=get_r ))
-      Samp_zv = cbind( Samp_zv, log(Mat_zv) )
+      Samp_zv = cbind( Samp_zv, "ln_r"=log(Mat_zv[,'intrinsic_growth_rate']), 'r'=Mat_zv[,'intrinsic_growth_rate'], 'ln_G'=log(Mat_zv[,'generation_time']), 'G'=Mat_zv[,'generation_time'] )
     }
 
     # Check for problems
