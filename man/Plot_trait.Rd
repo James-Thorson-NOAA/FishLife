@@ -12,7 +12,8 @@ Plot_trait(Taxon, params = c("K", "M"),
   SpeciesMatch = NULL, prob = 0.95, add = FALSE, xlim = log(c(0.01, 2)),
   ylim = xlim, partial_match = TRUE, main = "", xlab = "", ylab = "",
   lcol = "black", plot_lines = FALSE, verbose = FALSE, ticks = c(0, 5),
-  logticks = c(1, 2, 5), ...)
+  logticks = c(1, 2, 5), obsCov_jj = FishLife::database$obsCov_jj,
+  include_obscov = FALSE, lty = "solid", xaxt = "s", yaxt = "s", ...)
 }
 \arguments{
 \item{Taxon}{A taxon (matching row from \code{ParentChild_gz[,'ChildName']})}
@@ -62,4 +63,3 @@ Plot_trait(Taxon, params = c("K", "M"),
 \description{
 Plots predictive interval for a given taxon and trait-pair
 }
-

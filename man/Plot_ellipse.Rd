@@ -6,8 +6,9 @@
 \usage{
 Plot_ellipse(Cov, Mean = rep(0, 2), add = FALSE, prob = 0.95,
   xlim = log(c(0.01, 2)), ylim = xlim, logticks = c(1, 2, 5),
-  ticks = c(0, 5), whichlog = "xy", main = "", xlab = "", ylab = "",
-  lcol = "black", plot_lines = FALSE, ...)
+  ticks = c(0, 5), axis_scale = c("log", "log"), main = "", xlab = "",
+  ylab = "", lcol = "black", plot_lines = FALSE, lty = "solid",
+  xaxt = "s", yaxt = "s", ...)
 }
 \arguments{
 \item{Cov}{2x2 matrix representing covariance}
@@ -26,8 +27,6 @@ Plot_ellipse(Cov, Mean = rep(0, 2), add = FALSE, prob = 0.95,
 
 \item{ticks}{ticks to use if plotting on a natural-scale}
 
-\item{whichlog}{which axes are log-scale}
-
 \item{main}{legend for each panel}
 
 \item{xlab}{x-axis label}
@@ -39,6 +38,8 @@ Plot_ellipse(Cov, Mean = rep(0, 2), add = FALSE, prob = 0.95,
 \item{plot_lines}{whether to plot lines representing "major axis" and "OLS" regression parameters}
 
 \item{...}{additional arguments passed to \code{shape::plotellipse}}
+
+\item{whichlog}{which axes are log-scale}
 }
 \value{
 integer of row numbers of \code{ParentChild_gz} matching \code{genus_species}
@@ -46,4 +47,3 @@ integer of row numbers of \code{ParentChild_gz} matching \code{genus_species}
 \description{
 Plots an ellipse representing the bivariate predictive inteval
 }
-
