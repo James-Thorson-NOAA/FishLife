@@ -21,6 +21,8 @@ get_r = function(vec=NULL, Linf=exp(vec['Loo']), K=exp(vec['K']),
     if(aI>=2) n0_a[aI] = n0_a[aI-1]*exp(-M)
     if(aI==nages) n0_a[aI] = n0_a[aI]/(1-exp(-M))
   }
+  # Net reproductive rate
+  NR = sum(n0_a * SB_a)
 
   # Unfished spawning biomass per recruit
   SBR0 = sum( n0_a * biomass_a * maturity_a )
@@ -38,7 +40,7 @@ get_r = function(vec=NULL, Linf=exp(vec['Loo']), K=exp(vec['K']),
 
   # return intrinsic rate of population increase r and generation GT
   r_numbers = log( Re(eigen(LeslieM_numbers,only.values=TRUE)$values[1]) )
-  generation_time = sum(age_vec * n0_a * SB_a)/NR
+  generation_time = sum(age_vec * n0_a * SB_a) / NR
   Return = c("intrinsic_growth_rate"=r_numbers, "generation_time"=generation_time)
 
   # Generate Leslie matrix in biomass
