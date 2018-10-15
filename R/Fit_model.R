@@ -38,7 +38,7 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=FishLife::dat
   RunDir=tempfile(pattern="run_",tmpdir=tempdir(),fileext="/"), Params="Generate", verbose=FALSE, debug_mode=FALSE,
   SR_obs=NULL, StockData=NULL, j_SR=ncol(Y_ij)-3:1, zerocovTF_j=rep(FALSE,ncol(Y_ij)), additional_variance=c(0,0),
   invertTF=FALSE, SD_b_stock=10, b_type=0, Cov_design=NULL, Random="Generate", Cov_RAM=c("M"=FALSE), Turn_off_taxonomy=FALSE,
-  Pen_lowvar_lnRhat=0, lowerbound_MLSPS=1, Use_RAM_Mvalue_TF=TRUE, rho_space="natural", inclue_r=FALSE, ... ){
+  Pen_lowvar_lnRhat=0, lowerbound_MLSPS=1, Use_RAM_Mvalue_TF=TRUE, rho_space="natural", include_r=FALSE, ... ){
 
   #####################
   # Check for potential problems
@@ -402,7 +402,7 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=FishLife::dat
   Prec_zz = Opt$SD$jointPrecision[ , grep("beta_gj",colnames(Opt$SD$jointPrecision)) ]
     Prec_zz = Prec_zz[ grep("beta_gj",rownames(Opt$SD$jointPrecision)), ]
   # Extract and invert
-  VarNames = Predictive_distribution( mean_vec=Y_ij[1,], process_cov=NULL, obs_cov=NULL, check_names=TRUE, include_r=inclue_r )
+  VarNames = Predictive_distribution( mean_vec=Y_ij[1,], process_cov=NULL, obs_cov=NULL, check_names=TRUE, include_r=include_r )
   n_v = length(VarNames)
   PartialCorr_gjj = Prec_gjj = array(NA, dim=c(n_g,n_j,n_j), dimnames=list(ParentChild_gz[,'ChildName'],colnames(Y_ij),colnames(Y_ij)) )
   Corr_gvv = Cov_gvv = array(NA, dim=c(n_g,n_v,n_v), dimnames=list(ParentChild_gz[,'ChildName'],VarNames,VarNames) )
@@ -416,8 +416,8 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=FishLife::dat
     PartialCorr_gjj[gI,1:n_j,1:n_j] = -1*cov2cor( Prec_gjj[gI,1:n_j,1:n_j] )
     # Invert approximate cov and corr
     Cov_gvv[gI,1:n_j,1:n_j] = solve( Full_Precision )[1:n_j,1:n_j]
-    # mean_vec=Report$beta_gj[gI,]; process_cov=Cov_gvv[gI,1:n_j,1:n_j]; obs_cov=Report$obsCov_jj[1:n_j,1:n_j]; include_obscov=FALSE; check_bounds=FALSE; include_r=inclue_r; lowerbound_MLSPS=lowerbound_MLSPS; rho_option=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2)
-    Pred = Predictive_distribution( mean_vec=Report$beta_gj[gI,], process_cov=Cov_gvv[gI,1:n_j,1:n_j], obs_cov=Report$obsCov_jj[1:n_j,1:n_j], include_obscov=FALSE, check_bounds=FALSE, include_r=inclue_r, lowerbound_MLSPS=lowerbound_MLSPS, rho_option=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2) )
+    # mean_vec=Report$beta_gj[gI,]; process_cov=Cov_gvv[gI,1:n_j,1:n_j]; obs_cov=Report$obsCov_jj[1:n_j,1:n_j]; include_obscov=FALSE; check_bounds=FALSE; include_r=include_r; lowerbound_MLSPS=lowerbound_MLSPS; rho_option=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2)
+    Pred = Predictive_distribution( mean_vec=Report$beta_gj[gI,], process_cov=Cov_gvv[gI,1:n_j,1:n_j], obs_cov=Report$obsCov_jj[1:n_j,1:n_j], include_obscov=FALSE, check_bounds=FALSE, include_r=include_r, lowerbound_MLSPS=lowerbound_MLSPS, rho_option=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2) )
     beta_gv[gI,] = Pred$pred_mean
     Cov_gvv[gI,,] = Pred$pred_cov
     Corr_gvv[gI,,] = cov2cor( Cov_gvv[gI,,] )
