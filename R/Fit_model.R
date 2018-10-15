@@ -421,6 +421,7 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=FishLife::dat
     beta_gv[gI,] = Pred$pred_mean
     Cov_gvv[gI,,] = Pred$pred_cov
     Corr_gvv[gI,,] = cov2cor( Cov_gvv[gI,,] )
+    if( (gI%%1000) == 0 ) message( "Finished processing predictive variance for ", gI, " of ",n_g," taxa" )
   }
 
   # Return stuff
