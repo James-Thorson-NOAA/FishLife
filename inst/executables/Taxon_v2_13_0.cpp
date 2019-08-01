@@ -215,7 +215,7 @@ Type objective_function<Type>::operator() ()
     if( Options_vec(6)==0 ){  // Natural space
       ro_stock(StockI) = Ycomplete_ij(i_stock(StockI),j_SR(1));
     }
-    if( Options_vec(6)==1 | Options_vec(6)==2 ){  // Logit-space
+    if( (Options_vec(6)==1) | (Options_vec(6)==2) ){  // Logit-space
       ro_stock(StockI) = 2*invlogit(Ycomplete_ij(i_stock(StockI),j_SR(1))) - 1;
       // Add Jacobian if desired
       if( Options_vec(6)==2 ){

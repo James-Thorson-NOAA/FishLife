@@ -356,15 +356,17 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=FishLife::dat
 
   # Print to screen
   if( verbose==TRUE ){
-    print( "Numer of fixed effects:")
-    print( table(names(Obj$par)) )
-    print( "Numer of random effects:")
-    print( table(names(Obj$env$last.par[Obj$env$random])) )
+    cat( "Number of fixed effects:")
+    cat( table(names(Obj$par)) )
+    cat( "Number of random effects:")
+    cat( table(names(Obj$env$last.par[Obj$env$random])) )
   }
 
   # Optimize                         #  , startpar=opt$par[-grep("alpha",names(opt$par))]
-  Opt = TMBhelper::Optimize( obj=Obj, savedir=RunDir, getJointPrecision=TRUE, ... ) # jointPrecision is used below, and is too big to invert whole
-  # Opt = TMBhelper::Optimize( obj=Obj, savedir=RunDir, getJointPrecision=TRUE, newtonsteps=2 ) # jointPrecision is used below, and is too big to invert whole
+  # JointPrecision is used below, and is too big to invert whole;  must have getReportCovariance=TRUE to get JointPrecision
+  Opt = TMBhelper::fit_tmb( obj=Obj, savedir=RunDir, getJointPrecision=TRUE, getReportCovariance=TRUE, newtonsteps=2, ... )
+
+  #
   Report = Obj$report()
   colnames(Report$Ycomplete_ij) = colnames(Report$beta_gj) = colnames(Y_ij)
 
