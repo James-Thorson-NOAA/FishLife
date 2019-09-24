@@ -41,6 +41,17 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=FishLife::dat
   Pen_lowvar_lnRhat=0, lowerbound_MLSPS=1, Use_RAM_Mvalue_TF=TRUE, rho_space="natural", include_r=FALSE,
   PredTF_stock=NULL, extract_covariance=TRUE, ... ){
 
+  #### Local function
+  # Sample from GMRF using sparse precision
+  rmvnorm_prec <- function(mu, prec, n.sims) {
+    z <- matrix(rnorm(length(mu) * n.sims), ncol=n.sims)
+    L <- Matrix::Cholesky(prec, super=TRUE)
+    z <- Matrix::solve(L, z, system = "Lt") ## z = Lt^-1 %*% z
+    z <- Matrix::solve(L, z, system = "Pt") ## z = Pt    %*% z
+    z <- as.matrix(z)
+    mu + z
+  }
+
   #####################
   # Check for potential problems
   #####################
@@ -428,26 +439,40 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=FishLife::dat
     # Extract predictive covariance for species-specific traits (necessary to do separately for rows and columns)
     Prec_zz = Opt$SD$jointPrecision[ , grep("beta_gj",colnames(Opt$SD$jointPrecision)) ]
       Prec_zz = Prec_zz[ grep("beta_gj",rownames(Opt$SD$jointPrecision)), ]
+    # Predict
+    u_zr = rmvnorm_prec( mu=Obj$env$last.par.best, prec=Opt$SD$jointPrecision, n.sims=1000 )
     # Extract and invert
     VarNames = Predictive_distribution( mean_vec=Y_ij[1,], process_cov=NULL, obs_cov=NULL, check_names=TRUE, include_r=include_r )
     n_v = length(VarNames)
-    PartialCorr_gjj = Prec_gjj = array(NA, dim=c(n_g,n_j,n_j), dimnames=list(ParentChild_gz[,'ChildName'],colnames(Y_ij),colnames(Y_ij)) )
-    Corr_gvv = Cov_gvv = array(NA, dim=c(n_g,n_v,n_v), dimnames=list(ParentChild_gz[,'ChildName'],VarNames,VarNames) )
+    Prec_gjj = PartialCorr_gjj = array(NA, dim=c(n_g,n_j,n_j), dimnames=list(ParentChild_gz[,'ChildName'],colnames(Y_ij),colnames(Y_ij)) )
+    Prec_gvv = PartialCorr_gvv = Corr_gvv = Cov_gvv = array(NA, dim=c(n_g,n_v,n_v), dimnames=list(ParentChild_gz[,'ChildName'],VarNames,VarNames) )
     beta_gv = array(NA, dim=c(n_g,n_v), dimnames=list(ParentChild_gz[,'ChildName'],VarNames) )
     for( gI in 1:n_g ){
-      # Extract precision for species and ancestors        # FishLife::
-      Indices = as.vector( outer(seq(1,n_g*n_j,by=n_g)-1, Find_ancestors(child_num=gI, ParentChild_gz=ParentChild_gz), FUN="+") )
-      Full_Precision = matrix(Prec_zz[Indices,Indices],length(Indices),length(Indices))
-      # Record
-      Prec_gjj[gI,1:n_j,1:n_j] = Full_Precision[1:n_j,1:n_j]
-      PartialCorr_gjj[gI,1:n_j,1:n_j] = -1*cov2cor( Prec_gjj[gI,1:n_j,1:n_j] )
-      # Invert approximate cov and corr
-      Cov_gvv[gI,1:n_j,1:n_j] = solve( Full_Precision )[1:n_j,1:n_j]
-      # mean_vec=Report$beta_gj[gI,]; process_cov=Cov_gvv[gI,1:n_j,1:n_j]; obs_cov=Report$obsCov_jj[1:n_j,1:n_j]; include_obscov=FALSE; check_bounds=FALSE; include_r=include_r; lowerbound_MLSPS=lowerbound_MLSPS; rho_option=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2)
-      Pred = Predictive_distribution( mean_vec=Report$beta_gj[gI,], process_cov=Cov_gvv[gI,1:n_j,1:n_j], obs_cov=Report$obsCov_jj[1:n_j,1:n_j], include_obscov=FALSE, check_bounds=FALSE, include_r=include_r, lowerbound_MLSPS=lowerbound_MLSPS, rho_option=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2) )
+      # Method with full precision
+      if( TRUE ){
+        Indices = gI + ( seq(1,n_g*n_j,by=n_g)-1 )
+        Samp_rj = t(u_zr[grep("beta_gj",colnames(Opt$SD$jointPrecision))[Indices],])
+        colnames(Samp_rj) = colnames(Y_ij)
+        Pred = Predictive_distribution( mean_vec=Report$beta_gj[gI,], Samp_rj=Samp_rj, include_obscov=FALSE, check_bounds=FALSE, include_r=include_r, lowerbound_MLSPS=lowerbound_MLSPS, rho_option=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2) )
+        #PartialCorr_gvv[gI,,] = -1*solve(Corr_gvv[gI,,])
+      }
+      # Method with partial precision
+      if( FALSE ){
+        # Extract precision for species and ancestors        # FishLife::
+        Indices = as.vector( outer(seq(1,n_g*n_j,by=n_g)-1, Find_ancestors(child_num=gI, ParentChild_gz=ParentChild_gz), FUN="+") )
+        Full_Precision = matrix(Prec_zz[Indices,Indices],length(Indices),length(Indices))
+        # Record
+        Prec_gjj[gI,1:n_j,1:n_j] = Full_Precision[1:n_j,1:n_j]
+        # Invert approximate cov and corr
+        Cov_gvv[gI,1:n_j,1:n_j] = solve( Full_Precision )[1:n_j,1:n_j]
+        # mean_vec=Report$beta_gj[gI,]; process_cov=Cov_gvv[gI,1:n_j,1:n_j]; obs_cov=Report$obsCov_jj[1:n_j,1:n_j]; include_obscov=FALSE; check_bounds=FALSE; include_r=include_r; lowerbound_MLSPS=lowerbound_MLSPS; rho_option=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2)
+        Pred = Predictive_distribution( mean_vec=Report$beta_gj[gI,], process_cov=Cov_gvv[gI,1:n_j,1:n_j], obs_cov=Report$obsCov_jj[1:n_j,1:n_j], include_obscov=FALSE, check_bounds=FALSE, include_r=include_r, lowerbound_MLSPS=lowerbound_MLSPS, rho_option=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2) )
+        #PartialCorr_gjj[gI,1:n_j,1:n_j] = -1*cov2cor( Prec_gjj[gI,1:n_j,1:n_j] )
+      }
       beta_gv[gI,] = Pred$pred_mean
       Cov_gvv[gI,,] = Pred$pred_cov
       Corr_gvv[gI,,] = cov2cor( Cov_gvv[gI,,] )
+      #Prec_gvv[gI,,] = solve(Cov_gvv[gI,,])
       if( (gI%%1000) == 0 ) message( "Finished processing predictive variance for ", gI, " of ",n_g," taxa" )
     }
 
