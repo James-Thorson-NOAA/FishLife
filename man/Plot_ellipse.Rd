@@ -6,9 +6,9 @@
 \usage{
 Plot_ellipse(Cov, Mean = rep(0, 2), add = FALSE, prob = 0.95,
   xlim = log(c(0.01, 2)), ylim = xlim, logticks = c(1, 2, 5),
-  ticks = c(0, 5), axis_scale = c("log", "log"), main = "", xlab = "",
-  ylab = "", lcol = "black", plot_lines = FALSE, lty = "solid",
-  xaxt = "s", yaxt = "s", ...)
+  ticks = c(0, 5), axis_scale = c("log", "log"), main = "",
+  xlab = "", ylab = "", lcol = "black", plot_lines = FALSE,
+  lty = "solid", xaxt = "s", yaxt = "s", ...)
 }
 \arguments{
 \item{Cov}{2x2 matrix representing covariance}

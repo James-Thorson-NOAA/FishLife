@@ -4,7 +4,8 @@
 \alias{Calculate_ratio}
 \title{Calculate ratio of two modeled traits}
 \usage{
-Calculate_ratio(params = c("K", "M"), Cov_gjj = FishLife::database$Cov_gjj,
+Calculate_ratio(params = c("K", "M"),
+  Cov_gjj = FishLife::database$Cov_gjj,
   Mean_gj = FishLife::database$ParHat$beta_gj,
   ParentChild_gz = FishLife::database$ParentChild_gz)
 }
@@ -27,4 +28,3 @@ Matrix of exponentiated-differences (ratios) and log-standard deviations for pro
 \description{
 \code{Calculate_ratio} projects the covariance among traits onto a single difference (interpreted as a ratio for log-scaled traits)
 }
-

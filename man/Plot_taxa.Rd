@@ -4,16 +4,17 @@
 \alias{Plot_taxa}
 \title{Plots trait predictions for taxa}
 \usage{
-Plot_taxa(Taxa, prob = 0.95, params = matrix(c("K", "M", "Winfinity", "Loo",
-  "tmax", "tm", "Lm", "Temperature"), ncol = 2, byrow = TRUE),
+Plot_taxa(Taxa, prob = 0.95, params = matrix(c("K", "M", "Winfinity",
+  "Loo", "tmax", "tm", "Lm", "Temperature"), ncol = 2, byrow = TRUE),
   Cov_gjj = FishLife::database$Cov_gjj,
   Mean_gj = FishLife::database$ParHat$beta_gj,
   ParentChild_gz = FishLife::database$ParentChild_gz,
-  Y_ij = FishLife::database$Y_ij, xlim = log(c(0.01, 2)), ylim = xlim,
-  ticks = c(0, 5), logticks = c(1, 2, 5), partial_match = FALSE,
-  drop_pred = TRUE, mfrow = c(nrow(params), 1), legendnum = 2,
-  verbose = FALSE, plot_lines = FALSE, lcol = rainbow(length(Taxa)),
-  lty = rep("solid", length(Taxa)), xaxt = "s", yaxt = "s", ...)
+  Y_ij = FishLife::database$Y_ij, xlim = log(c(0.01, 2)),
+  ylim = xlim, ticks = c(0, 5), logticks = c(1, 2, 5),
+  partial_match = FALSE, drop_pred = TRUE, mfrow = c(nrow(params),
+  1), legendnum = 2, verbose = FALSE, plot_lines = FALSE,
+  lcol = rainbow(length(Taxa)), lty = rep("solid", length(Taxa)),
+  xaxt = "s", yaxt = "s", ...)
 }
 \arguments{
 \item{Taxa}{One or more taxonomic names (matching rows from \code{ParentChild_gz[,'ChildName']})}

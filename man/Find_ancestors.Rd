@@ -4,7 +4,8 @@
 \alias{Find_ancestors}
 \title{Find ancestors}
 \usage{
-Find_ancestors(child_num, ParentChild_gz = FishLife::database$ParentChild_gz)
+Find_ancestors(child_num,
+  ParentChild_gz = FishLife::database$ParentChild_gz)
 }
 \arguments{
 \item{child_num}{row number of \code{ParentChild_gz} for which to find ancestors}
@@ -17,4 +18,3 @@ vector of row numbers of \code{ParentChild_gz} for ancestors (including \code{ch
 \description{
 Find higher taxonomic levels for a given taxon (e.g., Class and Order for a given Family)
 }
-

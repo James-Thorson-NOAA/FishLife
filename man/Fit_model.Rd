@@ -5,17 +5,20 @@
 \title{Fit and predict fish traits}
 \usage{
 Fit_model(N_factors, N_obsfactors, Use_REML = TRUE,
-  Y_ij = FishLife::database$Y_ij, Z_ik = FishLife::database$Z_ik,
-  Version = "Taxon_v1_2_0", Process_cov = "Equal",
-  TmbDir = system.file("executables", package = "FishLife"),
-  RunDir = tempfile(pattern = "run_", tmpdir = tempdir(), fileext = "/"),
-  Params = "Generate", verbose = FALSE, debug_mode = FALSE,
-  SR_obs = NULL, StockData = NULL, j_SR = ncol(Y_ij) - 3:1,
-  zerocovTF_j = rep(FALSE, ncol(Y_ij)), additional_variance = c(0, 0),
-  invertTF = FALSE, SD_b_stock = 10, b_type = 0, Cov_design = NULL,
-  Random = "Generate", Cov_RAM = c(M = FALSE), Turn_off_taxonomy = FALSE,
-  Pen_lowvar_lnRhat = 0, lowerbound_MLSPS = 1, Use_RAM_Mvalue_TF = TRUE,
-  rho_space = "natural", include_r = FALSE, ...)
+  Database = FishLife::FishBase, Y_ij = Database$Y_ij,
+  Z_ik = Database$Z_ik, SR_obs = Database$SR_obs,
+  StockData = Database$StockData, Version = "Taxon_v2_14_0",
+  Process_cov = "Equal", TmbDir = system.file("executables", package =
+  "FishLife"), RunDir = tempfile(pattern = "run_", tmpdir = tempdir(),
+  fileext = "/"), Params = "Generate", verbose = FALSE,
+  debug_mode = FALSE, j_SR = ncol(Y_ij) - 3:1,
+  zerocovTF_j = rep(FALSE, ncol(Y_ij)), additional_variance = c(1e-04,
+  1e-04), invertTF = FALSE, SD_b_stock = 10, b_type = 0,
+  Cov_design = NULL, Random = "Generate", Cov_RAM = c(M = FALSE),
+  Turn_off_taxonomy = FALSE, Pen_lowvar_lnRhat = 0,
+  lowerbound_MLSPS = 1, Use_RAM_Mvalue_TF = TRUE,
+  rho_space = "natural", include_r = FALSE, PredTF_stock = NULL,
+  extract_covariance = TRUE, ...)
 }
 \arguments{
 \item{N_factors}{Number of factors in decomposition of covariance for random-walk along evolutionary tree (0 means a diagonal but unequal covariance; negative is the sum of a factor decomposition and a diagonal-but-unequal covariance)}

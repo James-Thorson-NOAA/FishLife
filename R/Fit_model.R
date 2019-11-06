@@ -33,10 +33,11 @@
 #' }
 #'
 #' @export
-Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=FishLife::database$Y_ij, Z_ik=FishLife::database$Z_ik,
-  Version="Taxon_v1_2_0", Process_cov="Equal", TmbDir=system.file("executables",package="FishLife"),
+Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Database=FishLife::FishBase,
+  Y_ij=Database$Y_ij, Z_ik=Database$Z_ik, SR_obs=Database$SR_obs, StockData=Database$StockData,
+  Version="Taxon_v2_14_0", Process_cov="Equal", TmbDir=system.file("executables",package="FishLife"),
   RunDir=tempfile(pattern="run_",tmpdir=tempdir(),fileext="/"), Params="Generate", verbose=FALSE, debug_mode=FALSE,
-  SR_obs=NULL, StockData=NULL, j_SR=ncol(Y_ij)-3:1, zerocovTF_j=rep(FALSE,ncol(Y_ij)), additional_variance=c(0,0),
+  j_SR=ncol(Y_ij)-3:1, zerocovTF_j=rep(FALSE,ncol(Y_ij)), additional_variance=c(0.0001,0.0001),
   invertTF=FALSE, SD_b_stock=10, b_type=0, Cov_design=NULL, Random="Generate", Cov_RAM=c("M"=FALSE), Turn_off_taxonomy=FALSE,
   Pen_lowvar_lnRhat=0, lowerbound_MLSPS=1, Use_RAM_Mvalue_TF=TRUE, rho_space="natural", include_r=FALSE,
   PredTF_stock=NULL, extract_covariance=TRUE, ... ){
@@ -418,7 +419,8 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Y_ij=FishLife::dat
 
   # Return stuff
   Return = list("N_factors"=N_factors, "N_obsfactors"=N_obsfactors, "Use_REML"=Use_REML,
-    "ParentChild_gz"=ParentChild_gz, "ParHat"=ParHat, "g_i"=g_i, "Y_ij"=Y_ij, "Z_ik"=Z_ik,
+    "ParentChild_gz"=ParentChild_gz, "ParHat"=ParHat, "g_i"=g_i,
+    "Y_ij"=Y_ij, "Z_ik"=Z_ik, "SR_obs"=SR_obs, "StockData"=StockData,
     "Obj"=Obj, "Opt"=Opt, "Report"=Report, "ParHat_SE"=ParHat_SE, "obsCov_jj"=Report$obsCov_jj)
   dimnames(Return$obsCov_jj) = list(colnames(Y_ij),colnames(Y_ij))
   if("Cov_jj" %in% names(Report)){

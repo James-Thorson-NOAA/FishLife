@@ -4,8 +4,8 @@
 \alias{Update_prediction}
 \title{Update predictions with new data}
 \usage{
-Update_prediction(Taxon, Ynew_ij, partial_match = TRUE, verbose = FALSE,
-  ParentChild_gz = FishLife::database$ParentChild_gz,
+Update_prediction(Taxon, Ynew_ij, partial_match = TRUE,
+  verbose = FALSE, ParentChild_gz = FishLife::database$ParentChild_gz,
   Cov_gjj = FishLife::database$Cov_gjj,
   Mean_gj = FishLife::database$ParHat$beta_gj,
   obsCov_jj = FishLife::database$obsCov_jj, Version = "Update_v1_0_0",
@@ -51,4 +51,3 @@ Combines the taxonomic predictions from FishBase with new user-supplied data
 This function allows the user to update predictions using new data from one or more studies.  A study for a single parameter is entered as a new
 row of \code{Ynew_ij}, where all elements are \code{NA} except for the parameter of interest.
 }
-
