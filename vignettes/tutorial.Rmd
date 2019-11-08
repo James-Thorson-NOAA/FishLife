@@ -39,7 +39,7 @@ First we demonstrate red snapper, which is within the FishBase database used to 
 
 ```{r, echo=TRUE, message=FALSE, fig.width=8, fig.height=8}
 # Get basic plot for Lutjanus campechanus
-Plot_taxa( Search_species(Genus="Lutjanus",Species="campechanus")$match_taxonomy, mfrow=c(2,2) )
+Plot_taxa( Search_species(Genus="Lutjanus",Species="campechanus")$match_taxonomy, mfrow=c(3,2) )
 ```
 
 ### Data-poor:  Cortez rockfish
@@ -47,7 +47,7 @@ Plot_taxa( Search_species(Genus="Lutjanus",Species="campechanus")$match_taxonomy
 Next we demonstrate cortez rockfish, which is not within the FishBase database used to train the model, so its predictions are relatively based on information from related species within genus *Sebastes*.  
 ```{r, echo=TRUE, message=FALSE, fig.width=8, fig.height=8}
 # Get basic plot for Sebastes cortezi
-Predict = Plot_taxa( Search_species(Genus="Sebastes",Species="cortezi")$match_taxonomy, mfrow=c(2,2) )
+Predict = Plot_taxa( Search_species(Genus="Sebastes",Species="cortezi")$match_taxonomy, mfrow=c(3,2) )
 ```
 
 We then show updated values for the predictive mean using `Predict[[1]]$Mean_pred`...
@@ -81,7 +81,7 @@ Please see code in "tutorial.Rmd" for details.
 Third, we demonstrate predictions for family *Scombridae*, to show how predictions are available for higher-level taxonomies.
 ```{r, echo=TRUE, message=FALSE, fig.width=8, fig.height=8}
 # Get basic plot for Family Scombridae 
-Plot_taxa( Search_species(Family="Scombridae")$match_taxonomy, mfrow=c(2,2) )
+Plot_taxa( Search_species(Family="Scombridae")$match_taxonomy, mfrow=c(3,2) )
 ```
 
 ### Comparison:  Trouts
@@ -91,7 +91,7 @@ Fourth, we compare predictions for two species, brown and rainbow trout.
 # Compare two species
 Taxa = c( Search_species(Genus="Oncorhynchus",Species="mykiss",add_ancestors=FALSE)$match_taxonomy,
   Search_species(Genus="Salmo",Species="Trutta",add_ancestors=FALSE)$match_taxonomy )
-Plot_taxa( Taxa, mfrow=c(2,2) )
+Plot_taxa( Taxa, mfrow=c(3,2) )
 ```
 
 # How to update or replicate results

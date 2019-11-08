@@ -5,21 +5,22 @@
 \title{Plots trait predictions}
 \usage{
 Plot_trait(Taxon, params = c("K", "M"),
-  Cov_gjj = FishLife::database$Cov_gjj,
-  Mean_gj = FishLife::database$ParHat$beta_gj,
-  ParentChild_gz = FishLife::database$ParentChild_gz,
-  Y_ij = FishLife::database$Y_ij, g_i = FishLife::database$g_i,
-  SpeciesMatch = NULL, prob = 0.95, add = FALSE, xlim = log(c(0.01,
-  2)), ylim = xlim, partial_match = TRUE, main = "", xlab = "",
-  ylab = "", lcol = "black", plot_lines = FALSE, verbose = FALSE,
-  ticks = c(0, 5), logticks = c(1, 2, 5),
-  obsCov_jj = FishLife::database$obsCov_jj, include_obscov = FALSE,
-  lty = "solid", xaxt = "s", yaxt = "s", ...)
+  Database = FishLife::FishBase_and_RAM, Cov_gjj = Database$Cov_gvv,
+  Mean_gj = Database$beta_gv, ParentChild_gz = Database$ParentChild_gz,
+  Y_ij = Database$Y_ij, g_i = Database$g_i, SpeciesMatch = NULL,
+  prob = 0.95, add = FALSE, xlim = log(c(0.01, 2)), ylim = xlim,
+  partial_match = TRUE, main = "", xlab = "", ylab = "",
+  lcol = "black", plot_lines = FALSE, verbose = FALSE, ticks = c(0,
+  5), logticks = c(1, 2, 5), obsCov_jj = Database$obsCov_jj,
+  include_obscov = FALSE, lty = "solid", xaxt = "s", yaxt = "s",
+  ...)
 }
 \arguments{
 \item{Taxon}{A taxon (matching row from \code{ParentChild_gz[,'ChildName']})}
 
 \item{params}{character vector (length of two) of parameters to plot}
+
+\item{Database}{Whether to use results for both adult and stock-recruit parameters, \code{Database="FishBase_and_RAM"}, or just adult parameters, \code{Database="FishBase"}}
 
 \item{Cov_gjj}{Array of estimated covariance for each taxonomic group \code{g} and trait \code{j}}
 

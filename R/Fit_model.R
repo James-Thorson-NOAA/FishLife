@@ -4,9 +4,12 @@
 #'
 #' @param N_factors Number of factors in decomposition of covariance for random-walk along evolutionary tree (0 means a diagonal but unequal covariance; negative is the sum of a factor decomposition and a diagonal-but-unequal covariance)
 #' @param N_obsfactors Number of factors in decomposotion of observation covariance (same format as \code{N_obsfactors})
+#' @param Database, Whether to use results for both adult and stock-recruit parameters, \code{Database="FishBase_and_RAM"}, or just adult parameters, \code{Database="FishBase"}
 #' @param Use_REML, OPTIONAL boolean whether to use maximum marginal likelihood or restricted maximum likelihood (termed "REML")
 #' @param Y_ij a data frame of trait values (perhaps log-scaled) with rows for records, and tagged-columns for traits
 #' @param Z_ik a data frame of taxonomic classification for each row of \code{Y_ij}
+#' @param SR_obs Stock-recruit records from RAM Legacy stock-recruit database
+#' @param StockData Auxiliary information for every stock with stock-recruit information
 #' @param Version TMB version number
 #' @param Process_cov Whether process-error covariance is equal or differs multiplicatively for different taxonomic levels (Options:  "Equal" or "Unequal")
 #' @param TmbDir Directory containing pre-compiled TMB script
@@ -33,18 +36,19 @@
 #' }
 #'
 #' @export
-Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Database=FishLife::FishBase,
+Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Database=FishLife::FishBase_and_RAM,
   Y_ij=Database$Y_ij, Z_ik=Database$Z_ik, SR_obs=Database$SR_obs, StockData=Database$StockData,
-  Version="Taxon_v2_14_0", Process_cov="Equal", TmbDir=system.file("executables",package="FishLife"),
+  Version="Taxon_v2_14_0", Process_cov="Unequal", TmbDir=system.file("executables",package="FishLife"),
   RunDir=tempfile(pattern="run_",tmpdir=tempdir(),fileext="/"), Params="Generate", verbose=FALSE, debug_mode=FALSE,
-  j_SR=ncol(Y_ij)-3:1, zerocovTF_j=rep(FALSE,ncol(Y_ij)), additional_variance=c(0.0001,0.0001),
+  j_SR=ncol(Y_ij)-3:1, zerocovTF_j=rep(FALSE,ncol(Y_ij)), additional_variance=c(0,0),
   invertTF=FALSE, SD_b_stock=10, b_type=0, Cov_design=NULL, Random="Generate", Cov_RAM=c("M"=FALSE), Turn_off_taxonomy=FALSE,
-  Pen_lowvar_lnRhat=0, lowerbound_MLSPS=1, Use_RAM_Mvalue_TF=TRUE, rho_space="natural", include_r=FALSE,
+  Pen_lowvar_lnRhat=1, lowerbound_MLSPS=1, Use_RAM_Mvalue_TF=TRUE, rho_space="natural", include_r=TRUE,
   PredTF_stock=NULL, extract_covariance=TRUE, ... ){
 
   #### Local function
   # Sample from GMRF using sparse precision
-  rmvnorm_prec <- function(mu, prec, n.sims) {
+  rmvnorm_prec <- function(mu, prec, n.sims, seed=1) {
+    set.seed( seed )
     z <- matrix(rnorm(length(mu) * n.sims), ncol=n.sims)
     L <- Matrix::Cholesky(prec, super=TRUE)
     z <- Matrix::solve(L, z, system = "Lt") ## z = Lt^-1 %*% z
@@ -69,8 +73,10 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Database=FishLife:
     Nstock = 0
     Nobs = 0
     SR_obs = cbind("R_obs"=1, "SSB_obs"=1, "AR_Index"=1, "StockNum"=1)
-  }
-  if( !is.null(SR_obs) & !is.null(StockData) ){
+    include_r = FALSE
+    PredTF_stock = vector()
+    StockData = cbind( "SPRF0"=vector(), "M"=vector(), "SSBmax"=vector(), "Rmax"=vector(), "Stock_to_i"=vector() )
+  }else{
     if( !all( c("R_obs","SSB_obs","AR_Index","StockNum") %in% colnames(SR_obs)) ) stop("Check `SR_obs` input")
     if( !all( c("M","SPRF0","Stock_to_i") %in% colnames(StockData)) ) stop("Check `StockData` input")
     Nobs = nrow(SR_obs)
@@ -308,7 +314,9 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Database=FishLife:
     if( "theta_q" %in% names(Params) ) Map[["theta_q"]] = factor(NA)
   }
   # Map off species where PredTF_stock == TRUE
-  Map[["bparam_stock"]] = factor( ifelse(PredTF_stock==TRUE, NA, 1:Data$Nstock) )
+  if( Nstock > 0 ){
+    Map[["bparam_stock"]] = factor( ifelse(PredTF_stock==TRUE, NA, 1:Data$Nstock) )
+  }
 
   # Turn off taxonomic hierarchy, such that all taxa have expected LH params = alpha_j
   if( Turn_off_taxonomy==TRUE ){
@@ -346,6 +354,14 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Database=FishLife:
   # Check for problems
   if( rho_space%in%c("logit","logit_with_jacobian") & !("rho_option"%in%names(Data$Options_vec)) ){
     stop("Using non-default value for `rho_space` doesn't make sense with the version you are using")
+  }
+
+  # Debugging option
+  if( debug_mode==TRUE ){
+    on.exit( assign("Params", Params, envir=.GlobalEnv), add=TRUE )
+    on.exit( assign("Data", Data, envir=.GlobalEnv), add=TRUE )
+    on.exit( assign("Map", Map, envir=.GlobalEnv), add=TRUE )
+    on.exit( assign("Random", Random, envir=.GlobalEnv), add=TRUE )
   }
 
   #####################
@@ -451,30 +467,13 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Database=FishLife:
     beta_gv = array(NA, dim=c(n_g,n_v), dimnames=list(ParentChild_gz[,'ChildName'],VarNames) )
     for( gI in 1:n_g ){
       # Method with full precision
-      if( TRUE ){
-        Indices = gI + ( seq(1,n_g*n_j,by=n_g)-1 )
-        Samp_rj = t(u_zr[grep("beta_gj",colnames(Opt$SD$jointPrecision))[Indices],])
-        colnames(Samp_rj) = colnames(Y_ij)
-        Pred = Predictive_distribution( mean_vec=Report$beta_gj[gI,], Samp_rj=Samp_rj, include_obscov=FALSE, check_bounds=FALSE, include_r=include_r, lowerbound_MLSPS=lowerbound_MLSPS, rho_option=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2) )
-        #PartialCorr_gvv[gI,,] = -1*solve(Corr_gvv[gI,,])
-      }
-      # Method with partial precision
-      if( FALSE ){
-        # Extract precision for species and ancestors        # FishLife::
-        Indices = as.vector( outer(seq(1,n_g*n_j,by=n_g)-1, Find_ancestors(child_num=gI, ParentChild_gz=ParentChild_gz), FUN="+") )
-        Full_Precision = matrix(Prec_zz[Indices,Indices],length(Indices),length(Indices))
-        # Record
-        Prec_gjj[gI,1:n_j,1:n_j] = Full_Precision[1:n_j,1:n_j]
-        # Invert approximate cov and corr
-        Cov_gvv[gI,1:n_j,1:n_j] = solve( Full_Precision )[1:n_j,1:n_j]
-        # mean_vec=Report$beta_gj[gI,]; process_cov=Cov_gvv[gI,1:n_j,1:n_j]; obs_cov=Report$obsCov_jj[1:n_j,1:n_j]; include_obscov=FALSE; check_bounds=FALSE; include_r=include_r; lowerbound_MLSPS=lowerbound_MLSPS; rho_option=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2)
-        Pred = Predictive_distribution( mean_vec=Report$beta_gj[gI,], process_cov=Cov_gvv[gI,1:n_j,1:n_j], obs_cov=Report$obsCov_jj[1:n_j,1:n_j], include_obscov=FALSE, check_bounds=FALSE, include_r=include_r, lowerbound_MLSPS=lowerbound_MLSPS, rho_option=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2) )
-        #PartialCorr_gjj[gI,1:n_j,1:n_j] = -1*cov2cor( Prec_gjj[gI,1:n_j,1:n_j] )
-      }
+      Indices = gI + ( seq(1,n_g*n_j,by=n_g)-1 )
+      Samp_rj = t(u_zr[grep("beta_gj",colnames(Opt$SD$jointPrecision))[Indices],])
+      colnames(Samp_rj) = colnames(Y_ij)
+      Pred = Predictive_distribution( mean_vec=Report$beta_gj[gI,], Samp_rj=Samp_rj, include_obscov=FALSE, check_bounds=FALSE, include_r=include_r, lowerbound_MLSPS=lowerbound_MLSPS, rho_option=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2) )
       beta_gv[gI,] = Pred$pred_mean
       Cov_gvv[gI,,] = Pred$pred_cov
       Corr_gvv[gI,,] = cov2cor( Cov_gvv[gI,,] )
-      #Prec_gvv[gI,,] = solve(Cov_gvv[gI,,])
       if( (gI%%1000) == 0 ) message( "Finished processing predictive variance for ", gI, " of ",n_g," taxa" )
     }
 

@@ -5,19 +5,19 @@
 \title{Fit and predict fish traits}
 \usage{
 Fit_model(N_factors, N_obsfactors, Use_REML = TRUE,
-  Database = FishLife::FishBase, Y_ij = Database$Y_ij,
+  Database = FishLife::FishBase_and_RAM, Y_ij = Database$Y_ij,
   Z_ik = Database$Z_ik, SR_obs = Database$SR_obs,
   StockData = Database$StockData, Version = "Taxon_v2_14_0",
-  Process_cov = "Equal", TmbDir = system.file("executables", package =
-  "FishLife"), RunDir = tempfile(pattern = "run_", tmpdir = tempdir(),
+  Process_cov = "Unequal", TmbDir = system.file("executables", package
+  = "FishLife"), RunDir = tempfile(pattern = "run_", tmpdir = tempdir(),
   fileext = "/"), Params = "Generate", verbose = FALSE,
   debug_mode = FALSE, j_SR = ncol(Y_ij) - 3:1,
-  zerocovTF_j = rep(FALSE, ncol(Y_ij)), additional_variance = c(1e-04,
-  1e-04), invertTF = FALSE, SD_b_stock = 10, b_type = 0,
-  Cov_design = NULL, Random = "Generate", Cov_RAM = c(M = FALSE),
-  Turn_off_taxonomy = FALSE, Pen_lowvar_lnRhat = 0,
+  zerocovTF_j = rep(FALSE, ncol(Y_ij)), additional_variance = c(0, 0),
+  invertTF = FALSE, SD_b_stock = 10, b_type = 0, Cov_design = NULL,
+  Random = "Generate", Cov_RAM = c(M = FALSE),
+  Turn_off_taxonomy = FALSE, Pen_lowvar_lnRhat = 1,
   lowerbound_MLSPS = 1, Use_RAM_Mvalue_TF = TRUE,
-  rho_space = "natural", include_r = FALSE, PredTF_stock = NULL,
+  rho_space = "natural", include_r = TRUE, PredTF_stock = NULL,
   extract_covariance = TRUE, ...)
 }
 \arguments{
@@ -27,9 +27,15 @@ Fit_model(N_factors, N_obsfactors, Use_REML = TRUE,
 
 \item{Use_REML, }{OPTIONAL boolean whether to use maximum marginal likelihood or restricted maximum likelihood (termed "REML")}
 
+\item{Database, }{Whether to use results for both adult and stock-recruit parameters, \code{Database="FishBase_and_RAM"}, or just adult parameters, \code{Database="FishBase"}}
+
 \item{Y_ij}{a data frame of trait values (perhaps log-scaled) with rows for records, and tagged-columns for traits}
 
 \item{Z_ik}{a data frame of taxonomic classification for each row of \code{Y_ij}}
+
+\item{SR_obs}{Stock-recruit records from RAM Legacy stock-recruit database}
+
+\item{StockData}{Auxiliary information for every stock with stock-recruit information}
 
 \item{Version}{TMB version number}
 

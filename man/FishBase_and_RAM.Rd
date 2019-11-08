@@ -8,8 +8,9 @@
 \describe{
   \item{N_factors}{Number of factors used for evolution in life-history model}
   \item{N_obsfactors}{Number of factors used for measurent-error in life-history model}
+  \item{beta_gv}{Predictive mean (in transformed space) among traits for every taxon in tree}
+  \item{Cov_gvv}{Covariance among traits for every taxon in tree}
   \item{Use_REML}{Boolean, whether REML was used for model}
-  \item{Cov_gjj}{Covariance among traits for every taxon in tree}
   \item{ParentChild_gz}{Record of taxonomic tree}
   \item{ParHat}{Parameter estimates and predictions}
   \item{g_i}{Associates every observation with a level of the taxonomic tree}

@@ -4,8 +4,8 @@
 \alias{Find_ancestors}
 \title{Find ancestors}
 \usage{
-Find_ancestors(child_num,
-  ParentChild_gz = FishLife::database$ParentChild_gz)
+Find_ancestors(child_num, Database = FishLife::FishBase_and_RAM,
+  ParentChild_gz = Database$ParentChild_gz)
 }
 \arguments{
 \item{child_num}{row number of \code{ParentChild_gz} for which to find ancestors}

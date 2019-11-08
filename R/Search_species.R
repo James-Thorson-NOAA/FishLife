@@ -19,7 +19,7 @@
 
 #' @export
 Search_species = function( Class="predictive", Order="predictive", Family="predictive", Genus="predictive", Species="predictive",
-   add_ancestors=TRUE, ParentChild_gz=FishLife::database$ParentChild_gz ){
+   add_ancestors=TRUE, Database=FishLife::FishBase_and_RAM, ParentChild_gz=Database$ParentChild_gz ){
 
   # Match full taxonomy from fishbase
   Match = 1:nrow(rfishbase::fishbase)

@@ -14,11 +14,16 @@
 #' @inheritParams Calculate_ratio
 
 #' @export
-Plot_trait = function( Taxon, params=c('K','M'), Cov_gjj=FishLife::database$Cov_gjj, Mean_gj=FishLife::database$ParHat$beta_gj,
-  ParentChild_gz=FishLife::database$ParentChild_gz, Y_ij=FishLife::database$Y_ij, g_i=FishLife::database$g_i,
+Plot_trait = function( Taxon, params=c('K','M'), Database=FishLife::FishBase_and_RAM, Cov_gjj=Database$Cov_gvv, Mean_gj=Database$beta_gv,
+  ParentChild_gz=Database$ParentChild_gz, Y_ij=Database$Y_ij, g_i=Database$g_i,
   SpeciesMatch=NULL, prob=0.95, add=FALSE, xlim=log(c(0.01,2)), ylim=xlim, partial_match=TRUE, main="", xlab="", ylab="",
-  lcol="black", plot_lines=FALSE, verbose=FALSE, ticks=c(0,5), logticks=c(1,2,5), obsCov_jj=FishLife::database$obsCov_jj,
+  lcol="black", plot_lines=FALSE, verbose=FALSE, ticks=c(0,5), logticks=c(1,2,5), obsCov_jj=Database$obsCov_jj,
   include_obscov=FALSE, lty="solid", xaxt="s", yaxt="s", ... ){
+
+  # Check for problems
+  if( !all(params %in% colnames(Mean_gj)) ){
+    stop("Please change params to match `colnames(Mean_gj)`")
+  }
 
   # Match taxon
   if(partial_match==TRUE) Which = grep(Taxon, ParentChild_gz[,'ChildName'])
@@ -27,8 +32,11 @@ Plot_trait = function( Taxon, params=c('K','M'), Cov_gjj=FishLife::database$Cov_
   if(verbose==TRUE) print( ParentChild_gz[Which,] )
 
   # Plot ellipse
+  axis_scale = sapply(params,FUN=switch,"Temperature"="natural","h"="natural","rho"="natural","G"="natural","r"="natural","logitbound_h"="logit_0.2_1.0","log")
   #Plot_ellipse( Cov=Cov_gjj[Which,params,params], Mean=Mean_gj[Which,params], add=add, whichlog=paste(c("x","y")[which(!params%in%c("Temperature","h"))],collapse=""), xlim=xlim, ylim=ylim, main=main, xlab=xlab, lcol=lcol, plot_lines=plot_lines, ticks=ticks, logticks=logticks, prob=prob, ... )
-  Plot_ellipse( Cov=Cov_gjj[Which,params,params], Mean=Mean_gj[Which,params], add=add, axis_scale=sapply(params,FUN=switch,"Temperature"="natural","h"="natural","rho"="natural","G"="natural","r"="natural","logitbound_h"="logit_0.2_1.0","log"), xlim=xlim, ylim=ylim, main=main, xlab=xlab, lcol=lcol, plot_lines=plot_lines, ticks=ticks, logticks=logticks, prob=prob, lty=lty, xaxt=xaxt, yaxt=yaxt, ... )
+  Plot_ellipse( Cov=Cov_gjj[Which,params,params], Mean=Mean_gj[Which,params], add=add, axis_scale=axis_scale, xlim=xlim, ylim=ylim, main=main,
+    xlab=xlab, lcol=lcol, plot_lines=plot_lines, ticks=ticks, logticks=logticks, prob=prob, lty=lty, xaxt=xaxt, yaxt=yaxt, ... )
+  #plot.new()
 
   # Plot observations
   if( !is.null(SpeciesMatch) ){

@@ -7,7 +7,9 @@ Predictive_distribution = function( mean_vec, process_cov, obs_cov, Samp_rj,
   var_names = names(mean_vec)
   n_j = length(mean_vec)
 
-  if( include_obscov!=0 ) stop("Input `include_obscov` is only implemented for FALSE")
+  if( include_obscov!=FALSE ){
+    stop("Input `include_obscov` is only implemented for FALSE")
+  }
   if( all(c("ln_var","rho","ln_MASPS") %in% var_names) ){
     # Define objects
     var_names = union( var_names, c("rho", "ln_margsd", "h", "logitbound_h", "ln_Fmsy_over_M", "ln_Fmsy") )
@@ -61,6 +63,12 @@ Predictive_distribution = function( mean_vec, process_cov, obs_cov, Samp_rj,
       pred_cov[1:n_j,1:n_j] = process_cov + obs_cov*include_obscov
     }
   }else{
+    if(missing(process_cov)){
+      process_cov = cov( Samp_rj, use="pairwise.complete" )
+    }
+    if(missing(obs_cov)){
+      obs_cov = matrix( 0, nrow=ncol(Samp_rj), ncol=ncol(Samp_rj) )
+    }
     pred_cov = process_cov + obs_cov*include_obscov
     pred_mean = mean_vec
   }
