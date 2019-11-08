@@ -11,7 +11,12 @@ vignette: >
 
 # Description
 
-`FishLife` is an R package for predicting and repositing life-history parameters for >30,000 fishes using both life-history correlations and similarities among related species.  This package uses data from FishBase as downloaded in 2016, and can be updated using a new database, or using additional data for a single species. 
+`FishLife` is an R package for predicting and repositing life-history parameters for >30,000 fishes using both life-history correlations and similarities among related species.  The package comes with two databases and pre-run results:
+
+* The original database and results is described by Thorson Munch Cope Gao (2017), and uses records of size, growth, maturity, and mortality parameters from FishBase as downloaded in 2016.
+* The updated database and results is described by Thorson (In press), and combines the original analysis with RAM Legacy database records of stock-recruit relationships to estimate a full life-cycle model for all species
+
+Results can be updated using a new database, or using additional data for a single species. 
 
 ## Explore predictions online
 
@@ -143,7 +148,8 @@ knitr::kable(Update$updateCov_j, digits=3)
 
 If using the software or predictions please cite:
 
-* Thorson, J. T., S. B. Munch, J. M. Cope, and J. Gao. In press. Predicting life history parameters for all fishes worldwide. Ecological Applications.
+* Thorson, J. T. In press.  Predicting recruitment density dependence and intrinsic growth rate for all fishes worldwide using a data-integrated life-history model.  Fish and Fisheries. 
+* Thorson, J. T., S. B. Munch, J. M. Cope, and J. Gao. 2017. Predicting life history parameters for all fishes worldwide. Ecological Applications. 27(8): 2262-2276. https://doi.org/10.1002/eap.1606
 
 Also please see:
 
