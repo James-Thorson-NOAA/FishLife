@@ -5,8 +5,10 @@
 \title{Search species}
 \usage{
 Search_species(Class = "predictive", Order = "predictive",
-  Family = "predictive", Genus = "predictive", Species = "predictive",
-  add_ancestors = TRUE, ParentChild_gz = FishLife::database$ParentChild_gz)
+  Family = "predictive", Genus = "predictive",
+  Species = "predictive", add_ancestors = TRUE,
+  Database = FishLife::FishBase_and_RAM,
+  ParentChild_gz = Database$ParentChild_gz)
 }
 \arguments{
 \item{Class}{Character input for taxonomic class}
@@ -35,4 +37,3 @@ and ignores any taxonomic input listed as \code{"predictive"} until it finds som
 \code{"predictive"} to any lower taxonomic level that is missing, and checks whether this specification yields a single,
 unique taxon.  If it does, it then returns the row number and potentially any ancestors (higher taxonomic levels)
 }
-

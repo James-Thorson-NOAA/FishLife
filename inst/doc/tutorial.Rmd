@@ -62,7 +62,19 @@ knitr::kable(Predict[[1]]$Mean_pred, digits=3)
 knitr::kable(Predict[[1]]$Cov_pred, digits=3)
 ```
 
-... for life-history parameters.  
+... for life-history parameters. These values are in log-space for all variables except Temperature, and converting to the predictive median can be accomplished by exponentiating those variables: :
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(c(exp(Predict[[1]]$Mean_pred[-8]),Predict[[1]]$Mean_pred['Temperature']), digits=3)
+```
+
+... or the predictive mean can be calculated by exponentiating and bias-correcting:
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(c(exp(Predict[[1]]$Mean_pred[-8]+0.5*diag(Predict[[1]]$Cov_pred)[-8]),Predict[[1]]$Mean_pred['Temperature']), digits=3)
+```
+
+Please see code in "tutorial.Rmd" for details.  
 
 ### High-level:  Scombridae
 

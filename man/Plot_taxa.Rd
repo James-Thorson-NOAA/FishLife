@@ -4,15 +4,17 @@
 \alias{Plot_taxa}
 \title{Plots trait predictions for taxa}
 \usage{
-Plot_taxa(Taxa, prob = 0.95, params = matrix(c("K", "M", "Winfinity", "Loo",
-  "tmax", "tm", "Lm", "Temperature"), ncol = 2, byrow = TRUE),
-  Cov_gjj = FishLife::database$Cov_gjj,
-  Mean_gj = FishLife::database$ParHat$beta_gj,
-  ParentChild_gz = FishLife::database$ParentChild_gz,
-  Y_ij = FishLife::database$Y_ij, xlim = log(c(0.01, 2)), ylim = xlim,
-  ticks = c(0, 5), logticks = c(1, 2, 5), partial_match = FALSE,
-  drop_pred = TRUE, mfrow = c(nrow(params), 1), legendnum = 2,
-  verbose = FALSE, plot_lines = FALSE, ...)
+Plot_taxa(Taxa, prob = 0.95, params = matrix(c("K", "M", "Winfinity",
+  "Loo", "tmax", "tm", "Lm", "Temperature", "ln_margsd", "rho",
+  "logitbound_h", "ln_r"), ncol = 2, byrow = TRUE),
+  Database = FishLife::FishBase_and_RAM, Cov_gjj = Database$Cov_gvv,
+  Mean_gj = Database$beta_gv, ParentChild_gz = Database$ParentChild_gz,
+  Y_ij = Database$Y_ij, g_i = Database$g_i, xlim = log(c(0.01, 2)),
+  ylim = xlim, ticks = c(0, 5), logticks = c(1, 2, 5),
+  partial_match = FALSE, drop_pred = TRUE, mfrow = c(nrow(params),
+  1), legendnum = 2, verbose = FALSE, plot_lines = FALSE,
+  lcol = rainbow(length(Taxa)), lty = rep("solid", length(Taxa)),
+  xaxt = "s", yaxt = "s", ...)
 }
 \arguments{
 \item{Taxa}{One or more taxonomic names (matching rows from \code{ParentChild_gz[,'ChildName']})}
@@ -21,6 +23,8 @@ Plot_taxa(Taxa, prob = 0.95, params = matrix(c("K", "M", "Winfinity", "Loo",
 
 \item{params}{matrix (2 columns) of parameters to plot, where each row gives parameter names for a given plot}
 
+\item{Database}{Whether to use results for both adult and stock-recruit parameters, \code{Database="FishBase_and_RAM"}, or just adult parameters, \code{Database="FishBase"}}
+
 \item{Cov_gjj}{Array of estimated covariance for each taxonomic group \code{g} and trait \code{j}}
 
 \item{Mean_gj}{Matrix of Empirical Bayes predictions of traits for each taxonomic group}
@@ -28,6 +32,8 @@ Plot_taxa(Taxa, prob = 0.95, params = matrix(c("K", "M", "Winfinity", "Loo",
 \item{ParentChild_gz}{Matrix representing taxonomic tree for analyzed data}
 
 \item{Y_ij}{a data frame of trait values (perhaps log-scaled) with rows for records, and tagged-columns for traits}
+
+\item{g_i}{Vector that associates every observation with a level of the taxonomic tree}
 
 \item{xlim}{x-limits if \code{add=FALSE}}
 
@@ -49,9 +55,10 @@ Plot_taxa(Taxa, prob = 0.95, params = matrix(c("K", "M", "Winfinity", "Loo",
 
 \item{plot_lines}{whether to plot lines representing "major axis" and "OLS" regression parameters}
 
+\item{lcol}{line color for ellipse}
+
 \item{...}{additional arguments passed to \code{shape::plotellipse}}
 }
 \description{
 Plots bivariate predictive intervals for specified parameters and taxa
 }
-

@@ -4,13 +4,13 @@
 \alias{Update_prediction}
 \title{Update predictions with new data}
 \usage{
-Update_prediction(Taxon, Ynew_ij, partial_match = TRUE, verbose = FALSE,
-  ParentChild_gz = FishLife::database$ParentChild_gz,
-  Cov_gjj = FishLife::database$Cov_gjj,
-  Mean_gj = FishLife::database$ParHat$beta_gj,
-  obsCov_jj = FishLife::database$obsCov_jj, Version = "Update_v1_0_0",
-  TmbDir = system.file("executables", package = "FishLife"),
-  RunDir = tempfile(pattern = "run_", tmpdir = tempdir(), fileext = "/"))
+Update_prediction(Taxon, Ynew_ij, partial_match = TRUE,
+  verbose = FALSE, Database = FishLife::FishBase_and_RAM,
+  ParentChild_gz = Database$ParentChild_gz, Cov_gjj = Database$Cov_gvv,
+  Mean_gj = Database$beta_gv, obsCov_jj = Database$obsCov_jj,
+  Version = "Update_v1_0_0", TmbDir = system.file("executables",
+  package = "FishLife"), RunDir = tempfile(pattern = "run_", tmpdir =
+  tempdir(), fileext = "/"))
 }
 \arguments{
 \item{Taxon}{Boolean, whether to require a partial match to a taxon-name \code{partial_match=TRUE} , or an exact match \code{partial_match=FALSE}}
@@ -20,6 +20,8 @@ Update_prediction(Taxon, Ynew_ij, partial_match = TRUE, verbose = FALSE,
 \item{partial_match}{Boolean, whether to require a partial match to a taxon-name \code{partial_match=TRUE} , or an exact match \code{partial_match=FALSE}}
 
 \item{verbose}{Boolean whether to print diagnostics to terminal}
+
+\item{Database}{Whether to use results for both adult and stock-recruit parameters, \code{Database="FishBase_and_RAM"}, or just adult parameters, \code{Database="FishBase"}}
 
 \item{ParentChild_gz}{vector providing index of parent-taxon for every child-taxa}
 
@@ -51,4 +53,3 @@ Combines the taxonomic predictions from FishBase with new user-supplied data
 This function allows the user to update predictions using new data from one or more studies.  A study for a single parameter is entered as a new
 row of \code{Ynew_ij}, where all elements are \code{NA} except for the parameter of interest.
 }
-

@@ -1,11 +1,11 @@
 Package: FishLife
 Type: Package
-Title: Predict Life History Traits For Any Fish
-Version: 1.0.2
-Date: 2017-08-04
+Title: Predict Life History Parameters For Any Fish
+Version: 2.0.0
+Date: 2019-11-05
 Authors@R: person("James","Thorson", email="James.Thorson@noaa.gov", role=c("aut","cre"))
 Maintainer: James Thorson <James.Thorson@noaa.gov>
-Description: Estimate life history traits from a multivariate 
+Description: Estimate life history parameters from a multivariate 
     random-walk process on a taxonomic tree, and use results to 
     predicts traits for any marine fish scientific (Genus-species) name.
 Imports:
@@ -30,7 +30,7 @@ Remotes:
 License: GPL-3
 LazyData: yes
 BuildVignettes: yes
-RoxygenNote: 5.0.1
+RoxygenNote: 6.1.1
 URL: http://github.com/James-Thorson/FishLife
 BugReports: http://github.com/James-Thorson/Thorson/FishLife/issues
 VignetteBuilder: knitr

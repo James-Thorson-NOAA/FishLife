@@ -1,5 +1,5 @@
 # FishLife
-Estimate fish traits for all marine fish species globally
+Estimate growth, size, maturity, mortality, stock-recruit, and population-dynamics parameters for all fish species globally
 
 [![DOI](https://zenodo.org/badge/67250650.svg)](https://zenodo.org/badge/latestdoi/67250650)
 
@@ -35,9 +35,24 @@ Plot_taxa( Search_species(Genus="Sebastes",Species="cortezi")$match_taxonomy )
 Plot_taxa( Search_species(Family="Scombridae")$match_taxonomy )
 ```
 
+### Use old database
+By default `FishLife` uses the most-recent version published.  This currently includes both growth, size, maturity, and mortality parameters from FishBase, as well as stock-recruit parameters estimated using the RAM Legacy stock-recruit database.  To use earlier versions, use the `Database` argument in each function:
+
+```R
+# Get basic plot for Lutjanus campechanus (in database, so prediction is informed by species-specific data)
+Plot_taxa( Search_species(Genus="Lutjanus",Species="campechanus")$match_taxonomy, Database="FishBase" )
+```
+
+or expliclty use the updated database using:
+
+```R
+Plot_taxa( Search_species(Genus="Lutjanus",Species="campechanus")$match_taxonomy, Database="FishBase_and_RAM" )`
+```
+
 Description of package
 =============
 ### Please cite if using the software
+* Thorson, J. T. In press.  Predicting recruitment density dependence and intrinsic growth rate for all fishes worldwide using a data-integrated life-history model.  Fish and Fisheries. 
 * Thorson, J. T., S. B. Munch, J. M. Cope, and J. Gao. 2017. Predicting life history parameters for all fishes worldwide. Ecological Applications. 27(8): 2262–2276. http://onlinelibrary.wiley.com/doi/10.1002/eap.1606/full
 
 Further reading

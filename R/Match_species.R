@@ -9,7 +9,7 @@
 #' @return integer of row numbers of \code{ParentChild_gz} matching \code{genus_species}
 
 #' @export
-Match_species = function( genus_species="Sebastes jordani", ParentChild_gz=FishLife::database$ParentChild_gz ){
+Match_species = function( genus_species="Sebastes jordani", Database=FishLife::FishBase_and_RAM, ParentChild_gz=Database$ParentChild_gz ){
   # Match full taxonomy from fishbase
   genus_species = strsplit( tolower(genus_species), split=c(" ","_"))[[1]]
   Which = which( tolower(rfishbase::fishbase$Genus)==genus_species[1] & tolower(rfishbase::fishbase$Species)==genus_species[2] )

@@ -5,7 +5,8 @@
 \title{Match species}
 \usage{
 Match_species(genus_species = "Sebastes jordani",
-  ParentChild_gz = FishLife::database$ParentChild_gz)
+  Database = FishLife::FishBase_and_RAM,
+  ParentChild_gz = Database$ParentChild_gz)
 }
 \arguments{
 \item{genus_species}{Character vector for Genus_species (separated by underscore character)}
@@ -18,4 +19,3 @@ integer of row numbers of \code{ParentChild_gz} matching \code{genus_species}
 \description{
 Match \code{genus_species} to a given row of \code{ParentChild_gz}
 }
-
