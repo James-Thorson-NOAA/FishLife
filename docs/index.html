@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>NOAA Fisheries FishLife</title>
+   <link type="text/css" rel="stylesheet" href="./static/simple.css" />
+
+</head>
+<body>
+    <div class="container">
+        <div class="mywrap">
+            <h1 class ="title">
+              FishLife
+            </h1>
+              
+              
+              <div class = "badge" data-md-tooltip=external_active id = external_active >
+              <!-- &#10039; -->
+              </div>
+              
+
+        </div>
+        <div class="mywrap">
+              
+              <button class = "codelink" title="link to online application" onclick=" window.open('https://james-thorson.shinyapps.io/FishLife/', '_blank'); return false;">
+                Online Application
+                </button>
+              
+
+              
+                <button class = "codelink nolink" title="Downloadable application unavailable">
+                Download Application
+                </button>
+              
+
+              
+               <button class = "codelink" title="link to documentation" onclick=" window.open('https://github.com/James-Thorson-NOAA/FishLife ', '_blank'); return false;">
+                Documenation
+                </button>
+              
+
+              
+               <button class = "codelink" title="link to Code Repository" onclick=" window.open('https://github.com/James-Thorson-NOAA/FishLife', '_blank'); return false;">
+                Code Repository
+                </button>
+              
+              <button class = "IconButton" title="e-mail fisheries.toolbox@noaa.gov" id ="email" onclick='location.href= "mailto:fisheries.toolbox@noaa.gov;"'>
+              </button>
+
+        </div>
+      <div class = "divider">
+      </div>
+
+
+      <div class ="main">
+        <div class="mywrap">
+              <div class ="label">
+                FishLife (FishLife)
+
+              </div>
+
+
+              
+
+
+              
+              
+              <img class = "versionButton" alt="GitHub release (latest by date)" src= https://img.shields.io/github/v/release/James-Thorson-NOAA/FishLife?color=%230093D0&include_prereleases&label=%20>
+              
+
+
+        </div>
+
+        <div class ="label">
+            
+             Type: 
+            
+        </div>
+
+        <div class = "authName">
+         Author: James T Thorson Stephan B. Munch, Jason M. Cope, Jin Gao
+
+        </div >
+
+        <div class ="mainText">
+          FishLife is an R package that includes software, data, and associated results for a simple evolutionary model of life-history parameters for fishes.  The model approximates the co-evolution of life-history parameters representing adult growth, size, mortality, and maturity, as well as stock-recruit parameters representing maximum spawners per spawner, Beverton-Holt 'steepness', and variability in recruitment.  Given these adult and stock-recruit predictions, the model can then predict life-cycle parameters including generation time, intrinsic growth rate, and fishing mortality reference point proxies. The model includes predictions of these life-history parameters (and associated multivariate predictive uncertainty) for all described fishes, while shrinking the predicted value of each parameter towards available data for that species, data for related species, and predicted values given available data for other parameters for that species.
+        </div>
+
+        <div class="mainText">
+        
+          <div class = "ref">
+            References
+          </div>
+            <ul>
+              
+              <li>Thorson, J.T., n.d. Predicting recruitment density dependence and intrinsic growth rate for all fishes worldwide using a data-integrated life-history model. Fish Fish. n/a. https://doi.org/10.1111/faf.12427</li>
+              
+              <li>Thorson, J.T., Munch, S.B., Cope, J.M., Gao, J., 2017. Predicting life history parameters for all fishes worldwide. Ecol. Appl. 27, 2262–2276. https://doi.org/10.1002/eap.1606</li>
+              
+              <li>Rudd, M.B., Thorson, J.T., Sagarese, S.R., 2019. Ensemble models for data-poor assessment: accounting for uncertainty in life-history information. ICES J. Mar. Sci. 76, 870–883. https://doi.org/10.1093/icesjms/fsz012</li>
+              
+            </ul>
+          
+
+
+          
+          <div class = "ref">
+            Associated Tools
+          </div>
+            <ul id = "assocaited_tools">
+              
+                <li><a href="https://github.com/merrillrudd/LIME"><i>LIME</i></a></li>
+              
+            </ul>
+              
+
+            
+              <div class = "ref">
+            Code Repository Badges
+          </div>
+             
+
+              
+              <img src="https://img.shields.io/github/last-commit/James-Thorson-NOAA/FishLife.svg?style=plastic">
+              
+              <img src="">
+              
+              
+
+          </div>
+      </div>
+
+      <div class = "divider"></div>
+
+        <footer >
+             <img src="./static/noaa-fisheries-rgb-2line-horizontal-small.png" height="75" alt="NOAA Fisheries">
+         <div class="mywrap_center">
+          <a class ="mylink line" href="https://www.commerce.gov/">U.S. Department of Commerce</a>
+         <a class ="mylink line" href="https://www.noaa.gov">National Oceanographic and Atmospheric Administration</a>
+         <a class ="mylink" href="https://www.fisheries.noaa.gov/">NOAA Fisheries</a>
+         </div>
+
+        </footer>
+        <div class ="attribution">Icons by icons8 https://icons8.com/</div>
+
+    </div>
+
+
+</body>
+</html>
+
