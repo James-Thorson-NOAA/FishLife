@@ -60,6 +60,10 @@ Further reading
 ### Evaluating accuracy of data and life-history predictions in FishBase
 * Thorson, J. T., J. M. Cope, and W. S. Patrick. 2014. Assessing the quality of life history information in publicly available databases. Ecological Applications 24:217–226. http://onlinelibrary.wiley.com/doi/10.1890/12-1855.1/abstract
 
+Description of research
+=============
+Presentation of research program available [online](https://www.youtube.com/watch?v=efVXe0J80oU&feature=youtu.be)
+
 Applications for stock assessment
 =============
 
