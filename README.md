@@ -31,9 +31,21 @@ Plot_taxa( Search_species(Genus="Lutjanus",Species="campechanus")$match_taxonomy
 # Get basic plot for Sebastes cortezi (not in database, so uses predictive distribution for genus Sebastes)
 Plot_taxa( Search_species(Genus="Sebastes",Species="cortezi")$match_taxonomy )
 
-# Get basic plot for Family Scombridae 
-Plot_taxa( Search_species(Family="Scombridae")$match_taxonomy )
+# Get basic plot and extract values for Family Scombridae 
+( Predictions = Plot_taxa(Search_species(Family="Scombridae")$match_taxonomy) )
 ```
+
+### Extract other values
+You can also see the full set of parameters calculated for each taxon, either for internal use of anticipated to be useful for users:
+```R
+head(FishLife::FishBase_and_RAM$beta_gv)
+```
+These can similarly be extracted and plotted:
+```
+params = matrix( c("K","M", "G","ln_MASPS"), ncol=2, byrow=TRUE)
+Plot_taxa( Search_species(Genus="Lutjanus",Species="campechanus")$match_taxonomy, params=params )
+```
+while other values (e.g., slope at the origin for the Beverton-Holt stock recruit curve) can then be calculated from the set of available parameters.  
 
 ### Use old database
 By default `FishLife` uses the most-recent version published.  This currently includes both growth, size, maturity, and mortality parameters from FishBase, as well as stock-recruit parameters estimated using the RAM Legacy stock-recruit database.  To use earlier versions, use the `Database` argument in each function:
