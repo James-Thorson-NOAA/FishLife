@@ -16,6 +16,7 @@
 #' @param RunDir Directory to use when compiling and running TMB script (different to avoid problems with read-write restrictions)
 #' @param Params optional list of parameter estimates to use as starting values (Default \code{Params="Generate"} starts from random values)
 #' @param verbose Boolean whether to print diagnostics to terminal
+#' @param run_model Boolean indicating whether to run the model or just return the built TMB object
 #' @param ... other paramers passed to \code{TMBhelper::Optimize}
 #'
 #' @return Tagged list containing objects from FishLife run (first 9 slots constitute list 'Estimate_database' for archiving results)
@@ -36,14 +37,41 @@
 #' }
 #'
 #' @export
-Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Database=FishLife::FishBase_and_RAM,
-  Y_ij=Database$Y_ij, Z_ik=Database$Z_ik, SR_obs=Database$SR_obs, StockData=Database$StockData,
-  Version="Taxon_v2_14_0", Process_cov="Unequal", TmbDir=system.file("executables",package="FishLife"),
-  RunDir=tempfile(pattern="run_",tmpdir=tempdir(),fileext="/"), Params="Generate", verbose=FALSE, debug_mode=FALSE,
-  j_SR=ncol(Y_ij)-3:1, zerocovTF_j=rep(FALSE,ncol(Y_ij)), additional_variance=c(0,0),
-  invertTF=FALSE, SD_b_stock=10, b_type=0, Cov_design=NULL, Random="Generate", Cov_RAM=c("M"=FALSE), Turn_off_taxonomy=FALSE,
-  Pen_lowvar_lnRhat=1, lowerbound_MLSPS=1, Use_RAM_Mvalue_TF=TRUE, rho_space="natural", include_r=TRUE,
-  PredTF_stock=NULL, extract_covariance=TRUE, ... ){
+Fit_model = function( N_factors,
+          N_obsfactors,
+          Use_REML = TRUE,
+          Database = FishLife::FishBase_and_RAM,
+          Y_ij = Database$Y_ij,
+          Z_ik = Database$Z_ik,
+          SR_obs = Database$SR_obs,
+          StockData = Database$StockData,
+          Version = "Taxon_v2_14_0",
+          Process_cov = "Unequal",
+          TmbDir = system.file("executables",package="FishLife"),
+          RunDir = tempfile(pattern = "run_",tmpdir=tempdir(),fileext="/"),
+          verbose = FALSE,
+          debug_mode = FALSE,
+          j_SR = ncol(Y_ij)-3:1,
+          zerocovTF_j = rep(FALSE,ncol(Y_ij)),
+          additional_variance = c(0,0),
+          invertTF = FALSE,
+          SD_b_stock = 10,
+          b_type = 0,
+          Cov_design = NULL,
+          Cov_RAM = c("M"=FALSE),
+          Turn_off_taxonomy = FALSE,
+          Pen_lowvar_lnRhat = 1,
+          lowerbound_MLSPS = 1,
+          Use_RAM_Mvalue_TF = TRUE,
+          rho_space = "natural",
+          include_r = TRUE,
+          PredTF_stock = NULL,
+          extract_covariance = TRUE,
+          run_model = TRUE,
+          Params = "Generate",
+          Random = "Generate",
+          Map = "Generate",
+          ... ){
 
   #### Local function
   # Sample from GMRF using sparse precision
@@ -285,70 +313,72 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Database=FishLife:
   }
 
   # Map
-  Map = list()
-  if( "cov_logmult_z" %in% names(Params) ){
-    if(Process_cov=="Equal") Map[["cov_logmult_z"]] = factor( rep(NA,length(Params[["cov_logmult_z"]])) )
-    if(Process_cov=="Unequal") Map[["cov_logmult_z"]] = factor( c(NA,1:(length(Params[["cov_logmult_z"]])-1)) )
-  }
-  if(is.na(Data$Options_vec['n_obsfactors'])){
-    Map[["obsL_z"]] = factor( rep(NA,length(Params[["obsL_z"]])) )
-  }
-  if( Nstock==0 ){
-    if("ln_b_stock" %in% names(Params)) Map[["ln_b_stock"]] = factor(rep(NA,length(Params[["ln_b_stock"]])))
-    if("bparam_stock" %in% names(Params)) Map[["bparam_stock"]] = factor(rep(NA,length(Params[["bparam_stock"]])))
-  }
-  if( N_factors==0 | TRUE ){
-    if( "L_logmult_col" %in% names(Params) ) Map[["L_logmult_col"]] = factor(rep(NA,length(Params[["L_logmult_col"]])))
-  }
-  if( N_obsfactors==0 | TRUE ){
-    if( "obsL_logmult_col" %in% names(Params) ) Map[["obsL_logmult_col"]] = factor(rep(NA,length(Params[["obsL_logmult_col"]])))
-  }
-  if( length(j_SR)==4 ){
-    if("ln_b_stock" %in% names(Params)) Map[["ln_b_stock"]] = factor(rep(NA,length(Params[["ln_b_stock"]])))
-    if("bparam_stock" %in% names(Params)) Map[["bparam_stock"]] = factor(rep(NA,length(Params[["bparam_stock"]])))
-  }
-  if( n_p==0 ){
-    if( "gamma_p" %in% names(Params) ) Map[["gamma_p"]] = factor(NA)
-  }
-  if( Cov_RAM[["M"]]==FALSE ){
-    if( "theta_q" %in% names(Params) ) Map[["theta_q"]] = factor(NA)
-  }
-  # Map off species where PredTF_stock == TRUE
-  if( Nstock > 0 ){
-    Map[["bparam_stock"]] = factor( ifelse(PredTF_stock==TRUE, NA, 1:Data$Nstock) )
-  }
+  if( Map[1] == "Generate" ){
+    Map = list()
+    if( "cov_logmult_z" %in% names(Params) ){
+      if(Process_cov=="Equal") Map[["cov_logmult_z"]] = factor( rep(NA,length(Params[["cov_logmult_z"]])) )
+      if(Process_cov=="Unequal") Map[["cov_logmult_z"]] = factor( c(NA,1:(length(Params[["cov_logmult_z"]])-1)) )
+    }
+    if(is.na(Data$Options_vec['n_obsfactors'])){
+      Map[["obsL_z"]] = factor( rep(NA,length(Params[["obsL_z"]])) )
+    }
+    if( Nstock==0 ){
+      if("ln_b_stock" %in% names(Params)) Map[["ln_b_stock"]] = factor(rep(NA,length(Params[["ln_b_stock"]])))
+      if("bparam_stock" %in% names(Params)) Map[["bparam_stock"]] = factor(rep(NA,length(Params[["bparam_stock"]])))
+    }
+    if( N_factors==0 | TRUE ){
+      if( "L_logmult_col" %in% names(Params) ) Map[["L_logmult_col"]] = factor(rep(NA,length(Params[["L_logmult_col"]])))
+    }
+    if( N_obsfactors==0 | TRUE ){
+      if( "obsL_logmult_col" %in% names(Params) ) Map[["obsL_logmult_col"]] = factor(rep(NA,length(Params[["obsL_logmult_col"]])))
+    }
+    if( length(j_SR)==4 ){
+      if("ln_b_stock" %in% names(Params)) Map[["ln_b_stock"]] = factor(rep(NA,length(Params[["ln_b_stock"]])))
+      if("bparam_stock" %in% names(Params)) Map[["bparam_stock"]] = factor(rep(NA,length(Params[["bparam_stock"]])))
+    }
+    if( n_p==0 ){
+      if( "gamma_p" %in% names(Params) ) Map[["gamma_p"]] = factor(NA)
+    }
+    if( Cov_RAM[["M"]]==FALSE ){
+      if( "theta_q" %in% names(Params) ) Map[["theta_q"]] = factor(NA)
+    }
+    # Map off species where PredTF_stock == TRUE
+    if( Nstock > 0 ){
+      Map[["bparam_stock"]] = factor( ifelse(PredTF_stock==TRUE, NA, 1:Data$Nstock) )
+    }
 
-  # Turn off taxonomic hierarchy, such that all taxa have expected LH params = alpha_j
-  if( Turn_off_taxonomy==TRUE ){
-    Map[["beta_gj"]] = factor( array(NA, dim=dim(Params[["beta_gj"]])) )
-    Map[["L_z"]] = factor( rep(NA,length(Params[["L_z"]])) )
-  }
+    # Turn off taxonomic hierarchy, such that all taxa have expected LH params = alpha_j
+    if( Turn_off_taxonomy==TRUE ){
+      Map[["beta_gj"]] = factor( array(NA, dim=dim(Params[["beta_gj"]])) )
+      Map[["L_z"]] = factor( rep(NA,length(Params[["L_z"]])) )
+    }
 
-  # Change
-  if( is.na(Data$Options_vec[1]) ){
-    Data$Options_vec[1] = 0
-  }
+    # Change
+    if( is.na(Data$Options_vec[1]) ){
+      Data$Options_vec[1] = 0
+    }
 
-  # Zero out covariance for some variables
-  if( N_factors!=0 ){
-    Mat = diag(ncol(Y_ij))[1:abs(N_factors),,drop=FALSE]
-    Which = upper.tri(Mat,diag=TRUE)
-    rownum = col(Mat)[Which]
-    Which = which( rownum %in% which(zerocovTF_j) )
-    Params[["L_z"]][Which] = 0
-    Map[["L_z"]] = 1:length(Params[["L_z"]])
-    Map[["L_z"]][Which] = NA
-    Map[["L_z"]] = factor(Map[["L_z"]])
-  }
-  if( N_obsfactors!=0 ){
-    Mat = diag(ncol(Y_ij))[1:abs(N_obsfactors),,drop=FALSE]
-    Which = upper.tri(Mat,diag=TRUE)
-    rownum = col(Mat)[Which]
-    Which = which( rownum %in% which(zerocovTF_j) )
-    Params[["obsL_z"]][Which] = 0
-    Map[["obsL_z"]] = 1:length(Params[["obsL_z"]])
-    Map[["obsL_z"]][Which] = NA
-    Map[["obsL_z"]] = factor(Map[["obsL_z"]])
+    # Zero out covariance for some variables
+    if( N_factors!=0 ){
+      Mat = diag(ncol(Y_ij))[1:abs(N_factors),,drop=FALSE]
+      Which = upper.tri(Mat,diag=TRUE)
+      rownum = col(Mat)[Which]
+      Which = which( rownum %in% which(zerocovTF_j) )
+      Params[["L_z"]][Which] = 0
+      Map[["L_z"]] = 1:length(Params[["L_z"]])
+      Map[["L_z"]][Which] = NA
+      Map[["L_z"]] = factor(Map[["L_z"]])
+    }
+    if( N_obsfactors!=0 ){
+      Mat = diag(ncol(Y_ij))[1:abs(N_obsfactors),,drop=FALSE]
+      Which = upper.tri(Mat,diag=TRUE)
+      rownum = col(Mat)[Which]
+      Which = which( rownum %in% which(zerocovTF_j) )
+      Params[["obsL_z"]][Which] = 0
+      Map[["obsL_z"]] = 1:length(Params[["obsL_z"]])
+      Map[["obsL_z"]][Which] = NA
+      Map[["obsL_z"]] = factor(Map[["obsL_z"]])
+    }
   }
 
   # Check for problems
@@ -386,6 +416,15 @@ Fit_model = function( N_factors, N_obsfactors, Use_REML=TRUE, Database=FishLife:
   dyn.load( paste0(RunDir,"/",TMB::dynlib(Version)) )          #
   Obj = MakeADFun( data=Data, parameters=Params, DLL=Version, map=Map, random=Random )
   Report = Obj$report()
+
+  # Print number of parameters
+  ThorsonUtilities::list_parameters( Obj )
+
+  #
+  if( run_model==FALSE ){
+    Return = list("Data"=Data, "Params"=Params, "Random"=Random, "Map"=Map, "Obj"=Obj )
+    return(Return)
+  }
 
   # Debugging option
   if( debug_mode==TRUE ){

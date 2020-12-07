@@ -32,7 +32,9 @@ Plot_trait = function( Taxon, params=c('K','M'), Database=FishLife::FishBase_and
   if(verbose==TRUE) print( ParentChild_gz[Which,] )
 
   # Plot ellipse
-  axis_scale = sapply(params,FUN=switch,"Temperature"="natural","h"="natural","rho"="natural","G"="natural","r"="natural","logitbound_h"="logit_0.2_1.0","log")
+  axis_scale = sapply(params,FUN=switch,"Temperature"="natural","h"="natural","rho"="natural","G"="natural","r"="natural","logitbound_h"="logit_0.2_1.0",
+    "Tmid_Spawner"="natural","Trange_Spawner"="natural", "Tmid_Embryo"="natural","Trange_Embryo"="natural", "Tmid_Larvae"="natural","Trange_Larvae"="natural", "Tmid_Adult"="natural","Trange_Adult"="natural",
+    "log")
   #Plot_ellipse( Cov=Cov_gjj[Which,params,params], Mean=Mean_gj[Which,params], add=add, whichlog=paste(c("x","y")[which(!params%in%c("Temperature","h"))],collapse=""), xlim=xlim, ylim=ylim, main=main, xlab=xlab, lcol=lcol, plot_lines=plot_lines, ticks=ticks, logticks=logticks, prob=prob, ... )
   Plot_ellipse( Cov=Cov_gjj[Which,params,params], Mean=Mean_gj[Which,params], add=add, axis_scale=axis_scale, xlim=xlim, ylim=ylim, main=main,
     xlab=xlab, lcol=lcol, plot_lines=plot_lines, ticks=ticks, logticks=logticks, prob=prob, lty=lty, xaxt=xaxt, yaxt=yaxt, ... )
