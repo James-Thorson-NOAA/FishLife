@@ -203,6 +203,13 @@ Fit_model = function( N_factors,
   n_j = ncol(Y_ij)
   n_g = nrow(ParentChild_gz)
 
+  # Context-specific inputs
+  if("M" %in% colnames(Y_ij)){
+    j_logM = which(colnames(Y_ij)=="M")-1
+  }else{
+    j_logM = 0
+  }
+
   #####################
   # TMB inputs
   #####################
@@ -240,15 +247,20 @@ Fit_model = function( N_factors,
   }
   if(Version%in%c("Taxon_v2_12_0")){
     Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=invertTF,"b_type"=b_type,"Turn_off_taxonomy"=Turn_off_taxonomy,"Use_RAM_Mvalue_TF"=Use_RAM_Mvalue_TF), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock,"Pen_lowvar_lnRhat"=Pen_lowvar_lnRhat, "lowerbound_MLSPS"=lowerbound_MLSPS), "Cov_pz"=Cov_pz, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=as.matrix(ParentChild_gz[,c('ParentRowNumber','ChildTaxon')])-1, "g_i"=g_i-1)
-    Data = c(Data, list("Nobs"=Nobs, "Nstock"=Nstock, "Obs2Stock"=SR_obs[,'StockNum']-1, "AR_Index"=SR_obs[,'AR_Index'], "ln_R_obs"=log(SR_obs[,'R_obs']), "SSB_obs"=SR_obs[,'SSB_obs'], "SPRF0_stock"=StockData[,'SPRF0'], "M_stock"=StockData[,'M'], "SSBmax_stock"=StockData[,'SSBmax'], "Rmax_stock"=StockData[,'Rmax'], "j_SR"=j_SR, "j_logM"=which(colnames(Y_ij)=="M")-1, "i_stock"=StockData[,'Stock_to_i']-1) )
+    Data = c(Data, list("Nobs"=Nobs, "Nstock"=Nstock, "Obs2Stock"=SR_obs[,'StockNum']-1, "AR_Index"=SR_obs[,'AR_Index'], "ln_R_obs"=log(SR_obs[,'R_obs']), "SSB_obs"=SR_obs[,'SSB_obs'], "SPRF0_stock"=StockData[,'SPRF0'], "M_stock"=StockData[,'M'], "SSBmax_stock"=StockData[,'SSBmax'], "Rmax_stock"=StockData[,'Rmax'], "j_SR"=j_SR, "j_logM"=j_logM, "i_stock"=StockData[,'Stock_to_i']-1) )
   }
   if(Version%in%c("Taxon_v2_13_0")){
     Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=invertTF,"b_type"=b_type,"Turn_off_taxonomy"=Turn_off_taxonomy,"Use_RAM_Mvalue_TF"=Use_RAM_Mvalue_TF,"rho_option"=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2)), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock,"Pen_lowvar_lnRhat"=Pen_lowvar_lnRhat, "lowerbound_MLSPS"=lowerbound_MLSPS), "Cov_pz"=Cov_pz, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=as.matrix(ParentChild_gz[,c('ParentRowNumber','ChildTaxon')])-1, "g_i"=g_i-1)
-    Data = c(Data, list("Nobs"=Nobs, "Nstock"=Nstock, "Obs2Stock"=SR_obs[,'StockNum']-1, "AR_Index"=SR_obs[,'AR_Index'], "ln_R_obs"=log(SR_obs[,'R_obs']), "SSB_obs"=SR_obs[,'SSB_obs'], "SPRF0_stock"=StockData[,'SPRF0'], "M_stock"=StockData[,'M'], "SSBmax_stock"=StockData[,'SSBmax'], "Rmax_stock"=StockData[,'Rmax'], "j_SR"=j_SR, "j_logM"=which(colnames(Y_ij)=="M")-1, "i_stock"=StockData[,'Stock_to_i']-1) )
+    Data = c(Data, list("Nobs"=Nobs, "Nstock"=Nstock, "Obs2Stock"=SR_obs[,'StockNum']-1, "AR_Index"=SR_obs[,'AR_Index'], "ln_R_obs"=log(SR_obs[,'R_obs']), "SSB_obs"=SR_obs[,'SSB_obs'], "SPRF0_stock"=StockData[,'SPRF0'], "M_stock"=StockData[,'M'], "SSBmax_stock"=StockData[,'SSBmax'], "Rmax_stock"=StockData[,'Rmax'], "j_SR"=j_SR, "j_logM"=j_logM, "i_stock"=StockData[,'Stock_to_i']-1) )
   }
   if(Version%in%c("Taxon_v2_14_0")){
     Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=invertTF,"b_type"=b_type,"Turn_off_taxonomy"=Turn_off_taxonomy,"Use_RAM_Mvalue_TF"=Use_RAM_Mvalue_TF,"rho_option"=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2)), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock,"Pen_lowvar_lnRhat"=Pen_lowvar_lnRhat, "lowerbound_MLSPS"=lowerbound_MLSPS), "Cov_pz"=Cov_pz, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=as.matrix(ParentChild_gz[,c('ParentRowNumber','ChildTaxon')])-1, "g_i"=g_i-1)
-    Data = c(Data, list("Nobs"=Nobs, "Nstock"=Nstock, "Obs2Stock"=SR_obs[,'StockNum']-1, "AR_Index"=SR_obs[,'AR_Index'], "ln_R_obs"=log(SR_obs[,'R_obs']), "SSB_obs"=SR_obs[,'SSB_obs'], "PredTF_stock"=PredTF_stock, "SPRF0_stock"=StockData[,'SPRF0'], "M_stock"=StockData[,'M'], "SSBmax_stock"=StockData[,'SSBmax'], "Rmax_stock"=StockData[,'Rmax'], "j_SR"=j_SR, "j_logM"=which(colnames(Y_ij)=="M")-1, "i_stock"=StockData[,'Stock_to_i']-1) )
+    Data = c(Data, list("Nobs"=Nobs, "Nstock"=Nstock, "Obs2Stock"=SR_obs[,'StockNum']-1, "AR_Index"=SR_obs[,'AR_Index'], "ln_R_obs"=log(SR_obs[,'R_obs']), "SSB_obs"=SR_obs[,'SSB_obs'], "PredTF_stock"=PredTF_stock, "SPRF0_stock"=StockData[,'SPRF0'], "M_stock"=StockData[,'M'], "SSBmax_stock"=StockData[,'SSBmax'], "Rmax_stock"=StockData[,'Rmax'], "j_SR"=j_SR, "j_logM"=j_logM, "i_stock"=StockData[,'Stock_to_i']-1) )
+  }
+
+  # Fix potential issues
+  if( "j_logM"%in%names(Data) && length(Data$j_logM)==0 ){
+    Data$j_logM = 0
   }
 
   # Parameters
