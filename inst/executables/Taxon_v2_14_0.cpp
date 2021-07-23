@@ -320,7 +320,10 @@ Type objective_function<Type>::operator() ()
   }
 
   // Penalize low variance in predictive recruitment
-  jnll_comp(10) = -1 * abs(Options(3))*sum(log(sd_ln_Rhat_stock));
+  Type Pen_lowvar_lnRhat = Options(3);
+  if( Pen_lowvar_lnRhat > 0 ){
+    jnll_comp(10) = -1 * Pen_lowvar_lnRhat * sum(log(sd_ln_Rhat_stock));
+  }
   REPORT( sum_ln_Rhat_stock );
   REPORT( mean_ln_Rhat_stock );
   REPORT( num_ln_Rhat_stock );

@@ -64,6 +64,8 @@ Fit_model = function( N_factors,
           lowerbound_MLSPS = 1,
           Use_RAM_Mvalue_TF = TRUE,
           rho_space = "natural",
+          n_sims = 1000,
+          n_batches = NULL,
           include_r = TRUE,
           PredTF_stock = NULL,
           extract_covariance = TRUE,
@@ -75,14 +77,22 @@ Fit_model = function( N_factors,
 
   #### Local function
   # Sample from GMRF using sparse precision
-  rmvnorm_prec <- function(mu, prec, n.sims, seed=1) {
+  rmvnorm_prec <- function(mu, prec, n_sims, seed=1, varnames="", n_batches=NULL) {
     set.seed( seed )
-    z <- matrix(rnorm(length(mu) * n.sims), ncol=n.sims)
-    L <- Matrix::Cholesky(prec, super=TRUE)
-    z <- Matrix::solve(L, z, system = "Lt") ## z = Lt^-1 %*% z
-    z <- Matrix::solve(L, z, system = "Pt") ## z = Pt    %*% z
-    z <- as.matrix(z)
-    mu + z
+    which_vars = grep(varnames, names(mu))
+    if(is.null(n_batches)) n_batches = ceiling( length(which_vars) * n_sims * 8 / 4e9 )
+    if( (length(which_vars) * n_sims * 8 / n_batches) > 4e9 ) stop("Decrease `n_sims` to avoid R memory limits")
+    batch_index = cut(1:n_sims, n_batches)
+    out = mu[which_vars] %o% rep(1,n_sims)
+    for( batch in levels(batch_index) ){
+      which_index = which(batch_index == batch )
+      z <- matrix(rnorm(length(mu) * length(which_index)), ncol=length(which_index))
+      L <- Matrix::Cholesky(prec, super=TRUE)
+      z <- Matrix::solve(L, z, system = "Lt") ## z = Lt^-1 %*% z
+      z <- Matrix::solve(L, z, system = "Pt") ## z = Pt    %*% z
+      out[,which_index] <- out[,which_index] + as.matrix(z)[which_vars,]
+    }
+    return(out)
   }
 
   #####################
@@ -204,7 +214,7 @@ Fit_model = function( N_factors,
   n_g = nrow(ParentChild_gz)
 
   # Context-specific inputs
-  if("M" %in% colnames(Y_ij)){
+  if( "M" %in% colnames(Y_ij) ){
     j_logM = which(colnames(Y_ij)=="M")-1
   }else{
     j_logM = 0
@@ -261,6 +271,7 @@ Fit_model = function( N_factors,
   # Fix potential issues
   if( "j_logM"%in%names(Data) && length(Data$j_logM)==0 ){
     Data$j_logM = 0
+    message("test")
   }
 
   # Parameters
@@ -422,12 +433,13 @@ Fit_model = function( N_factors,
   origwd = getwd()
   on.exit(setwd(origwd),add=TRUE)
   setwd( RunDir )
-  compile( paste0(Version,".cpp") )
+  # SEE https://github.com/kaskr/adcomp/issues/321 for flags argument
+  compile( paste0(Version,".cpp"), flags="-Wno-ignored-attributes -O2 -mfpmath=sse -msse2 -mstackrealign" )
 
   # Build
   dyn.load( paste0(RunDir,"/",TMB::dynlib(Version)) )          #
   Obj = MakeADFun( data=Data, parameters=Params, DLL=Version, map=Map, random=Random )
-  Report = Obj$report()
+  Obj$env$beSilent()
 
   # Print number of parameters
   ThorsonUtilities::list_parameters( Obj )
@@ -446,15 +458,20 @@ Fit_model = function( N_factors,
 
   # Print to screen
   if( verbose==TRUE ){
-    cat( "Number of fixed effects:")
-    print( table(names(Obj$par)) )
-    cat( "Number of random effects:")
-    print( table(names(Obj$env$last.par[Obj$env$random])) )
+    #cat( "Number of fixed effects:")
+    #print( table(names(Obj$par)) )
+    #cat( "Number of random effects:")
+    #print( table(names(Obj$env$last.par[Obj$env$random])) )
   }
 
   # Optimize                         #  , startpar=opt$par[-grep("alpha",names(opt$par))]
   # JointPrecision is used below, and is too big to invert whole;  must have getReportCovariance=TRUE to get JointPrecision
-  Opt = TMBhelper::fit_tmb( obj=Obj, savedir=RunDir, getJointPrecision=TRUE, getReportCovariance=TRUE, ... )
+  Opt = TMBhelper::fit_tmb( obj = Obj,
+                            savedir = RunDir,
+                            getJointPrecision = TRUE,
+                            getReportCovariance = TRUE,
+                            control = list(eval.max=10000, iter.max=10000, trace=1),
+                            ... )
 
   #
   Report = Obj$report()
@@ -504,12 +521,14 @@ Fit_model = function( N_factors,
 
   if( extract_covariance==TRUE ){
     ### Approximate joint precision
-    message( "Extracting predictive variance of life-history parameters for each taxon...")
+    message( "Extracting predictive variance of life-history parameters for each taxon: ", Sys.time())
     # Extract predictive covariance for species-specific traits (necessary to do separately for rows and columns)
-    Prec_zz = Opt$SD$jointPrecision[ , grep("beta_gj",colnames(Opt$SD$jointPrecision)) ]
-      Prec_zz = Prec_zz[ grep("beta_gj",rownames(Opt$SD$jointPrecision)), ]
+    #Prec_zz = Opt$SD$jointPrecision[ , grep("beta_gj",colnames(Opt$SD$jointPrecision)) ]
+    #  Prec_zz = Prec_zz[ grep("beta_gj",rownames(Opt$SD$jointPrecision)), ]
     # Predict
-    u_zr = rmvnorm_prec( mu=Obj$env$last.par.best, prec=Opt$SD$jointPrecision, n.sims=1000 )
+    # Don't form full u_zr to avoid memory load
+    #u_zr = rmvnorm_prec( mu=Obj$env$last.par.best, prec=Opt$SD$jointPrecision, n_sims=n_sims )
+    u_zr = rmvnorm_prec( mu=Obj$env$last.par.best, prec=Opt$SD$jointPrecision, n_sims=n_sims, varnames="beta_gj", n_batches=n_batches )
     # Extract and invert
     VarNames = Predictive_distribution( mean_vec=Y_ij[1,], process_cov=NULL, obs_cov=NULL, check_names=TRUE, include_r=include_r )
     n_v = length(VarNames)
@@ -519,13 +538,18 @@ Fit_model = function( N_factors,
     for( gI in 1:n_g ){
       # Method with full precision
       Indices = gI + ( seq(1,n_g*n_j,by=n_g)-1 )
-      Samp_rj = t(u_zr[grep("beta_gj",colnames(Opt$SD$jointPrecision))[Indices],])
+      Samp_rj = t(u_zr[Indices,])
+      #Samp_rj = matrix(NA, nrow=n_sims, ncol=n_j)
+      #for( rI in 1:n_sims ){
+      #  u_z = rmvnorm_prec( mu=Obj$env$last.par.best, prec=Opt$SD$jointPrecision, n_sims=1, seed=1+rI )[,1]
+      #  Samp_rj[rI,] = u_z[ grep("beta_gj",colnames(Opt$SD$jointPrecision))[Indices] ]
+      #}
       colnames(Samp_rj) = colnames(Y_ij)
       Pred = Predictive_distribution( mean_vec=Report$beta_gj[gI,], Samp_rj=Samp_rj, include_obscov=FALSE, check_bounds=FALSE, include_r=include_r, lowerbound_MLSPS=lowerbound_MLSPS, rho_option=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2) )
       beta_gv[gI,] = Pred$pred_mean
       Cov_gvv[gI,,] = Pred$pred_cov
       Corr_gvv[gI,,] = cov2cor( Cov_gvv[gI,,] )
-      if( (gI%%1000) == 0 ) message( "Finished processing predictive variance for ", gI, " of ",n_g," taxa" )
+      if( (gI%%1000) == 0 ) message( "Finished processing predictive variance for ", gI, " of ",n_g," taxa: ", Sys.time() )
     }
 
     # Return stuff

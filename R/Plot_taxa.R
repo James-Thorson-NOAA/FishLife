@@ -41,7 +41,8 @@ Plot_taxa = function( Taxa,
 
   #
   use_row = apply( params, MARGIN=1, FUN=function(charvec){all(charvec %in% colnames(Mean_gj))} )
-  params = params[which(use_row),]
+  #params = params[which(use_row),,drop=FALSE]
+  print(params)
 
   # Loop through parameter-pairs
   par( mfrow=mfrow, mar=c(3,3,0,0), mgp=c(1.75,0.25,0), tck=-0.02, oma=c(1,1,1,1) )
