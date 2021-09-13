@@ -17,7 +17,7 @@
 #' @param Params optional list of parameter estimates to use as starting values (Default \code{Params="Generate"} starts from random values)
 #' @param verbose Boolean whether to print diagnostics to terminal
 #' @param run_model Boolean indicating whether to run the model or just return the built TMB object
-#' @param ... other paramers passed to \code{TMBhelper::Optimize}
+#' @param ... other paramers passed to \code{\link[TMBhelper]{fit_tmb}
 #'
 #' @return Tagged list containing objects from FishLife run (first 9 slots constitute list 'Estimate_database' for archiving results)
 #' \describe{
@@ -497,15 +497,27 @@ Fit_model = function( N_factors,
 
   # SE
   ParHat = Obj$env$parList()
-  ParHat_SE = as.list( Opt$SD, what="Std" )
-  colnames(ParHat$beta_gj) = colnames(ParHat_SE$beta_gj) = colnames(Report$Ycomplete_ij) = colnames(Y_ij)
+  #ParHat_SE = as.list( Opt$SD, what="Std" )
+  colnames(ParHat$beta_gj) = colnames(Report$Ycomplete_ij) = colnames(Y_ij)
+  #colnames(ParHat_SE$beta_gj) = colnames(Y_ij)
   #dyn.unload( paste0(RunDir,"/",TMB::dynlib(Version)) )          #
 
   # Return stuff
-  Return = list("N_factors"=N_factors, "N_obsfactors"=N_obsfactors, "Use_REML"=Use_REML,
-    "ParentChild_gz"=ParentChild_gz, "ParHat"=ParHat, "g_i"=g_i,
-    "Y_ij"=Y_ij, "Z_ik"=Z_ik, "SR_obs"=SR_obs, "StockData"=StockData,
-    "Obj"=Obj, "Opt"=Opt, "Report"=Report, "ParHat_SE"=ParHat_SE, "obsCov_jj"=Report$obsCov_jj)
+  Return = list( "N_factors" = N_factors,
+                 "N_obsfactors" = N_obsfactors,
+                 "Use_REML" = Use_REML,
+                 "ParentChild_gz" = ParentChild_gz,
+                 "ParHat" = ParHat,
+                 "g_i" = g_i,
+                 "Y_ij" = Y_ij,
+                 "Z_ik" = Z_ik,
+                 "SR_obs" = SR_obs,
+                 "StockData" = StockData,
+                 "Obj" = Obj,
+                 "Opt" = Opt,
+                 "Report" = Report,
+                 #"ParHat_SE" = ParHat_SE,
+                 "obsCov_jj" = Report$obsCov_jj )
   dimnames(Return$obsCov_jj) = list(colnames(Y_ij),colnames(Y_ij))
   if("Cov_jj" %in% names(Report)){
     Return = c(Return, list("Cov_jj"=Report$Cov_jj))
