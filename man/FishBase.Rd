@@ -4,7 +4,8 @@
 \name{FishBase}
 \alias{FishBase}
 \title{Database of size, growth, maturity, and mortality parameters}
-\format{A tagged list containing data and predictions
+\format{
+A tagged list containing data and predictions
 \describe{
   \item{N_factors}{Number of factors used for evolution in life-history model}
   \item{N_obsfactors}{Number of factors used for measurent-error in life-history model}
@@ -17,7 +18,8 @@
   \item{Y_ij}{Life-history parameters from FishBase}
   \item{Z_ik}{Taxonomy for each datum}
   ...
-}}
+}
+}
 \usage{
 FishBase
 }

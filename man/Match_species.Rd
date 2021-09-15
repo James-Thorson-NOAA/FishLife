@@ -4,9 +4,11 @@
 \alias{Match_species}
 \title{Match species}
 \usage{
-Match_species(genus_species = "Sebastes jordani",
+Match_species(
+  genus_species = "Sebastes jordani",
   Database = FishLife::FishBase_and_RAM,
-  ParentChild_gz = Database$ParentChild_gz)
+  ParentChild_gz = Database$ParentChild_gz
+)
 }
 \arguments{
 \item{genus_species}{Character vector for Genus_species (separated by underscore character)}

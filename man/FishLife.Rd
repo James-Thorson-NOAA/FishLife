@@ -3,7 +3,6 @@
 \docType{package}
 \name{FishLife}
 \alias{FishLife}
-\alias{FishLife-package}
 \title{Fisheries life-history database}
 \description{
 FishLife contains predictions of life history parameters for all described fishes,

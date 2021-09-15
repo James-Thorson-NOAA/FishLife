@@ -4,21 +4,45 @@
 \alias{Fit_model}
 \title{Fit and predict fish traits}
 \usage{
-Fit_model(N_factors, N_obsfactors, Use_REML = TRUE,
-  Database = FishLife::FishBase_and_RAM, Y_ij = Database$Y_ij,
-  Z_ik = Database$Z_ik, SR_obs = Database$SR_obs,
-  StockData = Database$StockData, Version = "Taxon_v2_14_0",
-  Process_cov = "Unequal", TmbDir = system.file("executables", package
-  = "FishLife"), RunDir = tempfile(pattern = "run_", tmpdir = tempdir(),
-  fileext = "/"), Params = "Generate", verbose = FALSE,
-  debug_mode = FALSE, j_SR = ncol(Y_ij) - 3:1,
-  zerocovTF_j = rep(FALSE, ncol(Y_ij)), additional_variance = c(0, 0),
-  invertTF = FALSE, SD_b_stock = 10, b_type = 0, Cov_design = NULL,
-  Random = "Generate", Cov_RAM = c(M = FALSE),
-  Turn_off_taxonomy = FALSE, Pen_lowvar_lnRhat = 1,
-  lowerbound_MLSPS = 1, Use_RAM_Mvalue_TF = TRUE,
-  rho_space = "natural", include_r = TRUE, PredTF_stock = NULL,
-  extract_covariance = TRUE, ...)
+Fit_model(
+  N_factors,
+  N_obsfactors,
+  Use_REML = TRUE,
+  Database = FishLife::FishBase_and_RAM,
+  Y_ij = Database$Y_ij,
+  Z_ik = Database$Z_ik,
+  SR_obs = Database$SR_obs,
+  StockData = Database$StockData,
+  Version = "Taxon_v2_14_0",
+  Process_cov = "Unequal",
+  TmbDir = system.file("executables", package = "FishLife"),
+  RunDir = tempfile(pattern = "run_", tmpdir = tempdir(), fileext = "/"),
+  verbose = FALSE,
+  debug_mode = FALSE,
+  j_SR = ncol(Y_ij) - 3:1,
+  zerocovTF_j = rep(FALSE, ncol(Y_ij)),
+  additional_variance = c(0, 0),
+  invertTF = FALSE,
+  SD_b_stock = 10,
+  b_type = 0,
+  Cov_design = NULL,
+  Cov_RAM = c(M = FALSE),
+  Turn_off_taxonomy = FALSE,
+  Pen_lowvar_lnRhat = 1,
+  lowerbound_MLSPS = 1,
+  Use_RAM_Mvalue_TF = TRUE,
+  rho_space = "natural",
+  n_sims = 1000,
+  n_batches = NULL,
+  include_r = TRUE,
+  PredTF_stock = NULL,
+  extract_covariance = TRUE,
+  run_model = TRUE,
+  Params = "Generate",
+  Random = "Generate",
+  Map = "Generate",
+  ...
+)
 }
 \arguments{
 \item{N_factors}{Number of factors in decomposition of covariance for random-walk along evolutionary tree (0 means a diagonal but unequal covariance; negative is the sum of a factor decomposition and a diagonal-but-unequal covariance)}
@@ -45,11 +69,11 @@ Fit_model(N_factors, N_obsfactors, Use_REML = TRUE,
 
 \item{RunDir}{Directory to use when compiling and running TMB script (different to avoid problems with read-write restrictions)}
 
-\item{Params}{optional list of parameter estimates to use as starting values (Default \code{Params="Generate"} starts from random values)}
-
 \item{verbose}{Boolean whether to print diagnostics to terminal}
 
-\item{...}{other paramers passed to \code{TMBhelper::Optimize}}
+\item{run_model}{Boolean indicating whether to run the model or just return the built TMB object}
+
+\item{Params}{optional list of parameter estimates to use as starting values (Default \code{Params="Generate"} starts from random values)}
 }
 \value{
 Tagged list containing objects from FishLife run (first 9 slots constitute list 'Estimate_database' for archiving results)
