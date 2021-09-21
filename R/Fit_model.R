@@ -37,7 +37,8 @@
 #' }
 #'
 #' @export
-Fit_model = function( N_factors,
+Fit_model <-
+function( N_factors,
           N_obsfactors,
           Use_REML = TRUE,
           Database = FishLife::FishBase_and_RAM,
@@ -557,7 +558,13 @@ Fit_model = function( N_factors,
       #  Samp_rj[rI,] = u_z[ grep("beta_gj",colnames(Opt$SD$jointPrecision))[Indices] ]
       #}
       colnames(Samp_rj) = colnames(Y_ij)
-      Pred = Predictive_distribution( mean_vec=Report$beta_gj[gI,], Samp_rj=Samp_rj, include_obscov=FALSE, check_bounds=FALSE, include_r=include_r, lowerbound_MLSPS=lowerbound_MLSPS, rho_option=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2) )
+      Pred = Predictive_distribution( mean_vec = Report$beta_gj[gI,],
+                                      Samp_rj = Samp_rj,
+                                      include_obscov = FALSE,
+                                      check_bounds = FALSE,
+                                      include_r = include_r,
+                                      lowerbound_MLSPS = lowerbound_MLSPS,
+                                      rho_option = switch(rho_space, "natural"=0, "logit"=1, "logit_with_jacobian"=2) )
       beta_gv[gI,] = Pred$pred_mean
       Cov_gvv[gI,,] = Pred$pred_cov
       Corr_gvv[gI,,] = cov2cor( Cov_gvv[gI,,] )

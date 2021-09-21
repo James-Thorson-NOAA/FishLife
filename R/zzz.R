@@ -1,11 +1,11 @@
 
-#.onLoad <- function(libname, pkgname) {
-#}
+# .onLoad <- function(libname, pkgname) {
+# }
 
 .onAttach <- function(libname, pkgname) {
   packageStartupMessage("###########################################################################################")
-  packageStartupMessage("Loading package FishLife, developed by James Thorson for the Northwest Fisheries Science Center")
-  packageStartupMessage("For details and citation guidance, please see http://github.com/james-thorson/FishLife/")
+  packageStartupMessage("Loading package FishLife, developed by James Thorson for the National Marine Fisheries Service")
+  packageStartupMessage("For details and citation guidance, please see http://github.com/James-Thorson-NOAA/FishLife/")
   packageStartupMessage("###########################################################################################")
 
   #if( !"ThorsonUtilities" %in% utils::installed.packages()[,1] ){

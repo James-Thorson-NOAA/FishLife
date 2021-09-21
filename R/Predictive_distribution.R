@@ -1,8 +1,16 @@
 
 #' @export
-Predictive_distribution = function( mean_vec, process_cov, obs_cov, Samp_rj,
-  include_obscov=FALSE, check_bounds=TRUE,
-  check_names=FALSE, lowerbound_MLSPS=0, rho_option=0, include_r=FALSE ){
+Predictive_distribution <-
+function( mean_vec,
+          process_cov,
+          obs_cov,
+          Samp_rj,
+          include_obscov = FALSE,
+          check_bounds = TRUE,
+          check_names = FALSE,
+          lowerbound_MLSPS = 0,
+          rho_option = 0,
+          include_r = FALSE ){
 
   var_names = names(mean_vec)
   n_j = length(mean_vec)
