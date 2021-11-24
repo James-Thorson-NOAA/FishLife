@@ -13,6 +13,7 @@ Fit_model(
   Z_ik = Database$Z_ik,
   SR_obs = Database$SR_obs,
   StockData = Database$StockData,
+  group_j = 1:ncol(Y_ij) - 1,
   Version = "Taxon_v2_14_0",
   Process_cov = "Unequal",
   TmbDir = system.file("executables", package = "FishLife"),
