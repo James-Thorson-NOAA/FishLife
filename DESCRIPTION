@@ -1,8 +1,8 @@
 Package: FishLife
 Type: Package
 Title: Predict Life History Parameters For Any Fish
-Version: 2.0.0
-Date: 2019-11-05
+Version: 2.0.1
+Date: 2022-01-03
 Authors@R: person("James","Thorson", email="James.Thorson@noaa.gov", role=c("aut","cre"))
 Maintainer: James Thorson <James.Thorson@noaa.gov>
 Description: Estimate life history parameters from a multivariate 
@@ -12,7 +12,7 @@ Imports:
     graphics,
     utils,
     stats,
-    devtools,
+    mvtnorm,
     shape,
     rfishbase,
     ThorsonUtilities,
@@ -25,12 +25,13 @@ Suggests:
     knitr,
     rmarkdown
 Remotes:
+    ropensci/rfishbase@fb-21.06,
     james-thorson/utilities,
     kaskr/TMB_contrib_R/TMBhelper
 License: GPL-3
 LazyData: yes
 BuildVignettes: yes
 RoxygenNote: 6.1.1
-URL: http://github.com/James-Thorson/FishLife
-BugReports: http://github.com/James-Thorson/Thorson/FishLife/issues
+URL: http://github.com/James-Thorson-NOAA/FishLife
+BugReports: http://github.com/James-Thorson-NOAA/FishLife/issues
 VignetteBuilder: knitr

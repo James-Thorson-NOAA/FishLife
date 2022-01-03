@@ -8,6 +8,12 @@
   packageStartupMessage("For details and citation guidance, please see http://github.com/james-thorson/FishLife/")
   packageStartupMessage("###########################################################################################")
 
+  # Check rfishbase version
+  if( utils::packageVersion("rfishbase") >= numeric_version("4.0.0") ){
+    packageStartupMessage("Please install an earlier version of rfishbase, e.g. using by running:")
+    packageStartupMessage("  remotes::install_github( 'ropensci/rfishbase@fb-21.06', force=TRUE )")
+  }
+
   #if( !"ThorsonUtilities" %in% utils::installed.packages()[,1] ){
   #  packageStartupMessage("Installing package: ThorsonUtilities...")
   #  devtools::install_github("james-thorson/utilities")
