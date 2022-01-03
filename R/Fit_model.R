@@ -2,6 +2,8 @@
 #'
 #' \code{Fit_model} estimates parameters and predicts values from a multivariate random-walk model for fish traits
 #'
+#' @inheritParams sem::sem
+#'
 #' @param N_factors Number of factors in decomposition of covariance for random-walk along evolutionary tree (0 means a diagonal but unequal covariance; negative is the sum of a factor decomposition and a diagonal-but-unequal covariance)
 #' @param N_obsfactors Number of factors in decomposotion of observation covariance (same format as \code{N_obsfactors})
 #' @param Database, Whether to use results for both adult and stock-recruit parameters, \code{Database="FishBase_and_RAM"}, or just adult parameters, \code{Database="FishBase"}
@@ -40,6 +42,7 @@
 Fit_model <-
 function( N_factors,
           N_obsfactors,
+          text = NULL,
           Use_REML = TRUE,
           Database = FishLife::FishBase_and_RAM,
           Y_ij = Database$Y_ij,
@@ -97,10 +100,54 @@ function( N_factors,
     return(out)
   }
 
+  # Function that converts SEM model to a RAM, see `?sem` for more context
+  build_ram = function( model, vars ){
+    vars = sapply( vars, FUN=function(char){gsub("-", "", gsub(" ", "", char))} )
+    n.paths = nrow(model)
+    par.names = model[, 2]
+    startvalues = model[,3]
+
+    # EXCERPT FROM `getAnywhere("sem.semmod")`
+    heads = from = to = rep(0, n.paths)
+    for (p in 1:n.paths) {
+      path = sem:::parse.path(model[p, 1])
+      heads[p] = abs(path$direction)
+      to[p] = path$second
+      from[p] = path$first
+      if (path$direction == -1) {
+        to[p] = path$first
+        from[p] = path$second
+      }
+    }
+    missing_vars = setdiff( c(from,to), vars )
+    if( length(missing_vars) > 0 ) stop( "Check `build_ram`:", paste0(missing_vars,sep=", ") )
+
+    ram = data.frame(matrix(0, nrow=p, ncol=5))
+    pars = na.omit(unique(par.names))
+    ram[, 1] = heads
+    ram[, 2] = apply(outer(vars, to, "=="), 2, which)
+    ram[, 3] = apply(outer(vars, from, "=="), 2, which)
+    par.nos = apply(outer(pars, par.names, "=="), 2, which)
+    if(length(par.nos) > 0){
+      ram[, 4] = unlist(lapply(par.nos, function(x) if (length(x)==0){0}else{x}))
+    }
+    ram[, 5] = startvalues
+    colnames(ram) = c("heads", "to", "from", "parameter", "start")
+    return(ram)
+  }
+
   #####################
   # Check for potential problems
   #####################
   start_time = Sys.time()
+
+  # Build RAM
+  if(!is.null(text)){
+    SEM_model = sem::specifyModel( text=text, exog.variances=TRUE, endog.variances=TRUE, covs=colnames(Y_ij) )
+    RAM = build_ram( SEM_model, colnames(Y_ij) )
+  }else{
+    RAM = array( NA, dim=c(0,5), dimnames=list(NULL,c("heads","to","from","parameter","start")) )
+  }
 
   # Code uses "_" so throw error if included in names
   if( any(apply(Z_ik, MARGIN=2, FUN=function(vec){length(grep("_",vec))})>0) ){
@@ -273,6 +320,10 @@ function( N_factors,
     Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=invertTF,"b_type"=b_type,"Turn_off_taxonomy"=Turn_off_taxonomy,"Use_RAM_Mvalue_TF"=Use_RAM_Mvalue_TF,"rho_option"=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2)), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock,"Pen_lowvar_lnRhat"=Pen_lowvar_lnRhat, "lowerbound_MLSPS"=lowerbound_MLSPS), "Cov_pz"=Cov_pz, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=as.matrix(ParentChild_gz[,c('ParentRowNumber','ChildTaxon')])-1, "g_i"=g_i-1, "group_j"=group_j)
     Data = c(Data, list("Nobs"=Nobs, "Nstock"=Nstock, "Obs2Stock"=SR_obs[,'StockNum']-1, "AR_Index"=SR_obs[,'AR_Index'], "ln_R_obs"=log(SR_obs[,'R_obs']), "SSB_obs"=SR_obs[,'SSB_obs'], "PredTF_stock"=PredTF_stock, "SPRF0_stock"=StockData[,'SPRF0'], "M_stock"=StockData[,'M'], "SSBmax_stock"=StockData[,'SSBmax'], "Rmax_stock"=StockData[,'Rmax'], "j_SR"=j_SR, "j_logM"=j_logM, "i_stock"=StockData[,'Stock_to_i']-1) )
   }
+  if(Version%in%c("Taxon_v3_0_0")){
+    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=invertTF,"b_type"=b_type,"Turn_off_taxonomy"=Turn_off_taxonomy,"Use_RAM_Mvalue_TF"=Use_RAM_Mvalue_TF,"rho_option"=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2)), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock,"Pen_lowvar_lnRhat"=Pen_lowvar_lnRhat, "lowerbound_MLSPS"=lowerbound_MLSPS), "RAM"=cbind(RAM[,1],RAM[,2],RAM[,3],RAM[,4]), "Cov_pz"=Cov_pz, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=as.matrix(ParentChild_gz[,c('ParentRowNumber','ChildTaxon')])-1, "g_i"=g_i-1, "group_j"=group_j)
+    Data = c(Data, list("Nobs"=Nobs, "Nstock"=Nstock, "Obs2Stock"=SR_obs[,'StockNum']-1, "AR_Index"=SR_obs[,'AR_Index'], "ln_R_obs"=log(SR_obs[,'R_obs']), "SSB_obs"=SR_obs[,'SSB_obs'], "PredTF_stock"=PredTF_stock, "SPRF0_stock"=StockData[,'SPRF0'], "M_stock"=StockData[,'M'], "SSBmax_stock"=StockData[,'SSBmax'], "Rmax_stock"=StockData[,'Rmax'], "j_SR"=j_SR, "j_logM"=j_logM, "i_stock"=StockData[,'Stock_to_i']-1) )
+  }
 
   # Fix potential issues
   if( "j_logM"%in%names(Data) && length(Data$j_logM)==0 ){
@@ -294,6 +345,13 @@ function( N_factors,
         #if( n_row == -1*n_col ) stop("Illogical inputs")
       }
       return(param)
+    }
+
+    #
+    if(!is.null(text)){
+      L_z = rep( 0.1, max(RAM[,4]) )
+    }else{
+      L_z = rloadings( n_row=n_j, n_col=Data$Options_vec['n_factors'], mean=1, sd=0.1 )
     }
 
     ### Get informative starting values for RAM variables
@@ -334,6 +392,10 @@ function( N_factors,
       Params = list( "alpha_j"=alpha_j, "L_z"=rloadings(n_row=n_j,n_col=Data$Options_vec['n_factors'],mean=1,sd=0.1), "obsL_z"=rloadings(n_row=n_j,n_col=Data$Options_vec['n_obsfactors'],mean=1,sd=0.1), "L_logmult_col"=rep(0,ifelse(N_factors==0,1,abs(N_factors))), "obsL_logmult_col"=rep(0,ifelse(N_obsfactors==0,1,abs(N_obsfactors))), "cov_logmult_z"=rep(0,max(Data$PC_gz[,'ChildTaxon'])+1), "betainput_gj"=rmatrix(nrow=n_g,ncol=n_j), "Y_a"=Y_a )
       Params = c( Params, list("bparam_stock"=rep(0,ifelse(Nstock>0,Nstock,1)), "gamma_p"=rep(0,ifelse(n_p==0,1,n_p)), "theta_q"=0) )
     }
+    if(Version%in%c("Taxon_v3_0_0")){
+      Params = list( "alpha_j"=alpha_j, "L_z"=L_z, "obsL_z"=rloadings(n_row=n_j,n_col=Data$Options_vec['n_obsfactors'],mean=1,sd=0.1), "L_logmult_col"=rep(0,ifelse(N_factors==0,1,abs(N_factors))), "obsL_logmult_col"=rep(0,ifelse(N_obsfactors==0,1,abs(N_obsfactors))), "cov_logmult_z"=rep(0,max(Data$PC_gz[,'ChildTaxon'])+1), "betainput_gj"=rmatrix(nrow=n_g,ncol=n_j), "Y_a"=Y_a )
+      Params = c( Params, list("bparam_stock"=rep(0,ifelse(Nstock>0,Nstock,1)), "gamma_p"=rep(0,ifelse(n_p==0,1,n_p)), "theta_q"=0) )
+    }
   }
 
   # Random
@@ -344,7 +406,7 @@ function( N_factors,
     if(Version%in%c("Taxon_v2_14_0","Taxon_v2_13_0","Taxon_v2_12_0","Taxon_v2_11_0","Taxon_v2_10_0","Taxon_v2_9_0","Taxon_v2_8_0","Taxon_v2_7_0","Taxon_v2_6_0","Taxon_v2_5_0","Taxon_v2_4_0","Taxon_v2_3_0","Taxon_v2_2_0","Taxon_v2_1_0","Taxon_v2_0_0","Taxon_v1_2_0","Taxon_v1_1_0")){
       Random = c("Y_a", "beta_gj")
     }
-    if(Version%in%c("Taxon_v2_15_0")){
+    if(Version%in%c("Taxon_v3_0_0","Taxon_v2_15_0")){
       Random = c("Y_a", "betainput_gj")
     }
     if(Use_REML==TRUE){
@@ -403,15 +465,17 @@ function( N_factors,
     }
 
     # Zero out covariance for some variables
-    if( N_factors!=0 ){
-      Mat = diag(ncol(Y_ij))[1:abs(N_factors),,drop=FALSE]
-      Which = upper.tri(Mat,diag=TRUE)
-      rownum = col(Mat)[Which]
-      Which = which( rownum %in% which(zerocovTF_j) )
-      Params[["L_z"]][Which] = 0
-      Map[["L_z"]] = 1:length(Params[["L_z"]])
-      Map[["L_z"]][Which] = NA
-      Map[["L_z"]] = factor(Map[["L_z"]])
+    if( is.null(text) ){
+      if( N_factors!=0 ){
+        Mat = diag(ncol(Y_ij))[1:abs(N_factors),,drop=FALSE]
+        Which = upper.tri(Mat,diag=TRUE)
+        rownum = col(Mat)[Which]
+        Which = which( rownum %in% which(zerocovTF_j) )
+        Params[["L_z"]][Which] = 0
+        Map[["L_z"]] = 1:length(Params[["L_z"]])
+        Map[["L_z"]][Which] = NA
+        Map[["L_z"]] = factor(Map[["L_z"]])
+      }
     }
     if( N_obsfactors!=0 ){
       Mat = diag(ncol(Y_ij))[1:abs(N_obsfactors),,drop=FALSE]
@@ -467,7 +531,7 @@ function( N_factors,
 
   #
   if( run_model==FALSE ){
-    Return = list("Data"=Data, "Params"=Params, "Random"=Random, "Map"=Map, "Obj"=Obj )
+    Return = list("Data"=Data, "Params"=Params, "Random"=Random, "Map"=Map, "Obj"=Obj, "SEM_model"=SEM_model, "RAM"=RAM )
     return(Return)
   }
 
@@ -550,6 +614,9 @@ function( N_factors,
     Return = c(Return, list("Cov_jjz"=Report$Cov_jj %o% exp(ParHat$cov_logmult_z)))
     dimnames(Return$Cov_jjz) = list(colnames(Y_ij),colnames(Y_ij),colnames(Z_ik))
   }
+  if( !is.null(text) ){
+    Return = c(Return, list("SEM_model"=SEM_model, "RAM"=RAM))
+  }
 
   ####################
   # Interpret results
@@ -564,7 +631,7 @@ function( N_factors,
     # Predict
     # Don't form full u_zr to avoid memory load
     #u_zr = rmvnorm_prec( mu=Obj$env$last.par.best, prec=Opt$SD$jointPrecision, n_sims=n_sims )
-    if(Version%in%c("Taxon_v2_15_0")){
+    if(Version%in%c("Taxon_v3_0_0","Taxon_v2_15_0")){
       varname = "betainput_gj"
     }else{
       varname = "beta_gj"
