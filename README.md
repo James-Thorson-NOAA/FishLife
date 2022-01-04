@@ -87,3 +87,17 @@ Applications for stock assessment
 * Soupfin shark, South Africa, DAFF, 2018 (link [here](https://www.researchgate.net/publication/338491033_First_comprehensive_assessment_of_soupfin_shark_Galeorhinus_galeus_in_South_Africa))
 * Spanish mackerel, eastern Australia, Fisheries Queensland (link [here](http://era.daf.qld.gov.au/id/eprint/8226/25/Spanish%20mackerel%20EC%20stock%20assessment%20report%202021.pdf))
 
+Journal Arcticles using FishLife
+=============
+
+1.	Omori, K.L., Tribuzio, C.G., Babcock, E.A., Hoenig, J.M., 2021. Methods for Identifying Species Complexes Using a Novel Suite of Multivariate Approaches and Multiple Data Sources: A Case Study With Gulf of Alaska Rockfish. Front. Mar. Sci. 1084.
+
+3.	Pons, M., Cope, J.M., Kell, L.T., 2020. Comparing performance of catch-based and length-based stock assessment methods in data-limited fisheries. Can. J. Fish. Aquat. Sci. 77, 1026–1037. https://doi.org/10.1139/cjfas-2019-0276
+
+4.	Rudd, M.B., Thorson, J.T., Sagarese, S.R., 2019. Ensemble models for data-poor assessment: accounting for uncertainty in life-history information. ICES J. Mar. Sci. 76, 870–883. https://doi.org/10.1093/icesjms/fsz012
+
+5.	Thorson, J.T., 2020. Predicting recruitment density dependence and intrinsic growth rate for all fishes worldwide using a data-integrated life-history model. Fish Fish. 21, 237–251. https://doi.org/10.1111/faf.12427
+
+7.	Thorson, J.T., Munch, S.B., Cope, J.M., Gao, J., 2017. Predicting life history parameters for all fishes worldwide. Ecol. Appl. 27, 2262–2276. https://doi.org/10.1002/eap.1606
+
+
