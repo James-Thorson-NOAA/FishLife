@@ -84,6 +84,7 @@ Type objective_function<Type>::operator() ()
   // Slot 4:  Turn off taxonomic hierarchy, such that Yhat_ij(i,j) = alpha_j(j) for all i and j
   // Slot 5:  Options_vec(5)=1: Use RAM M;    Options_vec(5)=0:  Use modeled M value
   // Slot 6:  Whether rho is in natural space or logit-space
+  // Slot 7:  Use Poisson-multinomial transformation to fit factors
   DATA_VECTOR( Options );
   // Slot 0:  Additive constant for diagnonal of variance of obsCov_jj
   // Slot 1:  Additive constant for diagnonal of variance of Cov_jj
@@ -240,22 +241,33 @@ Type objective_function<Type>::operator() ()
 
   // Probability of data
   matrix<Type> Yhat_ij( n_i, n_j );
+  matrix<Type> loglike_ij( n_i, n_j );
+  loglike_ij.setZero();
   for( int i=0; i<n_i; i++){
+    // Normal, or collapse all phylogeny
     if( Options_vec(4)==false ){
       Yhat_ij.row( i ) = beta_gj.row( g_i(i) );
     }else{
       Yhat_ij.row( i ) = alpha_j;
     }
+    // Correlated or IID observation-error
     if( (Options_vec(0)!=0) | (Nstock>0) ){
-      jnll_comp(5) += MVNORM( obsCov_jj )( Ycomplete_ij.row(i) - Yhat_ij.row(i) );
+      loglike_ij(i,0) = -1 * MVNORM( obsCov_jj )( Ycomplete_ij.row(i) - Yhat_ij.row(i) );
     }else{
       for( int j=0; j<n_j; j++){
         if( !isNA(Y_ij(i,j)) ){
-          jnll_comp(5) -= dnorm( Y_ij(i,j), Yhat_ij(i,j), pow(obsCov_jj(j,j),0.5), true );
+          // Normal (continuous) or Poisson (factor-valued)
+          if( (Options_vec(7)==0) || (numlevels_j(j)==1) ){
+            loglike_ij(i,j) = dnorm( Y_ij(i,j), Yhat_ij(i,j), pow(obsCov_jj(j,j),0.5), true );
+          }else{
+            loglike_ij(i,j) = dpois( Y_ij(i,j), exp(Yhat_ij(i,j)), true );
+          }
         }
       }
     }
   }
+  REPORT( loglike_ij );
+  jnll_comp(5) = -1 * sum(loglike_ij);
 
   /////////////////////////
   // SR part
