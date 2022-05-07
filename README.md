@@ -91,7 +91,9 @@ Applications for stock assessment
 Journal Arcticles using FishLife
 =============
 
-1.	Omori, K.L., Tribuzio, C.G., Babcock, E.A., Hoenig, J.M., 2021. Methods for Identifying Species Complexes Using a Novel Suite of Multivariate Approaches and Multiple Data Sources: A Case Study With Gulf of Alaska Rockfish. Front. Mar. Sci. 1084.
+1.  Mora, P., Figueroa-Muñoz, G., Cubillos, L., Strange-Olate, P., 2022. A data-limited approach to determine the status of the artisanal fishery of sea silverside in southern Chile. Mar. Fish. Sci. MAFIS 35, 275–298.
+
+3.	Omori, K.L., Tribuzio, C.G., Babcock, E.A., Hoenig, J.M., 2021. Methods for Identifying Species Complexes Using a Novel Suite of Multivariate Approaches and Multiple Data Sources: A Case Study With Gulf of Alaska Rockfish. Front. Mar. Sci. 1084.
 
 2.	Pawluk, M., Fujiwara, M., Martinez-Andrade, F., 2022. Climate change linked to functional homogenization of a subtropical estuarine system. Ecol. Evol. 12, e8783. https://doi.org/10.1002/ece3.8783
 
