@@ -7,7 +7,7 @@ bool isNA(Type x){
 }
 
 template<class Type>
-matrix<Type> cov_matrix( vector<Type> L_val, vector<Type> logmult_col, matrix<int> RAM, Type min_var, int n_rows, int n_cols, bool invertTF ){
+matrix<Type> cov_matrix( vector<Type> L_val, matrix<int> RAM, Type min_var, int n_rows, int n_cols ){
   // Define temporary objects
   int n_z = RAM.col(0).size();
   matrix<Type> Cov_rr(n_rows, n_rows);
@@ -47,9 +47,6 @@ matrix<Type> cov_matrix( vector<Type> L_val, vector<Type> logmult_col, matrix<in
           L_rc(r,c) = 0.0;
         }
       }}
-      for(int c=0; c<abs(n_cols); c++){
-        L_rc.col(c) = L_rc.col(c) * exp(logmult_col(c));
-      }
     }
     // Diagonal matrix
     if( n_cols<=0 ){
@@ -65,9 +62,7 @@ matrix<Type> cov_matrix( vector<Type> L_val, vector<Type> logmult_col, matrix<in
     }
     // Combine and return
     Cov_rr += L_rc * L_rc.transpose();
-    if(invertTF==false) Return_rr = Cov_rr;
-    if(invertTF==true) Return_rr = atomic::matinv( Cov_rr );
-    return Return_rr;
+    return Cov_rr;
   }
 }
 
@@ -79,7 +74,7 @@ Type objective_function<Type>::operator() ()
   DATA_IVECTOR( Options_vec );
   // Slot 0:  Number of observation factors
   // Slot 1:  Number of process error factors
-  // Slot 2:  invertTF (whether to invert cov)
+  // Slot 2:  invertTF (DEPRECATED)
   // Slot 3:  Form for b_stock 0: bparam_stock = ln_b;  1: bparam_stock = log(phi_stock) =: log(SB_max / SB0)
   // Slot 4:  Turn off taxonomic hierarchy, such that Yhat_ij(i,j) = alpha_j(j) for all i and j
   // Slot 5:  Options_vec(5)=1: Use RAM M;    Options_vec(5)=0:  Use modeled M value
@@ -92,7 +87,6 @@ Type objective_function<Type>::operator() ()
   // Slot 3:  Penalty on low variance in ln_Rhat (to avoid B-H predictive function being flat over observed SSB range, which leads to singular inner hessian)
   // Slot 4:  Lower bound on MLSPS
   DATA_IMATRIX( RAM )
-  DATA_IMATRIX( Cov_pz );
 
   // Data -- FishBase
   DATA_MATRIX( Y_ij );
@@ -125,21 +119,16 @@ Type objective_function<Type>::operator() ()
   PARAMETER_VECTOR( alpha_j );
   PARAMETER_VECTOR( L_z );
   PARAMETER_VECTOR( obsL_z );
-  PARAMETER_VECTOR( L_logmult_col );
-  PARAMETER_VECTOR( obsL_logmult_col );
   PARAMETER_VECTOR( cov_logmult_z ); // log-multiplier for process-error covariance for different taxonomic levels
   PARAMETER_MATRIX( betainput_gj );
   PARAMETER_VECTOR( Y_a );
 
   // Parameters -- SR
   PARAMETER_VECTOR( bparam_stock );  // Nuissance parameter
-  PARAMETER_VECTOR( gamma_p ); // Potential coefficients linking variables in beta_gj specified by Cov_design
-  PARAMETER_VECTOR( theta_q ); // Potential coefficients linking variables in RAM database (turned off via mapping if absent)
 
   // Derived data
   int n_j = Y_ij.row(0).size();
   int n_i = Y_ij.col(0).size();
-  int n_p = Cov_pz.col(0).size();
   int n_g = PC_gz.col(0).size();
 
   // Objective funcction
@@ -207,14 +196,12 @@ Type objective_function<Type>::operator() ()
 
   // Process covariance
   matrix<Type> Cov_jj( n_j, n_j );
-  Cov_jj = cov_matrix(L_z, L_logmult_col, RAM, Options(1), n_j, Options_vec(1), Options_vec(2));
-  jnll_comp(8) = -1 * sum(dnorm( L_logmult_col, Type(0.0), Type(1.0), true ));
+  Cov_jj = cov_matrix( L_z, RAM, Options(1), n_j, Options_vec(1) );
 
   // Observation covariance
   matrix<int> RAMobs( 0, 5 );
   matrix<Type> obsCov_jj( n_j, n_j );
-  obsCov_jj = cov_matrix(obsL_z, obsL_logmult_col, RAMobs, Options(0), n_j, Options_vec(0), Options_vec(2));
-  jnll_comp(9) = -1 * sum(dnorm( obsL_logmult_col, Type(0.0), Type(1.0), true ));
+  obsCov_jj = cov_matrix( obsL_z, RAMobs, Options(0), n_j, Options_vec(0) );
 
   // Probability of random effects
   vector<Type> Parent_j( n_j );
@@ -226,9 +213,6 @@ Type objective_function<Type>::operator() ()
       if( PC_gz(g,1)==0 ) Parent_j(j) = alpha_j(j);
       if( PC_gz(g,1)>=1 ) Parent_j(j) = betainput_gj(PC_gz(g,0),j);
       Prediction_j(j) = Parent_j(j);
-    }
-    for( int p=0; p<n_p; p++ ){
-      Prediction_j(Cov_pz(p,1)) += ( betainput_gj(g,Cov_pz(p,0))-Parent_j(Cov_pz(p,0)) ) * gamma_p(p);
     }
     for( int j=0; j<n_j; j++ ){
       Deviation_j(j) = betainput_gj(g,j) - Prediction_j(j);
@@ -308,11 +292,11 @@ Type objective_function<Type>::operator() ()
     }
     // Extract MASPS
     if( Options_vec(5)==1 ){
-      MASPS_stock(StockI) = exp( Ycomplete_ij(i_stock(StockI),j_SR(2)) + theta_q(0) * (ln_M_stock(StockI)-mean_ln_M_stock) );
+      MASPS_stock(StockI) = exp( Ycomplete_ij(i_stock(StockI),j_SR(2)) );
       MLSPS_stock(StockI) = Options(4) + MASPS_stock(StockI) / (1-exp(-M_stock(StockI)));
     }
     if( Options_vec(5)==0 ){   // THIS OPTION DOESN'T APPEAR TO CONVERGE
-      MASPS_stock(StockI) = exp( Ycomplete_ij(i_stock(StockI),j_SR(2)) + theta_q(0) * beta_gj(g_i(i_stock(StockI)),j_logM) );
+      MASPS_stock(StockI) = exp( Ycomplete_ij(i_stock(StockI),j_SR(2)) );
       MLSPS_stock(StockI) = Options(4) + MASPS_stock(StockI) / (1-exp(-exp(beta_gj(g_i(i_stock(StockI)),j_logM))));
     }
     // Ensure that MLSPS > 1, such that h > 0.2;  Changed from V2.5.0 to V2.6.0
