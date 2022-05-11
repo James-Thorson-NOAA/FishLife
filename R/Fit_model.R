@@ -503,7 +503,7 @@ function( N_factors,
   on.exit(setwd(origwd),add=TRUE)
   setwd( RunDir )
   # SEE https://github.com/kaskr/adcomp/issues/321 for flags argument
-  if( packageVersion("TMB") >= numeric_version("1.8.0") )
+  if( packageVersion("TMB") >= numeric_version("1.8.0") ){
     compile( paste0(Version,".cpp"), flags="-Wno-ignored-attributes -O2 -mfpmath=sse -msse2 -mstackrealign", framework="TMBad" )
   }else{
     compile( paste0(Version,".cpp"), flags="-Wno-ignored-attributes -O2 -mfpmath=sse -msse2 -mstackrealign" )
