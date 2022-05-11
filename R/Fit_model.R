@@ -41,7 +41,7 @@
 #' @export
 Fit_model <-
 function( N_factors,
-          N_obsfactors,
+          N_obsfactors = 0,
           text = NULL,
           Use_REML = TRUE,
           Database = FishLife::FishBase_and_RAM,
@@ -57,7 +57,6 @@ function( N_factors,
           verbose = FALSE,
           debug_mode = FALSE,
           j_SR = ncol(Y_ij)-3:1,
-          zerocovTF_j = rep(FALSE,ncol(Y_ij)),
           additional_variance = c(0,0),
           SD_b_stock = 10,
           b_type = 0,
@@ -446,30 +445,6 @@ function( N_factors,
     # Change
     if( is.na(Data$Options_vec[1]) ){
       Data$Options_vec[1] = 0
-    }
-
-    # Zero out covariance for some variables
-    if( is.null(text) ){
-      if( N_factors!=0 ){
-        Mat = diag(ncol(Y_ij))[1:abs(N_factors),,drop=FALSE]
-        Which = upper.tri(Mat,diag=TRUE)
-        rownum = col(Mat)[Which]
-        Which = which( rownum %in% which(zerocovTF_j) )
-        Params[["L_z"]][Which] = 0
-        Map[["L_z"]] = 1:length(Params[["L_z"]])
-        Map[["L_z"]][Which] = NA
-        Map[["L_z"]] = factor(Map[["L_z"]])
-      }
-    }
-    if( N_obsfactors!=0 ){
-      Mat = diag(ncol(Y_ij))[1:abs(N_obsfactors),,drop=FALSE]
-      Which = upper.tri(Mat,diag=TRUE)
-      rownum = col(Mat)[Which]
-      Which = which( rownum %in% which(zerocovTF_j) )
-      Params[["obsL_z"]][Which] = 0
-      Map[["obsL_z"]] = 1:length(Params[["obsL_z"]])
-      Map[["obsL_z"]][Which] = NA
-      Map[["obsL_z"]] = factor(Map[["obsL_z"]])
     }
   }
 
