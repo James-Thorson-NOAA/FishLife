@@ -6,11 +6,13 @@
 \usage{
 Fit_model(
   N_factors,
-  N_obsfactors,
+  N_obsfactors = 0,
+  text = NULL,
   Use_REML = TRUE,
   Database = FishLife::FishBase_and_RAM,
   Y_ij = Database$Y_ij,
   Z_ik = Database$Z_ik,
+  min_replicate_measurements = 0,
   SR_obs = Database$SR_obs,
   StockData = Database$StockData,
   group_j = 1:ncol(Y_ij) - 1,
@@ -21,13 +23,9 @@ Fit_model(
   verbose = FALSE,
   debug_mode = FALSE,
   j_SR = ncol(Y_ij) - 3:1,
-  zerocovTF_j = rep(FALSE, ncol(Y_ij)),
   additional_variance = c(0, 0),
-  invertTF = FALSE,
   SD_b_stock = 10,
   b_type = 0,
-  Cov_design = NULL,
-  Cov_RAM = c(M = FALSE),
   Turn_off_taxonomy = FALSE,
   Pen_lowvar_lnRhat = 1,
   lowerbound_MLSPS = 1,
@@ -39,6 +37,7 @@ Fit_model(
   PredTF_stock = NULL,
   extract_covariance = TRUE,
   run_model = TRUE,
+  multinomial_for_factors = FALSE,
   Params = "Generate",
   Random = "Generate",
   Map = "Generate",
@@ -75,6 +74,8 @@ Fit_model(
 \item{run_model}{Boolean indicating whether to run the model or just return the built TMB object}
 
 \item{Params}{optional list of parameter estimates to use as starting values (Default \code{Params="Generate"} starts from random values)}
+
+\item{...}{other paramers passed to \code{\link[TMBhelper]{fit_tmb}}}
 }
 \value{
 Tagged list containing objects from FishLife run (first 9 slots constitute list 'Estimate_database' for archiving results)

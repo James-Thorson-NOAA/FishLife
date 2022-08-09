@@ -19,7 +19,7 @@
 #' @param Params optional list of parameter estimates to use as starting values (Default \code{Params="Generate"} starts from random values)
 #' @param verbose Boolean whether to print diagnostics to terminal
 #' @param run_model Boolean indicating whether to run the model or just return the built TMB object
-#' @param ... other paramers passed to \code{\link[TMBhelper]{fit_tmb}
+#' @param ... other paramers passed to \code{\link[TMBhelper]{fit_tmb}}
 #'
 #' @return Tagged list containing objects from FishLife run (first 9 slots constitute list 'Estimate_database' for archiving results)
 #' \describe{
@@ -47,6 +47,7 @@ function( N_factors,
           Database = FishLife::FishBase_and_RAM,
           Y_ij = Database$Y_ij,
           Z_ik = Database$Z_ik,
+          min_replicate_measurements = 0,
           SR_obs = Database$SR_obs,
           StockData = Database$StockData,
           group_j = 1:ncol(Y_ij)-1,
@@ -192,7 +193,7 @@ function( N_factors,
   #####################
 
   # Figure out missingness
-  Missing_az = NULL
+  Missing_az = matrix( nrow=0, ncol=2 )
   for(jI in 1:ncol(Y_ij)){
     Which = which(is.na(Y_ij[,jI]))
     if( length(Which)>0 ){
@@ -446,6 +447,17 @@ function( N_factors,
     if( is.na(Data$Options_vec[1]) ){
       Data$Options_vec[1] = 0
     }
+  }
+
+  if( (min_replicate_measurements>0) & (N_obsfactors!=0) ){
+    stop("`min_replicate_measurements` must be zero except when `N_obsfactors=0`")
+  }else{
+    Genus_species = paste0( Z_ik[,'Genus'], "_", Z_ik[,'Species'] )
+    MaxNum_j = apply( Y_ij, MARGIN=2, FUN=function(x){max(tapply(x,INDEX=Genus_species,FUN=function(y){sum(!is.na(y))}))} )
+    Map$obsL_z = seq_len(length(Params$obsL_z))
+    Map$obsL_z[MaxNum_j <= min_replicate_measurements] = NA
+    Map$obsL_z = factor(Map$obsL_z)
+    Params$obsL_z[MaxNum_j <= min_replicate_measurements] = 0.01
   }
 
   # Check for problems
