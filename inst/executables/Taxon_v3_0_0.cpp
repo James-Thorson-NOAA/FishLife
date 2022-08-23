@@ -22,7 +22,7 @@ matrix<Type> cov_matrix( vector<Type> L_val, matrix<int> RAM, Type min_var, int 
     I_rr.setIdentity();
     for(int zI=0; zI<n_z; zI++){
       if(RAM(zI,0)==1) Rho( RAM(zI,1)-1, RAM(zI,2)-1 ) = L_val(RAM(zI,3)-1);
-      if(RAM(zI,0)==2) Gamma( RAM(zI,1)-1, RAM(zI,2)-1 ) = exp( L_val(RAM(zI,3)-1) );
+      if(RAM(zI,0)==2) Gamma( RAM(zI,1)-1, RAM(zI,2)-1 ) = L_val(RAM(zI,3)-1); // Cholesky of covariance, so -Inf to Inf;
     }
     L_rc = I_rr - Rho;
     L_rc = atomic::matinv( L_rc );
@@ -92,6 +92,7 @@ Type objective_function<Type>::operator() ()
   DATA_MATRIX( Y_ij );
   DATA_IMATRIX( Missing_az );
   DATA_IMATRIX( PC_gz );
+  DATA_VECTOR( distance_g );
   DATA_IVECTOR( g_i );
   DATA_IVECTOR( group_j );  // Used to deal with factor-valued variables, new in V2.15.0;  must by consecutive integers from 0 to max
 
@@ -119,7 +120,7 @@ Type objective_function<Type>::operator() ()
   PARAMETER_VECTOR( alpha_j );
   PARAMETER_VECTOR( L_z );
   PARAMETER_VECTOR( obsL_z );
-  PARAMETER_VECTOR( cov_logmult_z ); // log-multiplier for process-error covariance for different taxonomic levels
+  //PARAMETER_VECTOR( cov_logmult_z ); // log-multiplier for process-error covariance for different taxonomic levels
   PARAMETER_MATRIX( betainput_gj );
   PARAMETER_VECTOR( Y_a );
 
@@ -127,14 +128,16 @@ Type objective_function<Type>::operator() ()
   PARAMETER_VECTOR( bparam_stock );  // Nuissance parameter
 
   // Derived data
-  int n_j = Y_ij.row(0).size();
-  int n_i = Y_ij.col(0).size();
-  int n_g = PC_gz.col(0).size();
+  int n_j = Y_ij.cols();
+  int n_i = Y_ij.rows();
+  int n_g = PC_gz.rows();
 
   // Objective funcction
   Type jnll = 0;
   vector<Type> jnll_comp( 12 );
   jnll_comp.setZero();
+  vector<Type> jnll_g(n_g);
+  jnll_g.setZero();
   using namespace density;
 
   // Complete data
@@ -204,24 +207,26 @@ Type objective_function<Type>::operator() ()
   obsCov_jj = cov_matrix( obsL_z, RAMobs, Options(0), n_j, Options_vec(0) );
 
   // Probability of random effects
-  vector<Type> Parent_j( n_j );
-  vector<Type> Prediction_j( n_j );
+  matrix<Type> Pred_gj( n_g, n_j );
   vector<Type> Deviation_j( n_j );
   matrix<Type> tmpCov_jj( n_j, n_j );
   for( int g=0; g<n_g; g++ ){
     for( int j=0; j<n_j; j++ ){
-      if( PC_gz(g,1)==0 ) Parent_j(j) = alpha_j(j);
-      if( PC_gz(g,1)>=1 ) Parent_j(j) = betainput_gj(PC_gz(g,0),j);
-      Prediction_j(j) = Parent_j(j);
+      if( PC_gz(g,1)==0 ){
+        Pred_gj(g,j) = alpha_j(j);
+      }else{
+        Pred_gj(g,j) = betainput_gj(PC_gz(g,0),j);
+      }
     }
     for( int j=0; j<n_j; j++ ){
-      Deviation_j(j) = betainput_gj(g,j) - Prediction_j(j);
+      Deviation_j(j) = betainput_gj(g,j) - Pred_gj(g,j);
     }
-    tmpCov_jj = Cov_jj * exp(cov_logmult_z(PC_gz(g,1)));
+    tmpCov_jj = Cov_jj * distance_g(g);
     if( Options_vec(4)==false ){
-      jnll_comp(PC_gz(g,1)) += MVNORM( tmpCov_jj )( Deviation_j );
+      jnll_g(g) = MVNORM( tmpCov_jj )( Deviation_j );
     }
   }
+  jnll_comp(0) = sum(jnll_g);
 
   // Probability of data
   matrix<Type> Yhat_ij( n_i, n_j );
@@ -251,6 +256,8 @@ Type objective_function<Type>::operator() ()
     }
   }
   REPORT( loglike_ij );
+  REPORT( jnll_g );
+  REPORT( Pred_gj );
   jnll_comp(5) = -1 * sum(loglike_ij);
 
   /////////////////////////

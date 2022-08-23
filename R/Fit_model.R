@@ -40,19 +40,19 @@
 #'
 #' @export
 Fit_model <-
-function( N_factors,
-          N_obsfactors = 0,
-          text = NULL,
-          Use_REML = TRUE,
+function( text = NULL,
           Database = FishLife::FishBase_and_RAM,
+          tree = Database$tree,
           Y_ij = Database$Y_ij,
           Z_ik = Database$Z_ik,
+          Use_REML = TRUE,
+          N_factors = 0,
+          N_obsfactors = 0,
           min_replicate_measurements = 0,
           SR_obs = Database$SR_obs,
           StockData = Database$StockData,
           group_j = 1:ncol(Y_ij)-1,
-          Version = "Taxon_v2_14_0",
-          Process_cov = "Unequal",
+          Version = "Taxon_v3_0_0",
           TmbDir = system.file("executables",package="FishLife"),
           RunDir = tempfile(pattern = "run_",tmpdir=tempdir(),fileext="/"),
           verbose = FALSE,
@@ -70,13 +70,17 @@ function( N_factors,
           n_batches = NULL,
           include_r = TRUE,
           PredTF_stock = NULL,
-          extract_covariance = TRUE,
+          extract_covariance = FALSE,
           run_model = TRUE,
           multinomial_for_factors = FALSE,
           Params = "Generate",
           Random = "Generate",
           Map = "Generate",
+          add_predictive = FALSE,
           ... ){
+
+  #save.image( paste0(RunDir,"Save.RData") )
+  #stop()
 
   #### Local function
   # Sample from GMRF using sparse precision
@@ -139,6 +143,9 @@ function( N_factors,
   #####################
   start_time = Sys.time()
 
+  # Force setting
+  Process_cov = "Equal"
+
   # Build RAM
   if(!is.null(text)){
     SEM_model = sem::specifyModel( text=text, exog.variances=TRUE, endog.variances=TRUE, covs=colnames(Y_ij) )
@@ -147,10 +154,83 @@ function( N_factors,
     RAM = array( NA, dim=c(0,5), dimnames=list(NULL,c("heads","to","from","parameter","start")) )
   }
 
-  # Code uses "_" so throw error if included in names
-  if( any(apply(Z_ik, MARGIN=2, FUN=function(vec){length(grep("_",vec))})>0) ){
-    stop("Please do not use character '_' in names included in 'Z_ik'")
+  # Process tree if supplied
+  if( !is.null(Z_ik) & !is.null(tree) ){
+    stop("Please only supply either `Z_ik` or `tree`")
   }
+  if( is.null(Z_ik) & !is.null(tree) ){
+    message("Using supplied tree")
+    if(!all(rownames(Y_ij) %in% tree$tip.label)) stop("Some `rownames(Y_ij)` not in `tree$tip.label`")
+  }
+  if( !is.null(Z_ik) & is.null(tree) ){
+    # Code uses "_" so throw error if included in names
+    if( any(apply(Z_ik, MARGIN=2, FUN=function(vec){length(grep("_",vec))})>0) ){
+      stop("Please do not use character '_' in names included in 'Z_ik'")
+    }
+    message("Converting taxonomy `Z_ik` to tree of class `ape::phylo`")
+
+    # Step 1 -- Build tree
+    Data = Z_ik
+    Data$GenusSpecies = paste0( Data$Genus, " ", Data$Species )
+    for(colI in 1:ncol(Data)) Data[,colI] = factor(Data[,colI])
+    Data = unique(Data)
+    Formula = ~ Class/Order/Family/Genus/GenusSpecies
+    tree = ape::as.phylo(Formula, data = Data, collapse=FALSE) # collapse=FALSE preserves taxa-hierarchy to get edge-length right
+    tree$edge.length = rep(1,nrow(tree$edge))
+    if( isFALSE(add_predictive) ){
+      tree = ape::collapse.singles(tree)
+    }
+
+    # Step 2
+    if(nrow(Y_ij)!=nrow(Z_ik)) stop("Check number of rows in `Y_ij` and `Z_ik`")
+    #return(list(Y_ij=Y_ij, Data=Data))
+    rownames(Y_ij) = paste0( Z_ik$Genus, " ", Z_ik$Species )
+
+    message("Done with conversion")
+  }
+  if( is.null(Z_ik) & is.null(tree) ){
+    stop("Must supply either `Z_ik` or `tree`")
+  }
+
+  # Step 3 -- Add "predictive" tip for each node
+  if( isTRUE(add_predictive) ){
+    depth = node.depth.edgelength(tree_full)
+    names(depth) = c( tree$tip.label, tree$node.label )
+    tips_to_add = 5 - depth
+    for( node in 1:length(tips_to_add) ){
+      if( tips_to_add[node] > 0 ){
+        Match = match( names(tips_to_add)[node], tree_full$node.label )
+        Where = Ntip(tree_full) + Match
+        tip = ape::read.tree(text=paste0(paste0(rep("(",tips_to_add[node]),collapse=""),"predictive",paste0(rep(")",tips_to_add[node]-1),collapse=""),",b);"))
+        tip = ape::drop.tip( phy=tip, tip="b", collapse.singles=FALSE, trim.internal=ifelse(tips_to_add[node]==1,TRUE,FALSE) )
+        tip$edge.length = rep(1, nrow(tip$edge))
+        tip$node.label = rep("predictive", tip$Nnode)
+        tree_full = ape::bind.tree( tree_full, tip, where=Where )
+      }
+    }
+  }
+
+  # Step 4 -- Fix names
+  Names = Names_full = c( tree$tip.label, tree$node.label )
+  #Path = nodepath(tree)
+  #for( nI in 1:Ntip(tree) ){
+  #  Names_full[nI] = paste0( Names[Path[[nI]]][-1], collapse="_" )
+  #}
+  #root_index = Ntip(tree) + 1
+  #Time = Sys.time()
+  #for( nI in Ntip(tree)+1:Nnode(tree) ){
+  #  Path = nodepath(tree, from=nI, to=root_index )
+  #  Names_full[nI] = paste0( Names[rev(Path)][-1], collapse="_" )
+  #  if( FALSE ){
+  #    Which = which( tree$edge[,2] == nI )
+  #    if(length(Which)==1){
+  #      Names_full[nI] = paste( setdiff(Names[tree$edge[Which,1]],""), Names_full[nI], sep="_" )
+  #    }else if(length(Which)>1){
+  #      stop()
+  #    }
+  #  }
+  #}
+  #Sys.time() - Time
 
   # Process stock-recruit inputs
   if( is.null(SR_obs) | is.null(StockData) ){
@@ -185,9 +265,6 @@ function( N_factors,
   Cov_pz = matrix( c(0,0), ncol=2, nrow=1 )
   n_p = 0
 
-  # Check for errors
-  if(nrow(Y_ij)!=nrow(Z_ik)) stop("Check number of rows in `Y_ij` and `Z_ik`")
-
   #####################
   # Pre-process data
   #####################
@@ -202,53 +279,86 @@ function( N_factors,
   }
 
   # Figure out network structure for taxonomy
-  ParentChild_gz = NULL
-  # 1st column: child taxon name
-  # 2nd column: parent taxon name
-  # 3rd column: parent row-number in ParentChild_gz
-  # 4th column: Taxon level
-  # Loop through
-  for( colI in 1:ncol(Z_ik)){
-    Taxa_Names = apply( Z_ik[,1:colI,drop=FALSE], MARGIN=1, FUN=paste, collapse="_")
-    Unique_Taxa = unique(Taxa_Names)
-    for( uniqueI in 1:length(Unique_Taxa) ){
-      Which = which( Taxa_Names == Unique_Taxa[uniqueI] )
-      if( colI==1 ){
-        ParentChild_gz = rbind( ParentChild_gz, c(Unique_Taxa[uniqueI], NA, NA, colI) )
-      }else{
-        if( length(unique(Z_ik[Which,colI-1]))>1 ) stop("Taxa has multiple parents")
-        ChildName = Unique_Taxa[uniqueI]
-        ParentName = paste(rev(rev(strsplit(ChildName,"_")[[1]])[-1]),collapse="_")
-        ParentChild_gz = rbind( ParentChild_gz, c(ChildName, ParentName, match(ParentName,ParentChild_gz[,1]), colI) )
-      }
-    }
+  #ParentChild_gz = NULL
+  ## 1st column: child taxon name
+  ## 2nd column: parent taxon name
+  ## 3rd column: parent row-number in ParentChild_gz
+  ## 4th column: Taxon level
+  ## Loop through
+  #for( colI in 1:ncol(Z_ik)){
+  #  Taxa_Names = apply( Z_ik[,1:colI,drop=FALSE], MARGIN=1, FUN=paste, collapse="_")
+  #  Unique_Taxa = unique(Taxa_Names)
+  #  for( uniqueI in 1:length(Unique_Taxa) ){
+  #    Which = which( Taxa_Names == Unique_Taxa[uniqueI] )
+  #    if( colI==1 ){
+  #      ParentChild_gz = rbind( ParentChild_gz, c(Unique_Taxa[uniqueI], NA, NA, colI) )
+  #    }else{
+  #      if( length(unique(Z_ik[Which,colI-1]))>1 ) stop("Taxa has multiple parents")
+  #      ChildName = Unique_Taxa[uniqueI]
+  #      ParentName = paste(rev(rev(strsplit(ChildName,"_")[[1]])[-1]),collapse="_")
+  #      ParentChild_gz = rbind( ParentChild_gz, c(ChildName, ParentName, match(ParentName,ParentChild_gz[,1]), colI) )
+  #    }
+  #  }
+  #}
+  ## Loop through again to add predictive elements
+  #for( colI in 1:(ncol(Z_ik)-1)){
+  #  Taxa_Names = apply( Z_ik[,1:colI,drop=FALSE], MARGIN=1, FUN=paste, collapse="_")
+  #  Unique_Taxa = unique(Taxa_Names)
+  #  for( uniqueI in 1:length(Unique_Taxa) ){
+  #    ParentName = Unique_Taxa[uniqueI]
+  #    for( predI in 1:(ncol(Z_ik)-colI) ){
+  #      ChildName = paste0(ParentName,"_predictive")
+  #      ParentChild_gz = rbind( ParentChild_gz, c(ChildName, ParentName, match(ParentName,ParentChild_gz[,1]), colI+predI) )
+  #      ParentName = ChildName
+  #    }
+  #  }
+  #}
+  ## Add top predictive
+  #ParentChild_gz = rbind( ParentChild_gz, c("predictive", NA, NA, 1) )
+  #for( colI in 2:ncol(Z_ik)) ParentChild_gz = rbind( ParentChild_gz, c(paste(rep("predictive",colI),collapse="_"), paste(rep("predictive",colI-1),collapse="_"), match(paste(rep("predictive",colI-1),collapse="_"),ParentChild_gz[,1]), colI) )
+  ## Relabel
+  #ParentChild_gz = data.frame( ParentChild_gz )
+  #colnames(ParentChild_gz) = c("ChildName", "ParentName", "ParentRowNumber", "ChildTaxon")
+  #ParentChild_gz[,'ParentRowNumber'] = as.numeric(as.character(ParentChild_gz[,'ParentRowNumber']))
+  #ParentChild_gz[,'ChildTaxon'] = as.numeric(as.character(ParentChild_gz[,'ChildTaxon']))
+
+  #root_index = Ntip(tree) + 1
+  #ParentChild_gz = data.frame( ChildName=Names_full[tree$edge[,2]], ParentName=Names_full[tree$edge[,1]],
+  #              ParentRowNumber=tree$edge[,1], ChildTaxon=node.depth.edgelength(tree)[tree$edge[,2]] )
+  #ParentChild_gz[which(ParentChild_gz[,'ParentRowNumber']==root_index),"ParentRowNumber"] = NA
+  #ParentChild_gz[which(ParentChild_gz[,'ParentRowNumber']==root_index),"ParentName"] = NA
+
+  root_node = ape::Ntip(tree) + 1
+  Edge = tree$edge
+    Edge[,1] = ifelse( Edge[,1]==root_node, NA, Edge[,1] )
+    Edge[,1:2] = ifelse( Edge>root_node, Edge-1, Edge )
+  #Depth = ape::node.depth.edgelength(tree)
+  #  Depth = Depth[-root_node]
+  Length = tree$edge.length
+  Order = order(Edge[,2])
+  Depth = ifelse( is.na(Edge[,1]), 1, 2 )
+  if( any(Length==0) ){
+    min_nonzero_length = min( Length[Length!=0] )
+    warning("Fixing ", sum(Length==0), " edges with zero length")
+    Length = ifelse( Length==0, min(0.001,0.1*min_nonzero_length), Length)
   }
-  # Loop through again to add predictive elements
-  for( colI in 1:(ncol(Z_ik)-1)){
-    Taxa_Names = apply( Z_ik[,1:colI,drop=FALSE], MARGIN=1, FUN=paste, collapse="_")
-    Unique_Taxa = unique(Taxa_Names)
-    for( uniqueI in 1:length(Unique_Taxa) ){
-      ParentName = Unique_Taxa[uniqueI]
-      for( predI in 1:(ncol(Z_ik)-colI) ){
-        ChildName = paste0(ParentName,"_predictive")
-        ParentChild_gz = rbind( ParentChild_gz, c(ChildName, ParentName, match(ParentName,ParentChild_gz[,1]), colI+predI) )
-        ParentName = ChildName
-      }
-    }
+  ParentChild_gz = data.frame( ChildName=Names_full[Edge[Order,2]], ParentName=Names_full[Edge[Order,1]],
+                               ParentRowNumber=Edge[Order,1], ChildTaxon=Depth[Order],     # Force ChildTaxon=2
+                               EdgeLength=Length[Order] )
+  PC_gz = as.matrix(ParentChild_gz[,c('ParentRowNumber','ChildTaxon')]) - 1
+
+  if( !all(1:nrow(Edge) %in% unique(as.vector(Edge))) ){
+    stop("Check ParentChild_gz:  Some node is not included in graph")
   }
-  # Add top predictive
-  ParentChild_gz = rbind( ParentChild_gz, c("predictive", NA, NA, 1) )
-  for( colI in 2:ncol(Z_ik)) ParentChild_gz = rbind( ParentChild_gz, c(paste(rep("predictive",colI),collapse="_"), paste(rep("predictive",colI-1),collapse="_"), match(paste(rep("predictive",colI-1),collapse="_"),ParentChild_gz[,1]), colI) )
-  # Relabel
-  ParentChild_gz = data.frame( ParentChild_gz )
-  colnames(ParentChild_gz) = c("ChildName", "ParentName", "ParentRowNumber", "ChildTaxon")
-  ParentChild_gz[,'ParentRowNumber'] = as.numeric(as.character(ParentChild_gz[,'ParentRowNumber']))
-  ParentChild_gz[,'ChildTaxon'] = as.numeric(as.character(ParentChild_gz[,'ChildTaxon']))
+  #if( max(PC_gz[,1],na.rm=TRUE) >= nrow(betainput_gj) ){
+  #  stop("Check PC_gz")
+  #}
 
   # Identify location for every observation
-  Taxa_Names = apply( Z_ik, MARGIN=1, FUN=paste, collapse="_")
-  g_i = match( Taxa_Names, ParentChild_gz[,'ChildName'] )
-  n_k = ncol(Z_ik)
+  # ParentChild_gz is ordered with rownumber 1-10 for observations 1-10, etc
+  #g_i = match( rownames(Y_ij), tree$tip.label[Order] )
+  g_i = match( rownames(Y_ij), tree$tip.label )
+
   n_j = ncol(Y_ij)
   n_g = nrow(ParentChild_gz)
 
@@ -265,53 +375,53 @@ function( N_factors,
 
   # Data
   if(Version%in%"Taxon_v1_0_0") Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors), "Z_ik"=as.matrix(Z_ik)-1, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1)
-  if(Version%in%c("Taxon_v1_2_0","Taxon_v1_1_0")) Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors), "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=as.matrix(ParentChild_gz[,c('ParentRowNumber','ChildTaxon')])-1, "g_i"=g_i-1)
+  if(Version%in%c("Taxon_v1_2_0","Taxon_v1_1_0")) Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors), "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=PC_gz, "g_i"=g_i-1)
   if(Version%in%c("Taxon_v2_2_0","Taxon_v2_1_0","Taxon_v2_0_0")){
-    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=FALSE), "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=as.matrix(ParentChild_gz[,c('ParentRowNumber','ChildTaxon')])-1, "g_i"=g_i-1)
+    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=FALSE), "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=PC_gz, "g_i"=g_i-1)
     Data = c(Data, list("Nobs"=Nobs, "Nstock"=Nstock, "Obs2Stock"=SR_obs[,'StockNum']-1, "AR_Index"=SR_obs[,'AR_Index'], "ln_R_obs"=log(SR_obs[,'R_obs']), "SSB_obs"=SR_obs[,'SSB_obs'], "SPRF0_stock"=StockData[,'SPRF0'], "M_stock"=StockData[,'M'], "j_SR"=j_SR, "i_stock"=StockData[,'Stock_to_i']-1) )
   }
   if(Version%in%c("Taxon_v2_5_0","Taxon_v2_4_0","Taxon_v2_3_0")){
-    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=FALSE), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock), "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=as.matrix(ParentChild_gz[,c('ParentRowNumber','ChildTaxon')])-1, "g_i"=g_i-1)
+    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=FALSE), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock), "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=PC_gz, "g_i"=g_i-1)
     Data = c(Data, list("Nobs"=Nobs, "Nstock"=Nstock, "Obs2Stock"=SR_obs[,'StockNum']-1, "AR_Index"=SR_obs[,'AR_Index'], "ln_R_obs"=log(SR_obs[,'R_obs']), "SSB_obs"=SR_obs[,'SSB_obs'], "SPRF0_stock"=StockData[,'SPRF0'], "M_stock"=StockData[,'M'], "j_SR"=j_SR, "i_stock"=StockData[,'Stock_to_i']-1) )
   }
   if(Version%in%c("Taxon_v2_6_0")){
-    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=FALSE,"b_type"=b_type), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock), "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=as.matrix(ParentChild_gz[,c('ParentRowNumber','ChildTaxon')])-1, "g_i"=g_i-1)
+    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=FALSE,"b_type"=b_type), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock), "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=PC_gz, "g_i"=g_i-1)
     Data = c(Data, list("Nobs"=Nobs, "Nstock"=Nstock, "Obs2Stock"=SR_obs[,'StockNum']-1, "AR_Index"=SR_obs[,'AR_Index'], "ln_R_obs"=log(SR_obs[,'R_obs']), "SSB_obs"=SR_obs[,'SSB_obs'], "SPRF0_stock"=StockData[,'SPRF0'], "M_stock"=StockData[,'M'], "SSBmax_stock"=StockData[,'SSBmax'], "Rmax_stock"=StockData[,'Rmax'], "j_SR"=j_SR, "i_stock"=StockData[,'Stock_to_i']-1) )
   }
   if(Version%in%c("Taxon_v2_8_0","Taxon_v2_7_0")){
-    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=FALSE,"b_type"=b_type), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock), "Cov_pz"=Cov_pz, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=as.matrix(ParentChild_gz[,c('ParentRowNumber','ChildTaxon')])-1, "g_i"=g_i-1)
+    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=FALSE,"b_type"=b_type), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock), "Cov_pz"=Cov_pz, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=PC_gz, "g_i"=g_i-1)
     Data = c(Data, list("Nobs"=Nobs, "Nstock"=Nstock, "Obs2Stock"=SR_obs[,'StockNum']-1, "AR_Index"=SR_obs[,'AR_Index'], "ln_R_obs"=log(SR_obs[,'R_obs']), "SSB_obs"=SR_obs[,'SSB_obs'], "SPRF0_stock"=StockData[,'SPRF0'], "M_stock"=StockData[,'M'], "SSBmax_stock"=StockData[,'SSBmax'], "Rmax_stock"=StockData[,'Rmax'], "j_SR"=j_SR, "i_stock"=StockData[,'Stock_to_i']-1) )
   }
   if(Version%in%c("Taxon_v2_9_0")){
-    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=FALSE,"b_type"=b_type,"Turn_off_taxonomy"=Turn_off_taxonomy), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock), "Cov_pz"=Cov_pz, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=as.matrix(ParentChild_gz[,c('ParentRowNumber','ChildTaxon')])-1, "g_i"=g_i-1)
+    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=FALSE,"b_type"=b_type,"Turn_off_taxonomy"=Turn_off_taxonomy), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock), "Cov_pz"=Cov_pz, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=PC_gz, "g_i"=g_i-1)
     Data = c(Data, list("Nobs"=Nobs, "Nstock"=Nstock, "Obs2Stock"=SR_obs[,'StockNum']-1, "AR_Index"=SR_obs[,'AR_Index'], "ln_R_obs"=log(SR_obs[,'R_obs']), "SSB_obs"=SR_obs[,'SSB_obs'], "SPRF0_stock"=StockData[,'SPRF0'], "M_stock"=StockData[,'M'], "SSBmax_stock"=StockData[,'SSBmax'], "Rmax_stock"=StockData[,'Rmax'], "j_SR"=j_SR, "i_stock"=StockData[,'Stock_to_i']-1) )
   }
   if(Version%in%c("Taxon_v2_10_0")){
-    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=FALSE,"b_type"=b_type,"Turn_off_taxonomy"=Turn_off_taxonomy), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock,"Pen_lowvar_lnRhat"=Pen_lowvar_lnRhat), "Cov_pz"=Cov_pz, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=as.matrix(ParentChild_gz[,c('ParentRowNumber','ChildTaxon')])-1, "g_i"=g_i-1)
+    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=FALSE,"b_type"=b_type,"Turn_off_taxonomy"=Turn_off_taxonomy), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock,"Pen_lowvar_lnRhat"=Pen_lowvar_lnRhat), "Cov_pz"=Cov_pz, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=PC_gz, "g_i"=g_i-1)
     Data = c(Data, list("Nobs"=Nobs, "Nstock"=Nstock, "Obs2Stock"=SR_obs[,'StockNum']-1, "AR_Index"=SR_obs[,'AR_Index'], "ln_R_obs"=log(SR_obs[,'R_obs']), "SSB_obs"=SR_obs[,'SSB_obs'], "SPRF0_stock"=StockData[,'SPRF0'], "M_stock"=StockData[,'M'], "SSBmax_stock"=StockData[,'SSBmax'], "Rmax_stock"=StockData[,'Rmax'], "j_SR"=j_SR, "i_stock"=StockData[,'Stock_to_i']-1) )
   }
   if(Version%in%c("Taxon_v2_11_0")){
-    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=FALSE,"b_type"=b_type,"Turn_off_taxonomy"=Turn_off_taxonomy), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock,"Pen_lowvar_lnRhat"=Pen_lowvar_lnRhat, "lowerbound_MLSPS"=lowerbound_MLSPS), "Cov_pz"=Cov_pz, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=as.matrix(ParentChild_gz[,c('ParentRowNumber','ChildTaxon')])-1, "g_i"=g_i-1)
+    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=FALSE,"b_type"=b_type,"Turn_off_taxonomy"=Turn_off_taxonomy), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock,"Pen_lowvar_lnRhat"=Pen_lowvar_lnRhat, "lowerbound_MLSPS"=lowerbound_MLSPS), "Cov_pz"=Cov_pz, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=PC_gz, "g_i"=g_i-1)
     Data = c(Data, list("Nobs"=Nobs, "Nstock"=Nstock, "Obs2Stock"=SR_obs[,'StockNum']-1, "AR_Index"=SR_obs[,'AR_Index'], "ln_R_obs"=log(SR_obs[,'R_obs']), "SSB_obs"=SR_obs[,'SSB_obs'], "SPRF0_stock"=StockData[,'SPRF0'], "M_stock"=StockData[,'M'], "SSBmax_stock"=StockData[,'SSBmax'], "Rmax_stock"=StockData[,'Rmax'], "j_SR"=j_SR, "i_stock"=StockData[,'Stock_to_i']-1) )
   }
   if(Version%in%c("Taxon_v2_12_0")){
-    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=FALSE,"b_type"=b_type,"Turn_off_taxonomy"=Turn_off_taxonomy,"Use_RAM_Mvalue_TF"=Use_RAM_Mvalue_TF), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock,"Pen_lowvar_lnRhat"=Pen_lowvar_lnRhat, "lowerbound_MLSPS"=lowerbound_MLSPS), "Cov_pz"=Cov_pz, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=as.matrix(ParentChild_gz[,c('ParentRowNumber','ChildTaxon')])-1, "g_i"=g_i-1)
+    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=FALSE,"b_type"=b_type,"Turn_off_taxonomy"=Turn_off_taxonomy,"Use_RAM_Mvalue_TF"=Use_RAM_Mvalue_TF), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock,"Pen_lowvar_lnRhat"=Pen_lowvar_lnRhat, "lowerbound_MLSPS"=lowerbound_MLSPS), "Cov_pz"=Cov_pz, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=PC_gz, "g_i"=g_i-1)
     Data = c(Data, list("Nobs"=Nobs, "Nstock"=Nstock, "Obs2Stock"=SR_obs[,'StockNum']-1, "AR_Index"=SR_obs[,'AR_Index'], "ln_R_obs"=log(SR_obs[,'R_obs']), "SSB_obs"=SR_obs[,'SSB_obs'], "SPRF0_stock"=StockData[,'SPRF0'], "M_stock"=StockData[,'M'], "SSBmax_stock"=StockData[,'SSBmax'], "Rmax_stock"=StockData[,'Rmax'], "j_SR"=j_SR, "j_logM"=j_logM, "i_stock"=StockData[,'Stock_to_i']-1) )
   }
   if(Version%in%c("Taxon_v2_13_0")){
-    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=FALSE,"b_type"=b_type,"Turn_off_taxonomy"=Turn_off_taxonomy,"Use_RAM_Mvalue_TF"=Use_RAM_Mvalue_TF,"rho_option"=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2)), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock,"Pen_lowvar_lnRhat"=Pen_lowvar_lnRhat, "lowerbound_MLSPS"=lowerbound_MLSPS), "Cov_pz"=Cov_pz, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=as.matrix(ParentChild_gz[,c('ParentRowNumber','ChildTaxon')])-1, "g_i"=g_i-1)
+    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=FALSE,"b_type"=b_type,"Turn_off_taxonomy"=Turn_off_taxonomy,"Use_RAM_Mvalue_TF"=Use_RAM_Mvalue_TF,"rho_option"=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2)), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock,"Pen_lowvar_lnRhat"=Pen_lowvar_lnRhat, "lowerbound_MLSPS"=lowerbound_MLSPS), "Cov_pz"=Cov_pz, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=PC_gz, "g_i"=g_i-1)
     Data = c(Data, list("Nobs"=Nobs, "Nstock"=Nstock, "Obs2Stock"=SR_obs[,'StockNum']-1, "AR_Index"=SR_obs[,'AR_Index'], "ln_R_obs"=log(SR_obs[,'R_obs']), "SSB_obs"=SR_obs[,'SSB_obs'], "SPRF0_stock"=StockData[,'SPRF0'], "M_stock"=StockData[,'M'], "SSBmax_stock"=StockData[,'SSBmax'], "Rmax_stock"=StockData[,'Rmax'], "j_SR"=j_SR, "j_logM"=j_logM, "i_stock"=StockData[,'Stock_to_i']-1) )
   }
   if(Version%in%c("Taxon_v2_14_0")){
-    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=FALSE,"b_type"=b_type,"Turn_off_taxonomy"=Turn_off_taxonomy,"Use_RAM_Mvalue_TF"=Use_RAM_Mvalue_TF,"rho_option"=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2)), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock,"Pen_lowvar_lnRhat"=Pen_lowvar_lnRhat, "lowerbound_MLSPS"=lowerbound_MLSPS), "Cov_pz"=Cov_pz, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=as.matrix(ParentChild_gz[,c('ParentRowNumber','ChildTaxon')])-1, "g_i"=g_i-1)
+    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=FALSE,"b_type"=b_type,"Turn_off_taxonomy"=Turn_off_taxonomy,"Use_RAM_Mvalue_TF"=Use_RAM_Mvalue_TF,"rho_option"=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2)), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock,"Pen_lowvar_lnRhat"=Pen_lowvar_lnRhat, "lowerbound_MLSPS"=lowerbound_MLSPS), "Cov_pz"=Cov_pz, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=PC_gz, "g_i"=g_i-1)
     Data = c(Data, list("Nobs"=Nobs, "Nstock"=Nstock, "Obs2Stock"=SR_obs[,'StockNum']-1, "AR_Index"=SR_obs[,'AR_Index'], "ln_R_obs"=log(SR_obs[,'R_obs']), "SSB_obs"=SR_obs[,'SSB_obs'], "PredTF_stock"=PredTF_stock, "SPRF0_stock"=StockData[,'SPRF0'], "M_stock"=StockData[,'M'], "SSBmax_stock"=StockData[,'SSBmax'], "Rmax_stock"=StockData[,'Rmax'], "j_SR"=j_SR, "j_logM"=j_logM, "i_stock"=StockData[,'Stock_to_i']-1) )
   }
   if(Version%in%c("Taxon_v2_15_0")){
-    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=FALSE,"b_type"=b_type,"Turn_off_taxonomy"=Turn_off_taxonomy,"Use_RAM_Mvalue_TF"=Use_RAM_Mvalue_TF,"rho_option"=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2)), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock,"Pen_lowvar_lnRhat"=Pen_lowvar_lnRhat, "lowerbound_MLSPS"=lowerbound_MLSPS), "Cov_pz"=Cov_pz, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=as.matrix(ParentChild_gz[,c('ParentRowNumber','ChildTaxon')])-1, "g_i"=g_i-1, "group_j"=group_j)
+    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=FALSE,"b_type"=b_type,"Turn_off_taxonomy"=Turn_off_taxonomy,"Use_RAM_Mvalue_TF"=Use_RAM_Mvalue_TF,"rho_option"=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2)), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock,"Pen_lowvar_lnRhat"=Pen_lowvar_lnRhat, "lowerbound_MLSPS"=lowerbound_MLSPS), "Cov_pz"=Cov_pz, "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=PC_gz, "g_i"=g_i-1, "group_j"=group_j)
     Data = c(Data, list("Nobs"=Nobs, "Nstock"=Nstock, "Obs2Stock"=SR_obs[,'StockNum']-1, "AR_Index"=SR_obs[,'AR_Index'], "ln_R_obs"=log(SR_obs[,'R_obs']), "SSB_obs"=SR_obs[,'SSB_obs'], "PredTF_stock"=PredTF_stock, "SPRF0_stock"=StockData[,'SPRF0'], "M_stock"=StockData[,'M'], "SSBmax_stock"=StockData[,'SSBmax'], "Rmax_stock"=StockData[,'Rmax'], "j_SR"=j_SR, "j_logM"=j_logM, "i_stock"=StockData[,'Stock_to_i']-1) )
   }
   if(Version%in%c("Taxon_v3_0_0")){
-    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=FALSE,"b_type"=b_type,"Turn_off_taxonomy"=Turn_off_taxonomy,"Use_RAM_Mvalue_TF"=Use_RAM_Mvalue_TF,"rho_option"=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2),"multinomial_for_factors"=multinomial_for_factors), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock,"Pen_lowvar_lnRhat"=Pen_lowvar_lnRhat, "lowerbound_MLSPS"=lowerbound_MLSPS), "RAM"=cbind(RAM[,1],RAM[,2],RAM[,3],RAM[,4]), "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=as.matrix(ParentChild_gz[,c('ParentRowNumber','ChildTaxon')])-1, "g_i"=g_i-1, "group_j"=group_j)
+    Data = list("Options_vec"=c("n_obsfactors"=N_obsfactors,"n_factors"=N_factors,"invertTF"=FALSE,"b_type"=b_type,"Turn_off_taxonomy"=Turn_off_taxonomy,"Use_RAM_Mvalue_TF"=Use_RAM_Mvalue_TF,"rho_option"=switch(rho_space,"natural"=0,"logit"=1,"logit_with_jacobian"=2),"multinomial_for_factors"=multinomial_for_factors), "Options"=c("minvar_obsfactors"=additional_variance[1],"minvar_factors"=additional_variance[2],"SD_b_stock"=SD_b_stock,"Pen_lowvar_lnRhat"=Pen_lowvar_lnRhat, "lowerbound_MLSPS"=lowerbound_MLSPS), "RAM"=cbind(RAM[,1],RAM[,2],RAM[,3],RAM[,4]), "Y_ij"=as.matrix(Y_ij), "Missing_az"=Missing_az-1, "PC_gz"=PC_gz, "distance_g"=ParentChild_gz[,'EdgeLength'], "g_i"=g_i-1, "group_j"=group_j)
     Data = c(Data, list("Nobs"=Nobs, "Nstock"=Nstock, "Obs2Stock"=SR_obs[,'StockNum']-1, "AR_Index"=SR_obs[,'AR_Index'], "ln_R_obs"=log(SR_obs[,'R_obs']), "SSB_obs"=SR_obs[,'SSB_obs'], "PredTF_stock"=PredTF_stock, "SPRF0_stock"=StockData[,'SPRF0'], "M_stock"=StockData[,'M'], "SSBmax_stock"=StockData[,'SSBmax'], "Rmax_stock"=StockData[,'Rmax'], "j_SR"=j_SR, "j_logM"=j_logM, "i_stock"=StockData[,'Stock_to_i']-1) )
   }
 
@@ -383,7 +493,7 @@ function( N_factors,
       Params = c( Params, list("bparam_stock"=rep(0,ifelse(Nstock>0,Nstock,1)), "gamma_p"=rep(0,ifelse(n_p==0,1,n_p)), "theta_q"=0) )
     }
     if(Version%in%c("Taxon_v3_0_0")){
-      Params = list( "alpha_j"=alpha_j, "L_z"=L_z, "obsL_z"=rloadings(n_row=n_j,n_col=Data$Options_vec['n_obsfactors'],mean=1,sd=0.1), "cov_logmult_z"=rep(0,max(Data$PC_gz[,'ChildTaxon'])+1), "betainput_gj"=rmatrix(nrow=n_g,ncol=n_j), "Y_a"=Y_a )
+      Params = list( "alpha_j"=alpha_j, "L_z"=L_z, "obsL_z"=rloadings(n_row=n_j,n_col=Data$Options_vec['n_obsfactors'],mean=1,sd=0.1), "betainput_gj"=rmatrix(nrow=n_g,ncol=n_j), "Y_a"=Y_a )
       Params = c( Params, list("bparam_stock"=rep(0,ifelse(Nstock>0,Nstock,0))) )
     }
   }
@@ -452,7 +562,8 @@ function( N_factors,
   if( (min_replicate_measurements>0) & (N_obsfactors!=0) ){
     stop("`min_replicate_measurements` must be zero except when `N_obsfactors=0`")
   }else{
-    Genus_species = paste0( Z_ik[,'Genus'], "_", Z_ik[,'Species'] )
+    #Genus_species = paste0( Z_ik[,'Genus'], "_", Z_ik[,'Species'] )
+    Genus_species = rownames(Y_ij)
     MaxNum_j = apply( Y_ij, MARGIN=2, FUN=function(x){max(tapply(x,INDEX=Genus_species,FUN=function(y){sum(!is.na(y))}))} )
     Map$obsL_z = seq_len(length(Params$obsL_z))
     Map$obsL_z[MaxNum_j <= min_replicate_measurements] = NA
@@ -498,6 +609,7 @@ function( N_factors,
 
   # Build
   dyn.load( paste0(RunDir,"/",TMB::dynlib(Version)) )          #
+  #return( list(Params=Params, Data=Data, Map=Map, Random=Random) )
   Obj = MakeADFun( data=Data, parameters=Params, DLL=Version, map=Map, random=Random )
   Obj$env$beSilent()
 
@@ -506,7 +618,7 @@ function( N_factors,
 
   #
   if( run_model==FALSE ){
-    Return = list("Data"=Data, "Params"=Params, "Random"=Random, "Map"=Map, "Obj"=Obj, "SEM_model"=SEM_model, "RAM"=RAM )
+    Return = list("Data"=Data, "Params"=Params, "Random"=Random, "Map"=Map, "Obj"=Obj, "SEM_model"=SEM_model, "RAM"=RAM, "tree"=tree )
     return(Return)
   }
 
@@ -580,15 +692,16 @@ function( N_factors,
                  "Opt" = Opt,
                  "Report" = Report,
                  #"ParHat_SE" = ParHat_SE,
-                 "obsCov_jj" = Report$obsCov_jj )
+                 "obsCov_jj" = Report$obsCov_jj,
+                 "tree" = tree )
   dimnames(Return$obsCov_jj) = list(colnames(Y_ij),colnames(Y_ij))
   if("Cov_jj" %in% names(Report)){
     Return = c(Return, list("Cov_jj"=Report$Cov_jj))
   }
-  if("cov_logmult_z" %in% names(ParHat)){
-    Return = c(Return, list("Cov_jjz"=Report$Cov_jj %o% exp(ParHat$cov_logmult_z)))
-    dimnames(Return$Cov_jjz) = list(colnames(Y_ij),colnames(Y_ij),colnames(Z_ik))
-  }
+  #if("cov_logmult_z" %in% names(ParHat)){
+  #  Return = c(Return, list("Cov_jjz"=Report$Cov_jj %o% exp(ParHat$cov_logmult_z)))
+  #  dimnames(Return$Cov_jjz) = list(colnames(Y_ij),colnames(Y_ij),colnames(Z_ik))
+  #}
   if( !is.null(text) ){
     Return = c(Return, list("SEM_model"=SEM_model, "RAM"=RAM))
   }
@@ -596,6 +709,21 @@ function( N_factors,
   ####################
   # Interpret results
   ####################
+
+  # Get variable names
+  if(Version%in%c("Taxon_v3_0_0","Taxon_v2_15_0")){
+    varname = "betainput_gj"
+  }else{
+    varname = "beta_gj"
+  }
+  # Extract and invert
+  VarNames = Predictive_distribution( mean_vec = Y_ij[1,],
+                                      process_cov = NULL,
+                                      group_j = group_j,
+                                      obs_cov = NULL,
+                                      check_names = TRUE,
+                                      include_r = include_r )
+  n_v = length(VarNames)
 
   if( extract_covariance==TRUE ){
     ### Approximate joint precision
@@ -606,24 +734,11 @@ function( N_factors,
     # Predict
     # Don't form full u_zr to avoid memory load
     #u_zr = rmvnorm_prec( mu=Obj$env$last.par.best, prec=Opt$SD$jointPrecision, n_sims=n_sims )
-    if(Version%in%c("Taxon_v3_0_0","Taxon_v2_15_0")){
-      varname = "betainput_gj"
-    }else{
-      varname = "beta_gj"
-    }
     u_zr = rmvnorm_prec( mu = Obj$env$last.par.best,
                          prec = Opt$SD$jointPrecision,
                          n_sims = n_sims,
                          varnames = varname,
                          n_batches = n_batches )
-    # Extract and invert
-    VarNames = Predictive_distribution( mean_vec = Y_ij[1,],
-                                        process_cov = NULL,
-                                        group_j = group_j,
-                                        obs_cov = NULL,
-                                        check_names = TRUE,
-                                        include_r = include_r )
-    n_v = length(VarNames)
     Prec_gjj = PartialCorr_gjj = array(NA, dim=c(n_g,n_j,n_j), dimnames=list(ParentChild_gz[,'ChildName'],colnames(Y_ij),colnames(Y_ij)) )
     Prec_gvv = PartialCorr_gvv = Corr_gvv = Cov_gvv = array(NA, dim=c(n_g,n_v,n_v), dimnames=list(ParentChild_gz[,'ChildName'],VarNames,VarNames) )
     beta_gv = array(NA, dim=c(n_g,n_v), dimnames=list(ParentChild_gz[,'ChildName'],VarNames) )
@@ -650,11 +765,24 @@ function( N_factors,
       Corr_gvv[gI,,] = cov2cor( Cov_gvv[gI,,] )
       if( (gI%%1000) == 0 ) message( "Finished processing predictive variance for ", gI, " of ",n_g," taxa: ", Sys.time() )
     }
-
-    # Return stuff
     if("Cov_jj" %in% names(Report)){
       Return = c(Return, list("Cov_gvv"=Cov_gvv, "beta_gv"=beta_gv))
     }
+  }else{
+    beta_gv = array(NA, dim=c(n_g,n_v), dimnames=list(ParentChild_gz[,'ChildName'],VarNames) )
+    for( gI in 1:n_g ){
+      Pred = Predictive_distribution( mean_vec = Report[[varname]][gI,],
+                                      Samp_rj = matrix(Report[[varname]][gI,],nrow=1),
+                                      group_j = group_j,
+                                      include_obscov = FALSE,
+                                      check_bounds = FALSE,
+                                      include_r = include_r,
+                                      lowerbound_MLSPS = lowerbound_MLSPS,
+                                      rho_option = switch(rho_space, "natural"=0, "logit"=1, "logit_with_jacobian"=2) )
+      beta_gv[gI,] = Pred$pred_mean
+      if( (gI%%1000) == 0 ) message( "Finished processing plug-in mean estimator for ", gI, " of ",nrow(beta_gv)," taxa: ", Sys.time() )
+    }
+    Return = c(Return, list("beta_gv"=beta_gv))
   }
 
   Return[["total_runtime"]] = Sys.time() - start_time
