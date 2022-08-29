@@ -5,19 +5,19 @@
 \title{Fit and predict fish traits}
 \usage{
 Fit_model(
-  N_factors,
-  N_obsfactors = 0,
   text = NULL,
-  Use_REML = TRUE,
   Database = FishLife::FishBase_and_RAM,
+  tree = Database$tree,
   Y_ij = Database$Y_ij,
   Z_ik = Database$Z_ik,
+  Use_REML = TRUE,
+  N_factors = 0,
+  N_obsfactors = 0,
   min_replicate_measurements = 0,
   SR_obs = Database$SR_obs,
   StockData = Database$StockData,
   group_j = 1:ncol(Y_ij) - 1,
-  Version = "Taxon_v2_14_0",
-  Process_cov = "Unequal",
+  Version = "Taxon_v3_0_0",
   TmbDir = system.file("executables", package = "FishLife"),
   RunDir = tempfile(pattern = "run_", tmpdir = tempdir(), fileext = "/"),
   verbose = FALSE,
@@ -35,35 +35,34 @@ Fit_model(
   n_batches = NULL,
   include_r = TRUE,
   PredTF_stock = NULL,
-  extract_covariance = TRUE,
+  extract_covariance = FALSE,
   run_model = TRUE,
   multinomial_for_factors = FALSE,
   Params = "Generate",
   Random = "Generate",
   Map = "Generate",
+  add_predictive = FALSE,
   ...
 )
 }
 \arguments{
-\item{N_factors}{Number of factors in decomposition of covariance for random-walk along evolutionary tree (0 means a diagonal but unequal covariance; negative is the sum of a factor decomposition and a diagonal-but-unequal covariance)}
-
-\item{N_obsfactors}{Number of factors in decomposotion of observation covariance (same format as \code{N_obsfactors})}
-
-\item{Use_REML, }{OPTIONAL boolean whether to use maximum marginal likelihood or restricted maximum likelihood (termed "REML")}
-
 \item{Database, }{Whether to use results for both adult and stock-recruit parameters, \code{Database="FishBase_and_RAM"}, or just adult parameters, \code{Database="FishBase"}}
 
 \item{Y_ij}{a data frame of trait values (perhaps log-scaled) with rows for records, and tagged-columns for traits}
 
 \item{Z_ik}{a data frame of taxonomic classification for each row of \code{Y_ij}}
 
+\item{Use_REML, }{OPTIONAL boolean whether to use maximum marginal likelihood or restricted maximum likelihood (termed "REML")}
+
+\item{N_factors}{Number of factors in decomposition of covariance for random-walk along evolutionary tree (0 means a diagonal but unequal covariance; negative is the sum of a factor decomposition and a diagonal-but-unequal covariance)}
+
+\item{N_obsfactors}{Number of factors in decomposotion of observation covariance (same format as \code{N_obsfactors})}
+
 \item{SR_obs}{Stock-recruit records from RAM Legacy stock-recruit database}
 
 \item{StockData}{Auxiliary information for every stock with stock-recruit information}
 
 \item{Version}{TMB version number}
-
-\item{Process_cov}{Whether process-error covariance is equal or differs multiplicatively for different taxonomic levels (Options:  "Equal" or "Unequal")}
 
 \item{TmbDir}{Directory containing pre-compiled TMB script}
 
@@ -76,6 +75,8 @@ Fit_model(
 \item{Params}{optional list of parameter estimates to use as starting values (Default \code{Params="Generate"} starts from random values)}
 
 \item{...}{other paramers passed to \code{\link[TMBhelper]{fit_tmb}}}
+
+\item{Process_cov}{Whether process-error covariance is equal or differs multiplicatively for different taxonomic levels (Options:  "Equal" or "Unequal")}
 }
 \value{
 Tagged list containing objects from FishLife run (first 9 slots constitute list 'Estimate_database' for archiving results)
