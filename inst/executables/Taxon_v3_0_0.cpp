@@ -164,6 +164,8 @@ Type objective_function<Type>::operator() ()
 
   // Then for this columns, rescale to sum to one using multivariate logistic-transformation (including a dropped "reference" level)
   matrix<Type> beta_gj( n_g, n_j );
+  matrix<Type> betaextra_gj( n_g, n_j );
+  betaextra_gj.setZero();
   Type sum_exp_plus_one;
   beta_gj = betainput_gj;
   for( int j1=0; j1<n_j; j1++ ){
@@ -189,9 +191,29 @@ Type objective_function<Type>::operator() ()
             beta_gj(g,j2) = log(beta_gj(g,j2));
           }
         }
+        // Compile residual
+        betaextra_gj(g,j1) = log(Type(1.0) / sum_exp_plus_one);
       }
     }
   }
+  REPORT( betaextra_gj );
+
+  matrix<Type> Yextra_ij( n_i, n_j );
+  Yextra_ij.setZero();
+  for( int j1=0; j1<n_j; j1++ ){
+    if( numlevels_j(j1) >= 2 ){
+      for( int i=0; i<n_i; i++ ){
+        // get residual
+        Yextra_ij(i,j1) = 1.0;
+        for( int j2=0; j2<n_j; j2++ ){
+          if( group_j(j2)==j1 ){
+            Yextra_ij(i,j1) -= Y_ij(i,j2);
+          }
+        }
+      }
+    }
+  }
+  REPORT( Yextra_ij );
 
   /////////////////////////
   // FishBase part
@@ -249,16 +271,31 @@ Type objective_function<Type>::operator() ()
           if( (Options_vec(7)==0) || (numlevels_j(j)==1) ){
             loglike_ij(i,j) = dnorm( Y_ij(i,j), Yhat_ij(i,j), pow(obsCov_jj(j,j),0.5), true );
           }else{
-            loglike_ij(i,j) = dpois( Y_ij(i,j), exp(Yhat_ij(i,j)), true );
+            //loglike_ij(i,j) = dpois( Y_ij(i,j), exp(Yhat_ij(i,j)), true );
+            loglike_ij(i,j) = Y_ij(i,j) * Yhat_ij(i,j); // log( p^N )
           }
         }
       }
     }
   }
+
+  matrix<Type> loglikeextra_ij( n_i, n_j );
+  loglikeextra_ij.setZero();
+  for( int j1=0; j1<n_j; j1++ ){
+    if( (Options_vec(7)==1) && (numlevels_j(j1)>=2) ){
+      for( int i=0; i<n_i; i++ ){
+        if( !isNA(Yextra_ij(i,j1)) ){
+          loglikeextra_ij(i,j1) = Yextra_ij(i,j1) * betaextra_gj(g_i(i),j1); 
+        }
+      }
+    }
+  }
+
   REPORT( loglike_ij );
   REPORT( jnll_g );
   REPORT( Pred_gj );
-  jnll_comp(5) = -1 * sum(loglike_ij);
+  REPORT( loglikeextra_ij );
+  jnll_comp(5) = -1 * (sum(loglike_ij) + sum(loglikeextra_ij) );
 
   /////////////////////////
   // SR part
