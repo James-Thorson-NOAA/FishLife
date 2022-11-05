@@ -16,13 +16,18 @@ update_prediction(predmean_j, predcov_jj, obscov_jj, Ynew_ij)
 \item{Ynew_ij}{matrix of new samples (NAs are ignored and have essentially no effect)}
 }
 \description{
-Update predictions from a model
+Updates the predictive distribution for each trait analytically as
+  precision-weighted average of the existing prediction and new sampled values. Presumably
+  the function will be run such that samples are weighted by the estimated measurement-covariance.
+  The measurement-covariance is edited in each sample to account for missing values,
+  which are inputted as NA values;  this approximates the analytic calculation
+  without requiring integrating across missing samples.
 }
 \examples{
 \dontrun{
  # New values
- linf = c(61.1,50.2,41.8,35.4,52.8,46.3,53.4,54.1,43.9,45.5,50.7,55.1)
- vbk = c(0.28,0.45,0.57,0.56,0.1426,0.3669,0.182,0.3764,0.34,0.31,0.454,0.246)
+ linf = c(61.1, 50.2, 41.8, 35.4, 52.8, 46.3, 53.4, 54.1, 43.9, 45.5, 50.7, 55.1)
+ vbk = c(0.28, 0.45, 0.57, 0.56, 0.1426, 0.3669, 0.182, 0.3764, 0.34, 0.31, 0.454, 0.246)
 
  # Extract estimates
  predict_GP = Plot_taxa( Search_species(Genus="Macquaria",Species="ambigua", add_ancestors=FALSE)$match_taxonomy, mfrow=c(3,2) )

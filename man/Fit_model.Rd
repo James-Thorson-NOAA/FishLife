@@ -46,17 +46,29 @@ Fit_model(
 )
 }
 \arguments{
-\item{Database, }{Whether to use results for both adult and stock-recruit parameters, \code{Database="FishBase_and_RAM"}, or just adult parameters, \code{Database="FishBase"}}
+\item{text}{structural equation model structure, passed to either \code{\link[sem]{specifyModel}}
+and then parsed to control the set of path coefficients and variance-covariance parameters}
+
+\item{Database}{Whether to use results for both adult and stock-recruit parameters, \code{Database="FishBase_and_RAM"}, or just adult parameters, \code{Database="FishBase"}}
+
+\item{tree}{phylogenetic structure, using class \code{\link[ape]{as.phylo}}.  If \code{tree=NULL}
+then argument \code{Z_ik} is instead converted to a tree using 
+\code{ape::as.phylo( ~Class/Order/Family/Genus/GenusSpecies, ... )} to convert it to a tree}
 
 \item{Y_ij}{a data frame of trait values (perhaps log-scaled) with rows for records, and tagged-columns for traits}
 
 \item{Z_ik}{a data frame of taxonomic classification for each row of \code{Y_ij}}
 
-\item{Use_REML, }{OPTIONAL boolean whether to use maximum marginal likelihood or restricted maximum likelihood (termed "REML")}
+\item{Use_REML}{OPTIONAL boolean whether to use maximum marginal likelihood or restricted maximum likelihood (termed "REML")}
 
 \item{N_factors}{Number of factors in decomposition of covariance for random-walk along evolutionary tree (0 means a diagonal but unequal covariance; negative is the sum of a factor decomposition and a diagonal-but-unequal covariance)}
 
 \item{N_obsfactors}{Number of factors in decomposotion of observation covariance (same format as \code{N_obsfactors})}
+
+\item{min_replicate_measurements}{specified threshold for the number of measurements for a given continuous traits,
+where any continuous trait having fewer replicated measurements for at least one taxon will have the 
+measurement variance fixed at an arbitrarily low value, such that estimated traits are forced
+to approach the unreplicated measurements}
 
 \item{SR_obs}{Stock-recruit records from RAM Legacy stock-recruit database}
 
@@ -81,6 +93,8 @@ Fit_model(
 \value{
 Tagged list containing objects from FishLife run (first 9 slots constitute list 'Estimate_database' for archiving results)
 \describe{
+  \item{tree}{The phylogenetic tree used for analysis, whether inputted or generated from taxonomy based on \code{Z_ik}}
+  \item{SEM_model}{The phylogenetic tree used for analysis, whether inputted or generated from taxonomy based on \code{Z_ik}}
   \item{N_factors}{Number of factors used for evolution in life-history model}
   \item{N_obsfactors}{Number of factors used for measurent-error in life-history model}
   \item{Use_REML}{Boolean, whether REML was used for model}
@@ -98,4 +112,49 @@ Tagged list containing objects from FishLife run (first 9 slots constitute list 
 }
 \description{
 \code{Fit_model} estimates parameters and predicts values from a multivariate random-walk model for fish traits
+}
+\examples{
+\dontrun{
+# Load data set
+library(FishLife)
+
+# Simulate data
+tree = ape::rtree(n=100)
+xfit = x = 1 + 0.3 * phylolm::rTrait(n = 1, phy=tree)
+yfit = y = 2 + 1*x + 0.3 * phylolm::rTrait(n = 1, phy=tree)
+drop_x = sample( 1:ape::Ntip(tree), replace=FALSE, size=round(ape::Ntip(tree)*0.3) )
+xfit[drop_x] = NA
+drop_y = sample( 1:ape::Ntip(tree), replace=FALSE, size=round(ape::Ntip(tree)*0.3) )
+yfit[drop_y] = NA
+
+# Fit model
+Fit = Fit_model(
+  text = "x -> y, p",
+  Database = NULL,
+  Use_REML = FALSE,
+  Y_ij = data.frame( x=xfit, y=yfit ),
+  tree = tree,
+  min_replicate_measurements = Inf )
+
+# S3-defaults
+print(Fit)
+coef(Fit)
+
+# Convet and plot using sem
+mysem = as(Fit,"sem")
+sem::pathDiagram( model = mysem,
+                  style = "traditional",
+                  edge.labels = "values" )
+myplot = semPlot::semPlotModel( as(Fit,"sem") )
+semPlot::semPaths( myplot,
+                   nodeLabels = myplot@Vars$name )
+
+# Convert and plot using phylobase / phylosignal
+library(phylobase)
+plot( as(Fit,"phylo4d") )
+barplot( as(Fit,"phylo4d") )
+dotplot( as(Fit,"phylo4d") )
+gridplot( as(Fit,"phylo4d") )
+}
+
 }

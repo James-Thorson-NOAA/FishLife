@@ -16,7 +16,8 @@ Imports:
     shape,
     rfishbase,
     ThorsonUtilities,
-    TMBhelper
+    TMBhelper,
+    sem
 Depends:
     R (>= 3.1.0),
 Suggests:

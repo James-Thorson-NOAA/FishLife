@@ -4,10 +4,19 @@
 #'
 #' @inheritParams sem::sem
 #'
+#' @param text structural equation model structure, passed to either \code{\link[sem]{specifyModel}}
+#'        and then parsed to control the set of path coefficients and variance-covariance parameters
+#' @param tree phylogenetic structure, using class \code{\link[ape]{as.phylo}}.  If \code{tree=NULL}
+#'        then argument \code{Z_ik} is instead converted to a tree using 
+#'        \code{ape::as.phylo( ~Class/Order/Family/Genus/GenusSpecies, ... )} to convert it to a tree
+#' @param min_replicate_measurements specified threshold for the number of measurements for a given continuous traits,
+#'        where any continuous trait having fewer replicated measurements for at least one taxon will have the 
+#'        measurement variance fixed at an arbitrarily low value, such that estimated traits are forced
+#'        to approach the unreplicated measurements
 #' @param N_factors Number of factors in decomposition of covariance for random-walk along evolutionary tree (0 means a diagonal but unequal covariance; negative is the sum of a factor decomposition and a diagonal-but-unequal covariance)
 #' @param N_obsfactors Number of factors in decomposotion of observation covariance (same format as \code{N_obsfactors})
-#' @param Database, Whether to use results for both adult and stock-recruit parameters, \code{Database="FishBase_and_RAM"}, or just adult parameters, \code{Database="FishBase"}
-#' @param Use_REML, OPTIONAL boolean whether to use maximum marginal likelihood or restricted maximum likelihood (termed "REML")
+#' @param Database Whether to use results for both adult and stock-recruit parameters, \code{Database="FishBase_and_RAM"}, or just adult parameters, \code{Database="FishBase"}
+#' @param Use_REML OPTIONAL boolean whether to use maximum marginal likelihood or restricted maximum likelihood (termed "REML")
 #' @param Y_ij a data frame of trait values (perhaps log-scaled) with rows for records, and tagged-columns for traits
 #' @param Z_ik a data frame of taxonomic classification for each row of \code{Y_ij}
 #' @param SR_obs Stock-recruit records from RAM Legacy stock-recruit database
@@ -23,6 +32,8 @@
 #'
 #' @return Tagged list containing objects from FishLife run (first 9 slots constitute list 'Estimate_database' for archiving results)
 #' \describe{
+#'   \item{tree}{The phylogenetic tree used for analysis, whether inputted or generated from taxonomy based on \code{Z_ik}}
+#'   \item{SEM_model}{The phylogenetic tree used for analysis, whether inputted or generated from taxonomy based on \code{Z_ik}}
 #'   \item{N_factors}{Number of factors used for evolution in life-history model}
 #'   \item{N_obsfactors}{Number of factors used for measurent-error in life-history model}
 #'   \item{Use_REML}{Boolean, whether REML was used for model}
@@ -36,6 +47,50 @@
 #'   \item{Opt}{Output from optimization}
 #'   \item{Report}{tagged list of report-file from TMB}
 #'   \item{ParHat_SE}{Estimated/predicted standard errors for fixed/random effects}
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' # Load data set
+#' library(FishLife)
+#'
+#' # Simulate data
+#' tree = ape::rtree(n=100)
+#' xfit = x = 1 + 0.3 * phylolm::rTrait(n = 1, phy=tree)
+#' yfit = y = 2 + 1*x + 0.3 * phylolm::rTrait(n = 1, phy=tree)
+#' drop_x = sample( 1:ape::Ntip(tree), replace=FALSE, size=round(ape::Ntip(tree)*0.3) )
+#' xfit[drop_x] = NA
+#' drop_y = sample( 1:ape::Ntip(tree), replace=FALSE, size=round(ape::Ntip(tree)*0.3) )
+#' yfit[drop_y] = NA
+#'
+#' # Fit model
+#' Fit = Fit_model(
+#'   text = "x -> y, p",
+#'   Database = NULL,
+#'   Use_REML = FALSE,
+#'   Y_ij = data.frame( x=xfit, y=yfit ),
+#'   tree = tree,
+#'   min_replicate_measurements = Inf )
+#'
+#' # S3-defaults
+#' print(Fit)
+#' coef(Fit)
+#'
+#' # Convet and plot using sem
+#' mysem = as(Fit,"sem")
+#' sem::pathDiagram( model = mysem,
+#'                   style = "traditional",
+#'                   edge.labels = "values" )
+#' myplot = semPlot::semPlotModel( as(Fit,"sem") )
+#' semPlot::semPaths( myplot,
+#'                    nodeLabels = myplot@Vars$name )
+#'
+#' # Convert and plot using phylobase / phylosignal
+#' library(phylobase)
+#' plot( as(Fit,"phylo4d") )
+#' barplot( as(Fit,"phylo4d") )
+#' dotplot( as(Fit,"phylo4d") )
+#' gridplot( as(Fit,"phylo4d") )
 #' }
 #'
 #' @export
@@ -786,5 +841,48 @@ function( text = NULL,
   }
 
   Return[["total_runtime"]] = Sys.time() - start_time
+  class(Return) = "FishLife"
   return( Return )
+}
+
+#' Print parameter estimates and standard errors.
+#'
+#' @title Print parameter estimates
+#' @param x Output from \code{\link{Fit_model}}
+#' @param ... Not used
+#' @return NULL
+#' @method print FishLife
+#' @export
+print.FishLife <- function(x, ...)
+{
+  cat("Fit_model(.) result\n")
+  if( "Opt" %in% names(x) ){
+    print( x$Opt )
+  }else{
+    cat("`parameter_estimates` not available in `Fit_model`\n")
+  }
+  invisible(x$Opt)
+}
+
+#' Extract path coefficients.
+#'
+#' @title Extract path coefficients
+#' @param x Output from \code{\link{Fit_model}}
+#' @param ... Not used
+#' @return NULL
+#' @method coef FishLife
+#' @export
+coef.FishLife = function( x ){
+  beta_z = x$Opt$par[names(x$Opt$par)=="L_z"]
+  RAM = x$Obj$env$data$RAM
+  if(nrow(RAM) != nrow(x$SEM_model)) stop("Check assumptions")
+  # Report variances
+  for( i in which(RAM[,1]==2) ){
+    if( RAM[i,3] == RAM[i,2] ){
+      beta_z[i] = beta_z[i]^2
+    }
+  }
+  SEM_params = beta_z[ifelse(RAM[,4]==0, NA, RAM[,4])]
+  SEM_params = ifelse( is.na(SEM_params), as.numeric(x$SEM_model[,3]), SEM_params )
+  return( data.frame(Path=x$SEM_model[,1], Parameter=x$SEM_model[,2], Estimate=SEM_params ) )
 }
