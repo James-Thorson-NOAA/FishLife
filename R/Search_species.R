@@ -21,39 +21,43 @@
 Search_species = function( Class="predictive", Order="predictive", Family="predictive", Genus="predictive", Species="predictive",
    add_ancestors=TRUE, Database=FishLife::FishBase_and_RAM, ParentChild_gz=Database$ParentChild_gz ){
 
+  
+  fishbase <- rfishbase::load_taxa()
+  # note in modern version of fishbase Species returns the genus and species not just the species, hence modifications to use grep for finding species match instead
+  
   # Match full taxonomy from fishbase
-  Match = 1:nrow(rfishbase::fishbase)
-  if( Class!="predictive" ) Match = Match[ which(tolower(rfishbase::fishbase$Class[Match])==tolower(Class)) ]
-  if( Order!="predictive" ) Match = Match[ which(tolower(rfishbase::fishbase$Order[Match])==tolower(Order)) ]
-  if( Family!="predictive" ) Match = Match[ which(tolower(rfishbase::fishbase$Family[Match])==tolower(Family)) ]
-  if( Genus!="predictive" ) Match = Match[ which(tolower(rfishbase::fishbase$Genus[Match])==tolower(Genus)) ]
-  if( Species!="predictive" ) Match = Match[ which(tolower(rfishbase::fishbase$Species[Match])==tolower(Species)) ]
-  if( length(Match)==0 ) stop( paste("Inputs not found in FishBase, please check spelling of",tolower(Class),tolower(Order),tolower(Family),tolower(Genus),tolower(Species)) )
-
+  Match = 1:nrow(fishbase)
+  if( Class!="predictive" ){ Match = Match[ which(tolower(fishbase$Class[Match])==tolower(Class)) ]}
+  if( Order!="predictive" ){ Match = Match[ which(tolower(fishbase$Order[Match])==tolower(Order)) ]}
+  if( Family!="predictive" ){Match = Match[ which(tolower(fishbase$Family[Match])==tolower(Family)) ]}
+  if( Genus!="predictive" ){ Match = Match[ which(tolower(fishbase$Genus[Match])==tolower(Genus)) ]}
+  if( Species!="predictive" ){Match = Match[grep(tolower(Species),tolower(fishbase$Species[Match]))]}
+  if( length(Match)==0 ){ stop( paste("Inputs not found in FishBase, please check spelling of",tolower(Class),tolower(Order),tolower(Family),tolower(Genus),tolower(Species)) )}
+  
   # add missing taxonomic levels from FishBase if uniquely defined (and throw error if not)
   full_taxonomy = c(Class, Order, Family, Genus, Species)
   if( !all(c(Species)=="predictive") ){
-    if( length(unique(rfishbase::fishbase[Match,'Species']))!=1) stop("inputs are not unique")
-    if( length(unique(rfishbase::fishbase[Match,'Species']))==1) full_taxonomy[5] = unique(rfishbase::fishbase[Match,'Species'])[1]
+    if( length(unique(fishbase[Match,'Species']))!=1) stop("inputs are not unique")
+    if( length(unique(fishbase[Match,'Species']))==1) full_taxonomy[5] = unique(fishbase[Match,'Species'])[1]
   }
   if( !all(c(Species,Genus)=="predictive") ){
-    if( length(unique(rfishbase::fishbase[Match,'Genus']))!=1) stop("inputs are not unique")
-    if( length(unique(rfishbase::fishbase[Match,'Genus']))==1) full_taxonomy[4] = unique(rfishbase::fishbase[Match,'Genus'])[1]
+    if( length(unique(fishbase[Match,'Genus']))!=1) stop("inputs are not unique")
+    if( length(unique(fishbase[Match,'Genus']))==1) full_taxonomy[4] = unique(fishbase[Match,'Genus'])[1]
   }
   if( !all(c(Species,Genus,Family)=="predictive") ){
-    if( length(unique(rfishbase::fishbase[Match,'Family']))!=1) stop("inputs are not unique")
-    if( length(unique(rfishbase::fishbase[Match,'Family']))==1) full_taxonomy[3] = unique(rfishbase::fishbase[Match,'Family'])[1]
+    if( length(unique(fishbase[Match,'Family']))!=1) stop("inputs are not unique")
+    if( length(unique(fishbase[Match,'Family']))==1) full_taxonomy[3] = unique(fishbase[Match,'Family'])[1]
   }
   if( !all(c(Species,Genus,Family,Order)=="predictive") ){
-    if( length(unique(rfishbase::fishbase[Match,'Order']))!=1) stop("inputs are not unique")
-    if( length(unique(rfishbase::fishbase[Match,'Order']))==1) full_taxonomy[2] = unique(rfishbase::fishbase[Match,'Order'])[1]
+    if( length(unique(fishbase[Match,'Order']))!=1) stop("inputs are not unique")
+    if( length(unique(fishbase[Match,'Order']))==1) full_taxonomy[2] = unique(fishbase[Match,'Order'])[1]
   }
   if( !all(c(Species,Genus,Family,Order,Class)=="predictive") ){
-    if( length(unique(rfishbase::fishbase[Match,'Class']))!=1) stop("inputs are not unique")
-    if( length(unique(rfishbase::fishbase[Match,'Class']))==1) full_taxonomy[1] = unique(rfishbase::fishbase[Match,'Class'])[1]
+    if( length(unique(fishbase[Match,'Class']))!=1) stop("inputs are not unique")
+    if( length(unique(fishbase[Match,'Class']))==1) full_taxonomy[1] = unique(fishbase[Match,'Class'])[1]
   }
   match_taxonomy = full_taxonomy
-
+  
   # Match in database
   Count = 1
   Group = NA
@@ -65,12 +69,12 @@ Search_species = function( Class="predictive", Order="predictive", Family="predi
     }
   }
   message( "Closest match: ", as.character(ParentChild_gz[Group,'ChildName']) )
-
+  
   # Pick out ancestors
   if( add_ancestors==TRUE ){
-    Group = Find_ancestors(child_num=Group, ParentChild_gz=ParentChild_gz)
+    Group = marlin::find_ancestors(child_num=Group, ParentChild_gz=ParentChild_gz)
   }
-
+  
   # Function to add predictive to taxon name
   Add_predictive = function( char_vec ){
     return_vec = char_vec
@@ -83,10 +87,11 @@ Search_species = function( Class="predictive", Order="predictive", Family="predi
   match_taxonomy = unique(as.character(Add_predictive(ParentChild_gz[Group,'ChildName'])))
   # Find new matches
   GroupNum = match(match_taxonomy,ParentChild_gz[,'ChildName'])
-
+  
   # Return match
   Return = list( "GroupNum"=GroupNum, "match_taxonomy"=match_taxonomy )
   return( Return )
-}
+   
+  }
 
 
