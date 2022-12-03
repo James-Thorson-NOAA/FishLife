@@ -88,6 +88,7 @@ Applications for stock assessment
 * Smoothound shark, South Africa, DAFF, 2018 (link [here](https://www.researchgate.net/publication/338491221_Assessment_of_smoothhound_shark_Mustelus_mustelus_in_South_Africa))
 * Soupfin shark, South Africa, DAFF, 2018 (link [here](https://www.researchgate.net/publication/338491033_First_comprehensive_assessment_of_soupfin_shark_Galeorhinus_galeus_in_South_Africa))
  * Yang, W.-H., Martin, T.S., Moffitt, D., 2022. Stock assessment of Queensland east coast dusky flathead (Platycephalus fuscus), Australia, with data to December 2020.
+ * Parker, D., Kikuchi, E., Mourato, B.L., 2022. Assessment of the South Atlantic swordfish (Xiphias gladius) stock using JABBA. Collect Vol Sci Pap ICCAT 79, 608–639. (link [here](https://www.researchgate.net/profile/Bruno-Mourato/publication/365748009_ASSESSMENT_OF_THE_SOUTH_ATLANTIC_SWORDFISH_XIPHIAS_GLADIUS_STOCK_USING_JABBA/links/638142f1c2cb154d29293a78/ASSESSMENT-OF-THE-SOUTH-ATLANTIC-SWORDFISH-XIPHIAS-GLADIUS-STOCK-USING-JABBA.pdf))
 
 Journal Arcticles using FishLife
 =============
