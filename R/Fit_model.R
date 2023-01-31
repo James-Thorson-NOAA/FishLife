@@ -275,6 +275,7 @@ function( text = NULL,
   }
 
   # Step 4 -- Fix names
+  root_index = ape::Ntip(tree) + 1
   if( isTRUE(add_predictive) ){
     message("Re-formatting node and tip names to match `Search_species` format")
     Names = Names_full = c( tree$tip.label, tree$node.label )
@@ -287,7 +288,6 @@ function( text = NULL,
     for( nI in seq_len(ape::Ntip(tree)) ){
       Names_full[nI] = paste0( Names[Path[[nI]]][-1], collapse="_" )
     }
-    root_index = ape::Ntip(tree) + 1
     for( nI in ape::Ntip(tree)+seq_len(ape::Nnode(tree)) ){
       Path = ape::nodepath(tree, from=nI, to=root_index )
       Names_full[nI] = paste0( Names[rev(Path)][-1], collapse="_" )
@@ -301,6 +301,12 @@ function( text = NULL,
       #}
     }
     # remote root
+    Names_full = Names_full[-root_index]
+  }else{
+    if( is.null(tree$node.label) ){
+      tree$node.label = c( "root", paste0("node",seq_len(ape::Nnode(tree)-1)) )
+    }
+    Names_full = c( tree$tip.label, tree$node.label )
     Names_full = Names_full[-root_index]
   }
   
