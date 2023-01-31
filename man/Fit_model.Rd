@@ -152,9 +152,6 @@ semPlot::semPaths( myplot,
 # Convert and plot using phylobase / phylosignal
 library(phylobase)
 plot( as(Fit,"phylo4d") )
-barplot( as(Fit,"phylo4d") )
-dotplot( as(Fit,"phylo4d") )
-gridplot( as(Fit,"phylo4d") )
 }
 
 }

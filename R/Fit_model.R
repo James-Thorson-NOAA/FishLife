@@ -88,9 +88,6 @@
 #' # Convert and plot using phylobase / phylosignal
 #' library(phylobase)
 #' plot( as(Fit,"phylo4d") )
-#' barplot( as(Fit,"phylo4d") )
-#' dotplot( as(Fit,"phylo4d") )
-#' gridplot( as(Fit,"phylo4d") )
 #' }
 #'
 #' @export
@@ -216,6 +213,7 @@ function( text = NULL,
   if( is.null(Z_ik) & !is.null(tree) ){
     message("Using supplied tree")
     if(!all(rownames(Y_ij) %in% tree$tip.label)) stop("Some `rownames(Y_ij)` not in `tree$tip.label`")
+    if(isTRUE(add_predictive)) stop("`add_predictive` is not designed to work when specifying a tree")
   }
   if( !is.null(Z_ik) & is.null(tree) ){
     # Code uses "_" so throw error if included in names
@@ -249,13 +247,15 @@ function( text = NULL,
 
   # Step 3 -- Add "predictive" tip for each node
   if( isTRUE(add_predictive) ){
-    depth = node.depth.edgelength(tree_full)
+    message("Adding tips for predictive distribution")
+    tree_full = tree
+    depth = ape::node.depth.edgelength(tree_full)
     names(depth) = c( tree$tip.label, tree$node.label )
     tips_to_add = 5 - depth
     for( node in 1:length(tips_to_add) ){
       if( tips_to_add[node] > 0 ){
         Match = match( names(tips_to_add)[node], tree_full$node.label )
-        Where = Ntip(tree_full) + Match
+        Where = ape::Ntip(tree_full) + Match
         tip = ape::read.tree(text=paste0(paste0(rep("(",tips_to_add[node]),collapse=""),"predictive",paste0(rep(")",tips_to_add[node]-1),collapse=""),",b);"))
         tip = ape::drop.tip( phy=tip, tip="b", collapse.singles=FALSE, trim.internal=ifelse(tips_to_add[node]==1,TRUE,FALSE) )
         tip$edge.length = rep(1, nrow(tip$edge))
@@ -263,30 +263,47 @@ function( text = NULL,
         tree_full = ape::bind.tree( tree_full, tip, where=Where )
       }
     }
+    tree = tree_full
+  }
+  
+  # Test naming in FishLife::FishBase$ParentChild_gz[,1]
+  if( FALSE ){
+    x = as.character(FishLife::FishBase$ParentChild_gz[,1])
+    # x = Names_full
+    Len = sapply( x, FUN=function(char){length(strsplit(char,"_")[[1]])} )
+    Len = sapply( x, FUN=function(char){length(strsplit(char," ")[[1]])} )
   }
 
   # Step 4 -- Fix names
-  Names = Names_full = c( tree$tip.label, tree$node.label )
-  #Path = nodepath(tree)
-  #for( nI in 1:Ntip(tree) ){
-  #  Names_full[nI] = paste0( Names[Path[[nI]]][-1], collapse="_" )
-  #}
-  #root_index = Ntip(tree) + 1
-  #Time = Sys.time()
-  #for( nI in Ntip(tree)+1:Nnode(tree) ){
-  #  Path = nodepath(tree, from=nI, to=root_index )
-  #  Names_full[nI] = paste0( Names[rev(Path)][-1], collapse="_" )
-  #  if( FALSE ){
-  #    Which = which( tree$edge[,2] == nI )
-  #    if(length(Which)==1){
-  #      Names_full[nI] = paste( setdiff(Names[tree$edge[Which,1]],""), Names_full[nI], sep="_" )
-  #    }else if(length(Which)>1){
-  #      stop()
-  #    }
-  #  }
-  #}
-  #Sys.time() - Time
-
+  if( isTRUE(add_predictive) ){
+    message("Re-formatting node and tip names to match `Search_species` format")
+    Names = Names_full = c( tree$tip.label, tree$node.label )
+    Names[seq_len(ape::Ntip(tree))] = sapply( Names[seq_len(ape::Ntip(tree))], FUN=function(x){
+      y = strsplit(x," ")[[1]]
+      if(length(y)>=2) x = paste0(y[2:length(y)],collapse=" ")
+      return(x)
+    })
+    Path = ape::nodepath(tree)
+    for( nI in seq_len(ape::Ntip(tree)) ){
+      Names_full[nI] = paste0( Names[Path[[nI]]][-1], collapse="_" )
+    }
+    root_index = ape::Ntip(tree) + 1
+    for( nI in ape::Ntip(tree)+seq_len(ape::Nnode(tree)) ){
+      Path = ape::nodepath(tree, from=nI, to=root_index )
+      Names_full[nI] = paste0( Names[rev(Path)][-1], collapse="_" )
+      #if( FALSE ){
+      #  Which = which( tree$edge[,2] == nI )
+      #  if(length(Which)==1){
+      #    Names_full[nI] = paste( setdiff(Names[tree$edge[Which,1]],""), Names_full[nI], sep="_" )
+      #  }else if(length(Which)>1){
+      #    stop()
+      #  }
+      #}
+    }
+    # remote root
+    Names_full = Names_full[-root_index]
+  }
+  
   # Process stock-recruit inputs
   if( is.null(SR_obs) | is.null(StockData) ){
     ### TO ADD LATER
@@ -397,9 +414,11 @@ function( text = NULL,
     warning("Fixing ", sum(Length==0), " edges with zero length")
     Length = ifelse( Length==0, min(0.001,0.1*min_nonzero_length), Length)
   }
-  ParentChild_gz = data.frame( ChildName=Names_full[Edge[Order,2]], ParentName=Names_full[Edge[Order,1]],
-                               ParentRowNumber=Edge[Order,1], ChildTaxon=Depth[Order],     # Force ChildTaxon=2
-                               EdgeLength=Length[Order] )
+  ParentChild_gz = data.frame( ChildName = Names_full[Edge[Order,2]], 
+                               ParentName = Names_full[Edge[Order,1]],
+                               ParentRowNumber = Edge[Order,1], 
+                               ChildTaxon = Depth[Order],     # Force ChildTaxon = 2
+                               EdgeLength = Length[Order] )
   PC_gz = as.matrix(ParentChild_gz[,c('ParentRowNumber','ChildTaxon')]) - 1
 
   if( !all(1:nrow(Edge) %in% unique(as.vector(Edge))) ){
@@ -673,7 +692,7 @@ function( text = NULL,
 
   #
   if( run_model==FALSE ){
-    Return = list("Data"=Data, "Params"=Params, "Random"=Random, "Map"=Map, "Obj"=Obj, "SEM_model"=SEM_model, "RAM"=RAM, "tree"=tree )
+    Return = list("Data"=Data, "Params"=Params, "Random"=Random, "Map"=Map, "Obj"=Obj, "SEM_model"=SEM_model, "RAM"=RAM, "text"=text, "tree"=tree )
     return(Return)
   }
 
@@ -758,7 +777,7 @@ function( text = NULL,
   #  dimnames(Return$Cov_jjz) = list(colnames(Y_ij),colnames(Y_ij),colnames(Z_ik))
   #}
   if( !is.null(text) ){
-    Return = c(Return, list("SEM_model"=SEM_model, "RAM"=RAM))
+    Return = c(Return, list("SEM_model"=SEM_model, "RAM"=RAM, "text"=text))
   }
 
   ####################
