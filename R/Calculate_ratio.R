@@ -15,8 +15,12 @@
 #' }
 
 #' @export
-Calculate_ratio = function( params=c("K","M"), Database=FishLife::FishBase_and_RAM, Cov_gjj=Database$Cov_gvv,
-  Mean_gj=Database$beta_gv, ParentChild_gz=Database$ParentChild_gz ){
+Calculate_ratio <-
+function( params=c("K","M"),
+          Database=FishLife::FishBase_and_RAM,
+          Cov_gjj=Database$Cov_gvv,
+          Mean_gj=Database$beta_gv,
+          ParentChild_gz=Database$ParentChild_gz ){
 
   # Rotation matrix
   RotateM = function( angle ) matrix( c(cos(angle),sin(angle),-sin(angle),cos(angle)), 2,2 )

@@ -4,16 +4,36 @@
 \alias{Plot_trait}
 \title{Plots trait predictions}
 \usage{
-Plot_trait(Taxon, params = c("K", "M"),
-  Database = FishLife::FishBase_and_RAM, Cov_gjj = Database$Cov_gvv,
-  Mean_gj = Database$beta_gv, ParentChild_gz = Database$ParentChild_gz,
-  Y_ij = Database$Y_ij, g_i = Database$g_i, SpeciesMatch = NULL,
-  prob = 0.95, add = FALSE, xlim = log(c(0.01, 2)), ylim = xlim,
-  partial_match = TRUE, main = "", xlab = "", ylab = "",
-  lcol = "black", plot_lines = FALSE, verbose = FALSE, ticks = c(0,
-  5), logticks = c(1, 2, 5), obsCov_jj = Database$obsCov_jj,
-  include_obscov = FALSE, lty = "solid", xaxt = "s", yaxt = "s",
-  ...)
+Plot_trait(
+  Taxon,
+  params = c("K", "M"),
+  Database = FishLife::FishBase_and_RAM,
+  Cov_gjj = Database$Cov_gvv,
+  Mean_gj = Database$beta_gv,
+  ParentChild_gz = Database$ParentChild_gz,
+  Y_ij = Database$Y_ij,
+  g_i = Database$g_i,
+  SpeciesMatch = NULL,
+  prob = 0.95,
+  add = FALSE,
+  xlim = log(c(0.01, 2)),
+  ylim = xlim,
+  partial_match = TRUE,
+  main = "",
+  xlab = "",
+  ylab = "",
+  lcol = "black",
+  plot_lines = FALSE,
+  verbose = FALSE,
+  ticks = c(0, 5),
+  logticks = c(1, 2, 5),
+  obsCov_jj = Database$obsCov_jj,
+  include_obscov = FALSE,
+  lty = "solid",
+  xaxt = "s",
+  yaxt = "s",
+  ...
+)
 }
 \arguments{
 \item{Taxon}{A taxon (matching row from \code{ParentChild_gz[,'ChildName']})}

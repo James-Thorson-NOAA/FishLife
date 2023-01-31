@@ -1,12 +1,12 @@
 Package: FishLife
 Type: Package
 Title: Predict Life History Parameters For Any Fish
-Version: 2.0.1
-Date: 2022-01-03
+Version: 3.0.0
+Date: 2023-01-31
 Authors@R: person("James","Thorson", email="James.Thorson@noaa.gov", role=c("aut","cre"))
 Maintainer: James Thorson <James.Thorson@noaa.gov>
-Description: Estimate life history parameters from a multivariate 
-    random-walk process on a taxonomic tree, and use results to 
+Description: Estimate trade-offs among life history parameters using phylogenetic structural equation models, 
+    and use results for phylogenetic trait imputation, i.e., to 
     predicts traits for any marine fish scientific (Genus-species) name.
 Imports:
     graphics,
@@ -16,7 +16,9 @@ Imports:
     shape,
     rfishbase,
     ThorsonUtilities,
-    TMBhelper
+    TMBhelper,
+    sem,
+    ape
 Depends:
     R (>= 3.1.0),
 Suggests:
@@ -31,7 +33,7 @@ Remotes:
 License: GPL-3
 LazyData: yes
 BuildVignettes: yes
-RoxygenNote: 6.1.1
+RoxygenNote: 7.2.3
 URL: http://github.com/James-Thorson-NOAA/FishLife
 BugReports: http://github.com/James-Thorson-NOAA/FishLife/issues
 VignetteBuilder: knitr

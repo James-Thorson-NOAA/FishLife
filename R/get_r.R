@@ -1,6 +1,15 @@
-get_r = function(vec=NULL, Linf=exp(vec['Loo']), K=exp(vec['K']),
-  t0=-0.1, W_a=0.001, W_b=3.04, tm=exp(vec['tm']), dm=tm/4,
-  maxage=ceiling(min(100,2*exp(vec['tmax']))), h=vec['h'], M=exp(vec['M']) ){
+get_r <-
+function( vec=NULL,
+          Linf=exp(vec['Loo']),
+          K=exp(vec['K']),
+          t0=-0.1,
+          W_a=0.001,
+          W_b=3.04,
+          tm=exp(vec['tm']),
+          dm=tm/4,
+          maxage=ceiling(min(100,2*exp(vec['tmax']))),
+          h=vec['h'],
+          M=exp(vec['M']) ){
 
   # vector of ages
   age_vec = 0:maxage

@@ -9,7 +9,10 @@
 #' @return vector of row numbers of \code{ParentChild_gz} for ancestors (including \code{child_num})
 
 #' @export
-Find_ancestors = function( child_num, Database=FishLife::FishBase_and_RAM, ParentChild_gz=Database$ParentChild_gz ){
+Find_ancestors <-
+function( child_num,
+          Database = FishLife::FishBase_and_RAM,
+          ParentChild_gz = Database$ParentChild_gz ){
 
   # Search for all ancestors in the taxonomic tree
   family_nums = child_num

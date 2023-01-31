@@ -4,7 +4,8 @@
 \name{FishBase_and_RAM}
 \alias{FishBase_and_RAM}
 \title{Database of stock-recruit, population-dynamics, size, growth, maturity, and mortality parameters}
-\format{A tagged list containing data and predictions
+\format{
+A tagged list containing data and predictions
 \describe{
   \item{N_factors}{Number of factors used for evolution in life-history model}
   \item{N_obsfactors}{Number of factors used for measurent-error in life-history model}
@@ -19,7 +20,8 @@
   \item{SR_obs}{Stock-recruit records from RAM Legacy stock-recruit database}
   \item{StockData}{Auxiliary information for every stock with stock-recruit information}
   ...
-}}
+}
+}
 \usage{
 FishBase_and_RAM
 }

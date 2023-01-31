@@ -4,17 +4,33 @@
 \alias{Plot_taxa}
 \title{Plots trait predictions for taxa}
 \usage{
-Plot_taxa(Taxa, prob = 0.95, params = matrix(c("K", "M", "Winfinity",
-  "Loo", "tmax", "tm", "Lm", "Temperature", "ln_margsd", "rho",
-  "logitbound_h", "ln_r"), ncol = 2, byrow = TRUE),
-  Database = FishLife::FishBase_and_RAM, Cov_gjj = Database$Cov_gvv,
-  Mean_gj = Database$beta_gv, ParentChild_gz = Database$ParentChild_gz,
-  Y_ij = Database$Y_ij, g_i = Database$g_i, xlim = log(c(0.01, 2)),
-  ylim = xlim, ticks = c(0, 5), logticks = c(1, 2, 5),
-  partial_match = FALSE, drop_pred = TRUE, mfrow = c(nrow(params),
-  1), legendnum = 2, verbose = FALSE, plot_lines = FALSE,
-  lcol = rainbow(length(Taxa)), lty = rep("solid", length(Taxa)),
-  xaxt = "s", yaxt = "s", ...)
+Plot_taxa(
+  Taxa,
+  prob = 0.95,
+  params = matrix(c("K", "M", "Winfinity", "Loo", "tmax", "tm", "Lm", "Temperature",
+    "ln_margsd", "rho", "logitbound_h", "ln_r"), ncol = 2, byrow = TRUE),
+  Database = FishLife::FishBase_and_RAM,
+  Cov_gjj = Database$Cov_gvv,
+  Mean_gj = Database$beta_gv,
+  ParentChild_gz = Database$ParentChild_gz,
+  Y_ij = Database$Y_ij,
+  g_i = Database$g_i,
+  xlim = log(c(0.01, 2)),
+  ylim = xlim,
+  ticks = c(0, 5),
+  logticks = c(1, 2, 5),
+  partial_match = FALSE,
+  drop_pred = TRUE,
+  mfrow = c(nrow(params), 1),
+  legendnum = 2,
+  verbose = FALSE,
+  plot_lines = FALSE,
+  lcol = rainbow(length(Taxa)),
+  lty = rep("solid", length(Taxa)),
+  xaxt = "s",
+  yaxt = "s",
+  ...
+)
 }
 \arguments{
 \item{Taxa}{One or more taxonomic names (matching rows from \code{ParentChild_gz[,'ChildName']})}

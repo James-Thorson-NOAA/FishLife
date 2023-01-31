@@ -4,11 +4,16 @@
 \alias{Search_species}
 \title{Search species}
 \usage{
-Search_species(Class = "predictive", Order = "predictive",
-  Family = "predictive", Genus = "predictive",
-  Species = "predictive", add_ancestors = TRUE,
+Search_species(
+  Class = "predictive",
+  Order = "predictive",
+  Family = "predictive",
+  Genus = "predictive",
+  Species = "predictive",
+  add_ancestors = TRUE,
   Database = FishLife::FishBase_and_RAM,
-  ParentChild_gz = Database$ParentChild_gz)
+  ParentChild_gz = Database$ParentChild_gz
+)
 }
 \arguments{
 \item{Class}{Character input for taxonomic class}
