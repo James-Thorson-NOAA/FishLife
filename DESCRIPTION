@@ -27,7 +27,7 @@ Suggests:
     knitr,
     rmarkdown
 Remotes:
-    ropensci/rfishbase@fb-21.06
+    ropensci/rfishbase@fb-21.06,
     james-thorson/utilities,
     kaskr/TMB_contrib_R/TMBhelper
 License: GPL-3
@@ -35,5 +35,5 @@ LazyData: yes
 BuildVignettes: yes
 RoxygenNote: 7.2.3
 URL: http://github.com/James-Thorson-NOAA/FishLife
-BugReports: http://github.com/James-Thorson-NOAA/Thorson/FishLife/issues
+BugReports: http://github.com/James-Thorson-NOAA/FishLife/issues
 VignetteBuilder: knitr

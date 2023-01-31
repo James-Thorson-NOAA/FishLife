@@ -8,6 +8,7 @@
   packageStartupMessage("For details and citation guidance, please see http://github.com/James-Thorson-NOAA/FishLife/")
   packageStartupMessage("###########################################################################################")
 
+  # Check rfishbase version
   if( utils::packageVersion("rfishbase") >= numeric_version("4.0.0") ){
     packageStartupMessage("Please install an earlier version of rfishbase, e.g. using by running:")
     packageStartupMessage("  remotes::install_github( 'ropensci/rfishbase@fb-21.06', force=TRUE )")
