@@ -1,7 +1,7 @@
 # FishLife
 Estimate growth, size, maturity, mortality, stock-recruit, and population-dynamics parameters for all fish species globally
 
-[![DOI](https://zenodo.org/badge/67250650.svg)](https://zenodo.org/badge/latestdoi/67250650)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7590994.svg)](https://doi.org/10.5281/zenodo.7590994)
 
 # Visualize predictions
 
