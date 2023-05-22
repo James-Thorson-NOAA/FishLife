@@ -1,7 +1,21 @@
 # FishLife
-Estimate growth, size, maturity, mortality, stock-recruit, and population-dynamics parameters for all fish species globally
+A package for phylogenetic comparative methods (PCM) and phylogenetic trait imputation (PTI) using phylogenetic factor analysis and/or phylogenetic structural equation models.
+
+The package also includes results for these analyses applied to all fishes fishes globally, estimating:
+* life history parameters (growth, maturity, mortality);
+* juvenile productivity (stock-recruit parameters);
+* life-cycle characteristics (generation time and intrinsic growth rate);
+* spawning, behavioral, reproductive, and foraging traits;
+* morphometric characteristics;
+as described below
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7590994.svg)](https://doi.org/10.5281/zenodo.7590994)
+
+# Database of results
+The FishLife package also includes results for three prior analyses, which can be used to extract life-history predictions for all fishes:
+* [Thorson et al. 2023](https://doi.org/10.1111/2041-210X.14076):  This includes life-history parameters based on data from FishBase, morphometric information from [FishShapes]([url](http://onlinelibrary.wiley.com/doi/abs/10.1002/ecy.3829)), and spawning, behavioral, reproductive, and trophic traits.  Results are accessed using `data(FishBase, package="FishLife_and_Mophometrics")`, or `Plot_taxa(..., Database = FishLife::FishBase_and_Mophometrics)`
+* [Thorson 2020]([url](https://doi.org/10.1111/faf.12427)):  This includes life-history parameters based on data from FishBase as well as stock-recruit information from the RAM Legacy database, and combines these to get life-cycle predictions.  Results are accessed using `data(FishBase, package="FishLife_and_RAM")`, or `Plot_taxa(..., Database = FishLife::FishBase_and_RAM)`
+* [Thorson et al. 2017]([url](http://onlinelibrary.wiley.com/doi/10.1002/eap.1606/full)):  This includes life-history parameters based on data from FishBase, and is accessed using `data(FishBase, package="FishLife")`, or `Plot_taxa(..., Database = FishLife::FishBase)`
 
 # Visualize predictions
 
@@ -64,7 +78,10 @@ Plot_taxa( Search_species(Genus="Lutjanus",Species="campechanus")$match_taxonomy
 Description of package
 =============
 ### Please cite if using the software
-* Thorson, J. T. In press.  Predicting recruitment density dependence and intrinsic growth rate for all fishes worldwide using a data-integrated life-history model.  Fish and Fisheries. 
+* Thorson, J.T., Maureaud, A.A., Frelat, R., Mérigot, B., Bigman, J.S., Friedman, S.T., Palomares, M.L.D., Pinsky, M.L., Price, S.A., Wainwright, P., 2023. Identifying direct and indirect associations among traits by merging phylogenetic comparative methods and structural equation models. Methods Ecol. Evol. n/a. https://doi.org/10.1111/2041-210X.14076
+
+### Previous software versions and analytical descriptions
+* Thorson, J.T., 2020. Predicting recruitment density dependence and intrinsic growth rate for all fishes worldwide using a data-integrated life-history model. Fish Fish. 21, 237–251. https://doi.org/10.1111/faf.12427 
 * Thorson, J. T., S. B. Munch, J. M. Cope, and J. Gao. 2017. Predicting life history parameters for all fishes worldwide. Ecological Applications. 27(8): 2262–2276. http://onlinelibrary.wiley.com/doi/10.1002/eap.1606/full
 
 Further reading
