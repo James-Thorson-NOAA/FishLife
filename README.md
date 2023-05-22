@@ -14,8 +14,8 @@ as described below
 # Database of results
 The FishLife package also includes results for three prior analyses, which can be used to extract life-history predictions for all fishes:
 * [Thorson et al. 2023](https://doi.org/10.1111/2041-210X.14076):  This includes life-history parameters based on data from FishBase, morphometric information from [FishShapes]([url](http://onlinelibrary.wiley.com/doi/abs/10.1002/ecy.3829)), and spawning, behavioral, reproductive, and trophic traits.  Results are accessed using `data(FishBase, package="FishLife_and_Mophometrics")`, or `Plot_taxa(..., Database = FishLife::FishBase_and_Mophometrics)`
-* [Thorson 2020]([url](https://doi.org/10.1111/faf.12427)):  This includes life-history parameters based on data from FishBase as well as stock-recruit information from the RAM Legacy database, and combines these to get life-cycle predictions.  Results are accessed using `data(FishBase, package="FishLife_and_RAM")`, or `Plot_taxa(..., Database = FishLife::FishBase_and_RAM)`
-* [Thorson et al. 2017]([url](http://onlinelibrary.wiley.com/doi/10.1002/eap.1606/full)):  This includes life-history parameters based on data from FishBase, and is accessed using `data(FishBase, package="FishLife")`, or `Plot_taxa(..., Database = FishLife::FishBase)`
+* [Thorson 2020](https://doi.org/10.1111/faf.12427):  This includes life-history parameters based on data from FishBase as well as stock-recruit information from the RAM Legacy database, and combines these to get life-cycle predictions.  Results are accessed using `data(FishBase, package="FishLife_and_RAM")`, or `Plot_taxa(..., Database = FishLife::FishBase_and_RAM)`
+* [Thorson et al. 2017](http://onlinelibrary.wiley.com/doi/10.1002/eap.1606/full):  This includes life-history parameters based on data from FishBase, and is accessed using `data(FishBase, package="FishLife")`, or `Plot_taxa(..., Database = FishLife::FishBase)`
 
 # Visualize predictions
 
