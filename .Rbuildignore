@@ -3,3 +3,8 @@ cran-comments.md
 ^\.travis\.yml$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^scratch$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\.github$

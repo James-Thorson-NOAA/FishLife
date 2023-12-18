@@ -718,7 +718,7 @@ function( text = NULL,
 
   # Optimize                         #  , startpar=opt$par[-grep("alpha",names(opt$par))]
   # JointPrecision is used below, and is too big to invert whole;  must have getReportCovariance=TRUE to get JointPrecision
-  Opt = TMBhelper::fit_tmb( obj = Obj,
+  Opt = fit_tmb( obj = Obj,
                             savedir = RunDir,
                             getJointPrecision = TRUE,
                             getReportCovariance = TRUE,

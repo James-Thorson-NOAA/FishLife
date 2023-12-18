@@ -1,8 +1,8 @@
 Package: FishLife
 Type: Package
 Title: Predict Life History Parameters For Any Fish
-Version: 3.0.0
-Date: 2023-01-31
+Version: 3.1.0
+Date: 2023-12-17
 Authors@R: person("James","Thorson", email="James.Thorson@noaa.gov", role=c("aut","cre"))
 Maintainer: James Thorson <James.Thorson@noaa.gov>
 Description: Estimate trade-offs among life history parameters using phylogenetic structural equation models, 
@@ -15,8 +15,6 @@ Imports:
     mvtnorm,
     shape,
     rfishbase,
-    ThorsonUtilities,
-    TMBhelper,
     sem,
     ape
 Depends:
@@ -25,15 +23,14 @@ Suggests:
     TMB,
     testthat,
     knitr,
-    rmarkdown
+    rmarkdown,
+    archetypes
 Remotes:
     ropensci/rfishbase@fb-21.06,
-    james-thorson/utilities,
-    kaskr/TMB_contrib_R/TMBhelper
 License: GPL-3
 LazyData: yes
 BuildVignettes: yes
 RoxygenNote: 7.2.3
-URL: http://github.com/James-Thorson-NOAA/FishLife
+URL: http://github.com/James-Thorson-NOAA/FishLife, https://james-thorson-noaa.github.io/FishLife/
 BugReports: http://github.com/James-Thorson-NOAA/FishLife/issues
 VignetteBuilder: knitr
