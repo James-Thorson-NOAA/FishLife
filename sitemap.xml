@@ -4,6 +4,9 @@
     <loc>/404.html</loc>
   </url>
   <url>
+    <loc>/LICENSE-text.html</loc>
+  </url>
+  <url>
     <loc>/articles/Access.html</loc>
   </url>
   <url>
@@ -19,16 +22,10 @@
     <loc>/index.html</loc>
   </url>
   <url>
-    <loc>/LICENSE-text.html</loc>
-  </url>
-  <url>
     <loc>/news/index.html</loc>
   </url>
   <url>
     <loc>/reference/Calculate_ratio.html</loc>
-  </url>
-  <url>
-    <loc>/reference/coef.FishLife.html</loc>
   </url>
   <url>
     <loc>/reference/Find_ancestors.html</loc>
@@ -49,15 +46,6 @@
     <loc>/reference/Fit_model.html</loc>
   </url>
   <url>
-    <loc>/reference/fit_tmb.html</loc>
-  </url>
-  <url>
-    <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/list_parameters.html</loc>
-  </url>
-  <url>
     <loc>/reference/Match_species.html</loc>
   </url>
   <url>
@@ -70,13 +58,25 @@
     <loc>/reference/Plot_trait.html</loc>
   </url>
   <url>
-    <loc>/reference/print.FishLife.html</loc>
-  </url>
-  <url>
     <loc>/reference/Resize_estimates.html</loc>
   </url>
   <url>
     <loc>/reference/Search_species.html</loc>
+  </url>
+  <url>
+    <loc>/reference/coef.FishLife.html</loc>
+  </url>
+  <url>
+    <loc>/reference/fit_tmb.html</loc>
+  </url>
+  <url>
+    <loc>/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>/reference/list_parameters.html</loc>
+  </url>
+  <url>
+    <loc>/reference/print.FishLife.html</loc>
   </url>
   <url>
     <loc>/reference/setAs.html</loc>
