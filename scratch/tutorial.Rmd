@@ -30,7 +30,7 @@ First, install and load the package.
 
 ```{r, echo=TRUE, message=FALSE}
 # Install and load package
-devtools::install_github("james-thorson/FishLife")
+# devtools::install_github("james-thorson/FishLife", dep=TRUE)
 library( FishLife )
 ```
 
@@ -112,7 +112,10 @@ We now show code for how the model can be re-run on the loaded database using a 
 library( TMB )
 
 # Re-run results with a different model configuration
-Estimate_database = Fit_model( N_factors=-3, N_obsfactors=-3, Use_REML=TRUE)
+Estimate_database = Fit_model( N_factors = -3, 
+                               N_obsfactors = -3, 
+                               Use_REML = TRUE,
+                               Database = FishLife::FishBase_and_RAM )
 ```
 
 ## Update predictions for a single taxon using user-supplied data
@@ -121,7 +124,14 @@ We also show how to generate new predictions for a single species based on new l
 
 Specifically, we imagine a scenario where we have a new value for asymptotic length, which we format in a new dataframe `Ynew_ij` that can contain one or more parameters
 ```{r, echo=TRUE, message=FALSE}
-Ynew_ij = matrix( c("Loo"=log(40),"K"=NA,"Winfinity"=NA,"tmax"=NA,"tm"=NA,"M"=NA,"Lm"=NA,"Temperature"=NA), nrow=1)
+Ynew_ij = matrix( c("Loo"=log(40),
+                  "K"=NA,
+                  "Winfinity"=NA,
+                  "tmax"=NA,
+                  "tm"=NA,
+                  "M"=NA,
+                  "Lm"=NA,
+                  "Temperature"=NA), nrow=1)
 ```
 
 Then run an updating function for Cortez rockfish
@@ -143,17 +153,4 @@ knitr::kable(Update$updateCov_j, digits=3)
 ```
 
 ... for life-history parameters for this species. This update shows a change in asymptotic length (due to including new data) and also in relative growth rate (due to estimated covariance among traits).  
-
-# Description of package
-
-If using the software or predictions please cite:
-
-* Thorson, J. T. In press.  Predicting recruitment density dependence and intrinsic growth rate for all fishes worldwide using a data-integrated life-history model.  Fish and Fisheries. 
-* Thorson, J. T., S. B. Munch, J. M. Cope, and J. Gao. 2017. Predicting life history parameters for all fishes worldwide. Ecological Applications. 27(8): 2262-2276. https://doi.org/10.1002/eap.1606
-
-Also please see:
-
-* Thorson, J. T., J. M. Cope, and W. S. Patrick. 2014. Assessing the quality of life history information in publicly available databases. Ecological Applications 24:217-226.
-
-for further information regarding life-history predictions currently available in FishBase.  
 

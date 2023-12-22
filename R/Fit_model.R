@@ -694,7 +694,7 @@ function( text = NULL,
   Obj$env$beSilent()
 
   # Print number of parameters
-  ThorsonUtilities::list_parameters( Obj )
+  list_parameters( Obj )
 
   #
   if( run_model==FALSE ){

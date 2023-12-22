@@ -1,0 +1,166 @@
+---
+title: "Accessing predicted values"
+author: "James Thorson"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Accessing predicted values}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+# Build
+#  setwd(R'(C:\Users\James.Thorson\Desktop\Git\FishLife)'); devtools::build_rmd("vignettes/Access.Rmd"); rmarkdown::render( "vignettes/Access.Rmd", rmarkdown::pdf_document())
+```
+
+
+# Description
+
+`FishLife` is an R package for estimating evolutionary trade-offs among traits for >34,000 described fishes.  It also applies phylogenetic trait imputation, i.e., is used to predict and reposit predicted life-history parameters for all fishes, where imputed values are informed by both life-history correlations and similarities among related species.  The package comes with three databases and pre-run results:
+
+* The database and results described by [Thorson et al. (2023)](https://doi.org/10.1111/2041-210X.14076), introducing phylogenetic structural equation models and combining this with phylogenetic comparative methods to describe trade-offs among a larger set of life-history, morphometric, behavioral, trophic, and reproductive traits;
+* The database and results described by [Thorson (2020)](https://doi.org/10.1111/faf.12427), applying phylogenetic factor analysis to the original database as well as RAM Legacy database records of stock-recruit relationships to estimate a full life-cycle model for all species;
+* The original database and results described by [Thorson Munch Cope Gao (2017)](https://doi.org/10.1002/eap.1606), introducing phylogenetic factor analysis and using records of size, growth, maturity, and mortality parameters from FishBase as downloaded in 2016.
+
+In this vignete, we show how to access output from these various models.
+
+## Explore predictions online
+
+A graphical user interface (GUI) is available [online](https://james-thorson.shinyapps.io/FishLife/).  However, it has not been updated recently, and only shows results from Thorson Munch Cope Gao (2017).
+
+```{r, echo=TRUE, message=FALSE}
+# Install and load package
+# devtools::install_github("james-thorson/FishLife", dep=TRUE)
+library( FishLife )
+```
+
+# Thorson et al. 2023 results
+
+Starting with Thorson et al. (2023), FishLife uses _ape_ class `phylo` to represent relatedness among taxa.  This has several benefits:
+
+* It facilitates collaboration between evolutionary and ecological researchers for fishes;
+* It represents relatedness based on evolutionary distance, rather than simply approximating relatedness based on taxonomy;
+* It allows _FishLife_ to use well-maintained dependencies to input(read, subset, and merge) or output (plot and tabulate) results.
+
+However, this also results in changes in how results are accessed. Although we provide a function `as(FishLife::FishBase_and_Morphometrics,"phylo4d")`, we find that it is too slow to be useful.  Therefore, we instead recommend searching for a taxon name manually.  We demonstrate this for red snapper:
+
+```{r, echo=TRUE, message=FALSE, fig.width=8, fig.height=8}
+edge_names = c( FishBase_and_Morphometrics$tree$tip.label,
+                FishBase_and_Morphometrics$tree$node.label[-1] ) # Removing root
+                
+#
+which_g = match( "Lutjanus campechanus", edge_names )
+Table2023 = cbind( 
+  Mean = FishBase_and_Morphometrics$beta_gv[which_g,],
+  SE = sqrt(diag(FishBase_and_Morphometrics$Cov_gvv[which_g,,]))
+)
+knitr::kable( Table2023, digits=3)
+```
+
+# Thorson 2020 results
+
+The Thorson (2020) analysis sought to maintain customized code for accessing and plotting results.  We again demonstrate this for red snapper, which is within the FishBase database used to train the model so its predictions are relatively precise.  
+
+```{r, echo=TRUE, message=FALSE, fig.width=8, fig.height=8}
+# Get basic plot for Lutjanus campechanus
+Taxa = Search_species( Genus = "Lutjanus",
+                       Species = "campechanus")$match_taxonomy
+Predict = Plot_taxa( Taxa, 
+                     mfrow=c(3,2) )
+```
+
+We then show updated values for the predictive mean and standard errors...
+
+```{r, echo=FALSE, results='asis'}
+Table2020 = cbind( 
+  Mean = Predict[[1]]$Mean_pred,
+  SE = sqrt(diag(Predict[[1]]$Cov_pred))
+)
+knitr::kable( Table2020, digits=3)
+```
+
+where `Predict[[1]]$Mean_pred` provides mean values, and `Predict[[1]]$Cov_pred` provides the predictive covariance for life-history parameters. 
+
+Traits are in log-space except for `Temperature`, generation time `G` and intrinsict growth rate `r`.  If an analyst wants to back-transform a trait that is reported in log-space, thought should be given to whether an analyst wants to use a predictive median or predictive mean.  The predictive median is calculated by expnoentiating log-space values, while a predictive mean requires some bias-correction (perhaps based on a lognormal assumption using the predictive variance).  Finally generation time `G` and intrinsict growth rate `r` are calculated based on a nonlinear transformation of other traits using the Euler-Lotka formula, and we therefore report the mean in either log-space or natural space, obtained by sampling from the constituent traits, calculating the values for each sample, and then computing the mean of those calculations.  Given this procedure, exponentiating `ln_G` will not typically equal `G` and the same holds for `ln_r` and `r`.  
+
+### Data-poor:  Cortez rockfish
+
+Next we demonstrate cortez rockfish, which is not within the FishBase database used to train the model, so its predictions are relatively based on information from related species within genus *Sebastes*.  
+```{r, echo=TRUE, message=FALSE, fig.width=8, fig.height=8}
+# Get basic plot for Sebastes cortezi
+Taxa = Search_species( Genus = "Sebastes",
+                       Species = "cortezi")$match_taxonomy
+Predict = Plot_taxa( Taxa, 
+                     mfrow=c(3,2) )
+```
+
+### High-level:  Scombridae
+
+Third, we demonstrate predictions for family *Scombridae*, to show how predictions are available for higher-level taxonomies.
+```{r, echo=TRUE, message=FALSE, fig.width=8, fig.height=8}
+# Get basic plot for Family Scombridae 
+Plot_taxa( Search_species(Family="Scombridae")$match_taxonomy, mfrow=c(3,2) )
+```
+
+### Comparison:  Trouts
+
+Fourth, we compare predictions for two species, brown and rainbow trout.
+```{r, echo=TRUE, message=FALSE, fig.width=8, fig.height=8}
+# Compare two species
+Taxa = c( Search_species(Genus="Oncorhynchus",Species="mykiss",add_ancestors=FALSE)$match_taxonomy,
+  Search_species(Genus="Salmo",Species="Trutta",add_ancestors=FALSE)$match_taxonomy )
+Plot_taxa( Taxa, mfrow=c(3,2) )
+```
+
+# Thorson et al. (2017) results
+
+Results from Thorson et al. (2017) are accessed similarly, but indicating the earlier database:
+
+```{r, echo=TRUE, message=FALSE, fig.width=8, fig.height=8}
+# Get basic plot for Lutjanus campechanus
+Taxa = Search_species( Genus = "Lutjanus",
+                       Species="campechanus",
+                       Database = FishBase )$match_taxonomy
+params = matrix( c( "Loo", "K", "Winfinity", "tmax", 
+                    "tm", "M", "Lm", "Temperature"), ncol=2 )
+Predict = Plot_taxa( Taxa, 
+                     mfrow=c(2,2),
+                     Database = FishBase,
+                     params = params )
+```
+
+And we can again access the mean predicted values:
+
+```{r, echo=FALSE, results='asis'}
+Table2017 = cbind( 
+  Mean = Predict[[1]]$Mean_pred,
+  SE = sqrt(diag(Predict[[1]]$Cov_pred))
+)
+knitr::kable( Table2017, digits=3)
+```
+
+# Comparison among databases
+
+Finally, given this ongoing effort, it is natural to wonder whether output is consistent across database compilations, statistical assumptions, and associated model specification.  We therefore compare results for red snapper 
+
+```{r, echo=FALSE, results='asis'}
+Full = rbind(
+  data.frame( Table2017, "Year"=2017, "Param"=rownames(Table2017) ),
+  data.frame( Table2020[1:8,], "Year"=2020, "Param"=rownames(Table2017) ),
+  data.frame( Table2023[c(8,5,12,1,10,11,9,6),], "Year"=2023, "Param"=rownames(Table2017) )
+)
+Full$upper = Full$Mean + 1.96*Full$SE
+Full$lower = Full$Mean - 1.96*Full$SE
+
+library(ggplot2)
+ggplot(data=Full, aes(x=interaction(Year), y=Mean, color=Year)) +
+  geom_point( position=position_dodge(0.9) ) +
+  geom_errorbar( aes(ymax=as.numeric(upper),ymin=as.numeric(lower)),
+                 width=0.25, position=position_dodge(0.9)) +
+  facet_grid( rows=vars(Param), scales="free" )
+```

@@ -24,7 +24,10 @@ Suggests:
     testthat,
     knitr,
     rmarkdown,
-    archetypes
+    archetypes,
+    devtools,
+    kableExtra,
+    ggplot2
 Remotes:
     ropensci/rfishbase@fb-21.06,
 License: GPL-3
