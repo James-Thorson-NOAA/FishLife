@@ -1,79 +1,20 @@
 # FishLife
-A package for phylogenetic comparative methods (PCM) and phylogenetic trait imputation (PTI) using phylogenetic factor analysis and/or phylogenetic structural equation models.
+FishLife is an collaborative and international project that aims to:
 
-The package also includes results for these analyses applied to all fishes fishes globally, estimating:
-* life history parameters (growth, maturity, mortality);
-* juvenile productivity (stock-recruit parameters);
-* life-cycle characteristics (generation time and intrinsic growth rate);
-* spawning, behavioral, reproductive, and foraging traits;
-* morphometric characteristics;
-as described below
+1. Compile life-history traits (demographic parameters as well as behavioral, reproductive, morphological, and trophic traits)
+2. Estimate trade-offs among traits while imputing missing values;
+3. Distribute imputed trait-values (and standard errors) for use in fisheries science and management.
+
+The FishLife R-package includes results from three prior analyses:
+
+* The database and results described by [Thorson et al. (2023)](https://doi.org/10.1111/2041-210X.14076), introducing phylogenetic structural equation models and combining this with phylogenetic comparative methods to describe trade-offs among a larger set of life-history, morphometric, behavioral, trophic, and reproductive traits;
+* The database and results described by [Thorson (2020)](https://doi.org/10.1111/faf.12427), applying phylogenetic factor analysis to the original database as well as RAM Legacy database records of stock-recruit relationships to estimate a full life-cycle model for all species;
+* The original database and results described by [Thorson Munch Cope Gao (2017)](https://doi.org/10.1002/eap.1606), introducing phylogenetic factor analysis and using records of size, growth, maturity, and mortality parameters from FishBase as downloaded in 2016.
+
+For each of these three analyses, the R-package _FishLife_ includes the compiled database of trait measurements (aim-1), the estimated covariance among traits (aim-2), and the imputed trait values (aim-3).  See package vignettes for more details.
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7590994.svg)](https://doi.org/10.5281/zenodo.7590994)
 
-# Database of results
-The FishLife package also includes results for three prior analyses, which can be used to extract life-history predictions for all fishes:
-* [Thorson et al. 2023](https://doi.org/10.1111/2041-210X.14076):  This includes life-history parameters based on data from FishBase, morphometric information from [FishShapes]([url](http://onlinelibrary.wiley.com/doi/abs/10.1002/ecy.3829)), and spawning, behavioral, reproductive, and trophic traits.  Results are accessed using `data(FishBase, package="FishLife_and_Mophometrics")`, or `Plot_taxa(..., Database = FishLife::FishBase_and_Mophometrics)`
-* [Thorson 2020](https://doi.org/10.1111/faf.12427):  This includes life-history parameters based on data from FishBase as well as stock-recruit information from the RAM Legacy database, and combines these to get life-cycle predictions.  Results are accessed using `data(FishBase, package="FishLife_and_RAM")`, or `Plot_taxa(..., Database = FishLife::FishBase_and_RAM)`
-* [Thorson et al. 2017](http://onlinelibrary.wiley.com/doi/10.1002/eap.1606/full):  This includes life-history parameters based on data from FishBase, and is accessed using `data(FishBase, package="FishLife")`, or `Plot_taxa(..., Database = FishLife::FishBase)`
-
-# Visualize predictions
-
-A graphical user interface (GUI) is available [online](https://james-thorson.shinyapps.io/FishLife/)
-
-# Example usage
-
-### Load the package
-```R
-# Install and load package
-devtools::install_github("james-thorson/FishLife")
-library( FishLife )
-```
-
-### Vignette available
-Please see the `FishLife` vignette for details on how to extract predictions frmo the package, update predictions using new data, or replicate the analysis using a new data set.  
-```R
-vignette("tutorial","FishLife")
-```
-
-### Get predictions for a given taxon
-I also show a few simple examples of life-history predictions using `FishLife`, as archived in the package.  
-```R
-# Get basic plot for Lutjanus campechanus (in database, so prediction is informed by species-specific data)
-Plot_taxa( Search_species(Genus="Lutjanus",Species="campechanus")$match_taxonomy )
-
-# Get basic plot for Sebastes cortezi (not in database, so uses predictive distribution for genus Sebastes)
-Plot_taxa( Search_species(Genus="Sebastes",Species="cortezi")$match_taxonomy )
-
-# Get basic plot and extract values for Family Scombridae 
-( Predictions = Plot_taxa(Search_species(Family="Scombridae")$match_taxonomy) )
-```
-
-### Extract other values
-You can also see the full set of parameters calculated for each taxon, either for internal use of anticipated to be useful for users:
-```R
-head(FishLife::FishBase_and_RAM$beta_gv)
-```
-These can similarly be extracted and plotted:
-```
-params = matrix( c("K","M", "G","ln_MASPS"), ncol=2, byrow=TRUE)
-Plot_taxa( Search_species(Genus="Lutjanus",Species="campechanus")$match_taxonomy, params=params )
-```
-while other values (e.g., slope at the origin for the Beverton-Holt stock recruit curve) can then be calculated from the set of available parameters.  
-
-### Use old database
-By default `FishLife` uses the most-recent version published.  This currently includes both growth, size, maturity, and mortality parameters from FishBase, as well as stock-recruit parameters estimated using the RAM Legacy stock-recruit database.  To use earlier versions, use the `Database` argument in each function:
-
-```R
-# Get basic plot for Lutjanus campechanus (in database, so prediction is informed by species-specific data)
-Plot_taxa( Search_species(Genus="Lutjanus",Species="campechanus")$match_taxonomy, Database="FishBase" )
-```
-
-or expliclty use the updated database using:
-
-```R
-Plot_taxa( Search_species(Genus="Lutjanus",Species="campechanus")$match_taxonomy, Database="FishBase_and_RAM" )`
-```
 
 Description of package
 =============
@@ -88,6 +29,14 @@ Further reading
 =============
 ### Evaluating accuracy of data and life-history predictions in FishBase
 * Thorson, J. T., J. M. Cope, and W. S. Patrick. 2014. Assessing the quality of life history information in publicly available databases. Ecological Applications 24:217–226. http://onlinelibrary.wiley.com/doi/10.1890/12-1855.1/abstract
+
+### Simplified software for phylogenetic structural equation models
+* Package [phylosem](https://james-thorson-noaa.github.io/phylosem/index.html) on CRAN
+* Thorson, J. T., & van der Bijl, W. (2023). phylosem: A fast and simple R package for phylogenetic inference and trait imputation using phylogenetic structural equation models. Journal of Evolutionary Biology, 36(10), 1357–1364. https://doi.org/10.1111/jeb.14234
+
+### Role for phylogenetic comparative methods in fisheries science
+* Thorson, J. T. (2024). Trees for fishes: The neglected role for phylogenetic comparative methods in fisheries science. Fish and Fisheries, 25(1), 168–179. https://doi.org/10.1111/faf.12800
+
 
 Description of research
 =============
