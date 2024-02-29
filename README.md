@@ -1,3 +1,8 @@
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7590994.svg)](https://doi.org/10.5281/zenodo.7590994)
+[![Documentation](https://img.shields.io/badge/documentation-FishLife-orange.svg?colorB=E91E63)](https://James-Thorson-NOAA.github.io/FishLife/)
+
+
 # FishLife
 FishLife is an collaborative and international project that aims to:
 
@@ -12,9 +17,6 @@ The FishLife R-package includes results from three prior analyses:
 * The original database and results described by [Thorson Munch Cope Gao (2017)](https://doi.org/10.1002/eap.1606), introducing phylogenetic factor analysis and using records of size, growth, maturity, and mortality parameters from FishBase as downloaded in 2016.
 
 For each of these three analyses, the R-package _FishLife_ includes the compiled database of trait measurements (aim-1), the estimated covariance among traits (aim-2), and the imputed trait values (aim-3).  See package vignettes for more details.
-
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7590994.svg)](https://doi.org/10.5281/zenodo.7590994)
-
 
 Description of package
 =============
