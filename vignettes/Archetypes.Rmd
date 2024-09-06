@@ -33,7 +33,56 @@ suppressWarnings(RNGversion("3.5.0"))
 set.seed(1986)
 ```
 
-Next we re-run the archetype analysis and plot the resulting simplex of archetypes
+# Replicate model fitting
+
+If we want to replicate the entire analysis, we can load and inspect the SEM specification:
+
+```{r, echo=TRUE, message=FALSE, fig.width=6, fig.height=6, eval=TRUE}
+#
+text = FishBase_and_Morphometrics$text
+cat(text)
+```
+
+We also need the trait values, relatedness structure, and identify association of trait columns with factor levels.  To match the analysis in the main text (using taxonomy to represent relatedness), we specify `Z_ik` rather than `tree`:
+```{r, echo=TRUE, message=FALSE, fig.width=6, fig.height=6, eval=TRUE}
+# load tree
+Y_ij = FishBase_and_Morphometrics$Y_ij
+
+# load taxonomy
+Z_ik = FishBase_and_Morphometrics$Z_ik
+
+# Identify number of levels for categorical traits
+n_traits = 21
+n_levels = c( rep(1,17), 2, 4, 2, 4)
+group_j = rep(seq_len(n_traits)-1, times=n_levels)
+```
+
+We then can run this using the loaded data.  Here, we start it from the previous maximum-likelihood estimate to save time:
+
+```{r, echo=TRUE, message=FALSE, fig.width=6, fig.height=6, eval=FALSE}
+#
+startpar = unlist(FishBase_and_Morphometrics$ParHat[c("L_z","obsL_z")])
+startpar = startpar[which(startpar!=0.01)]
+
+# Full run
+Estimate_database = Fit_model(
+  text = text,
+  Database = NULL,
+  Y_ij = Y_ij,
+  Z_ik = Z_ik,
+  min_replicate_measurements = 3,
+  startpar = startpar,
+  group_j = group_j,
+  multinomial_for_factors = TRUE,
+  extract_covariance = FALSE,
+  getsd = FALSE,
+  newtonsteps = 0,
+  add_predictive = FALSE )
+```
+
+# Replicate archetype analysis
+
+Alternative, we might want to replicate the archetype analysis and plot the resulting simplex of archetypes.  To do so, we use the recorded estimates to save time:
 
 ```{r, echo=TRUE, message=FALSE, fig.width=6, fig.height=6}
 # Load results

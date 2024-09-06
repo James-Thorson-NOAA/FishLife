@@ -15,10 +15,8 @@ library(pkgdown)
 if( FALSE ){
   # set up to automatically publish pkgdown site to GitHub
   # usethis::create_github_token()
-  # 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
   # gitcreds::gitcreds_set(url = "https://github.com")
   usethis::use_pkgdown_github_pages()
-
 
   # Run once to configure your package to use pkgdown
   usethis::use_pkgdown()
