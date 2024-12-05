@@ -1,9 +1,9 @@
+# FishLife <a href='https://github.com/James-Thorson-NOAA/FishLife'><img src='man/logo.png' align="right" style="height:139px;"/></a>
+Fish trait database and imputation
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7590994.svg)](https://doi.org/10.5281/zenodo.7590994)
 [![Documentation](https://img.shields.io/badge/documentation-FishLife-orange.svg?colorB=E91E63)](https://James-Thorson-NOAA.github.io/FishLife/)
 
-
-# FishLife
 FishLife is an collaborative and international project that aims to:
 
 1. Compile life-history traits (demographic parameters as well as behavioral, reproductive, morphological, and trophic traits)
