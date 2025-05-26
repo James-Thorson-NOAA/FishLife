@@ -49,7 +49,9 @@
 #' using `rfishbase` as well as many other variables
 #'
 #' @details
+#'
 #' **Model output**
+#'
 #' \code{FishBase_and_Morphometrics$beta_gv} contains model output.
 #' Each row corresponds to a taxon or ancestral node, and each column corresponds
 #' to a predicted trait.  Note that log always refers to natural log.
@@ -58,6 +60,7 @@
 #' predictive distribution for a given trait, and this allows us to approximate the
 #' back-transformed mean value.
 #' Columns (in respective order) are defined as:
+#'
 #' | column | trait | source |
 #' | --- | --- | --- |
 #' | log(age_max)| log of maximum age (years) | FishBase |
