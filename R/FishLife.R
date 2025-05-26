@@ -6,7 +6,6 @@
 #'
 #' Please see github README for examples \url{http://github.com/james-thorson/FishLife/}
 #'
-#' @docType package
 #' @name FishLife
 #'
 #' @importFrom grDevices rainbow rgb

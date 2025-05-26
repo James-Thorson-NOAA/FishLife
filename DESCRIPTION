@@ -31,9 +31,10 @@ Suggests:
 Remotes:
     ropensci/rfishbase@fb-21.06,
 License: GPL-3
+Encoding: UTF-8
 LazyData: yes
 BuildVignettes: yes
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 URL: http://github.com/James-Thorson-NOAA/FishLife, https://james-thorson-noaa.github.io/FishLife/
 BugReports: http://github.com/James-Thorson-NOAA/FishLife/issues
 VignetteBuilder: knitr
