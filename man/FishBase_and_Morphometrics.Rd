@@ -4,33 +4,82 @@
 \name{FishBase_and_Morphometrics}
 \alias{FishBase_and_Morphometrics}
 \title{Database of FishBase (population-dynamics, size, growth, maturity, mortality parameters),
-         habitat, trophic, reproductive, and morphometric traits}
+habitat, trophic, reproductive, and morphometric traits}
 \format{
-A tagged list containing data and predictions
-\describe{
-  \item{text}{text file specifying the SEM structure}
-  \item{N_obsfactors}{Number of factors used for measurent-error in life-history model}
-  \item{beta_gv}{Predictive mean (in transformed space) among traits for every taxon in tree}
-  \item{Cov_gvv}{Covariance among traits for every taxon in tree}
-  \item{Use_REML}{Boolean, whether REML was used for model}
-  \item{ParentChild_gz}{Record of taxonomic tree}
-  \item{ParHat}{Parameter estimates and predictions}
-  \item{g_i}{Associates every observation with a level of the taxonomic tree}
-  \item{Y_ij}{Life-history parameters from FishBase}
-  \item{Z_ik}{Taxonomy for each datum}
-  \item{SR_obs}{Stock-recruit records from RAM Legacy stock-recruit database}
-  \item{StockData}{Auxiliary information for every stock with stock-recruit information}
-  \item{RAM}{Matrix specifying SEM parameters}
-  \item{SEM_model}{Description of SEM path diagram}
-  \item{tree}{Evolutionary tree in phylo format, for use in plotting, with order matching ParentChild_gz}
-  ...
-}
+An object of class \code{FishLife} of length 15.
 }
 \usage{
 FishBase_and_Morphometrics
 }
+\value{
+A tagged list containing data and predictions
+\describe{
+\item{text}{text file specifying the SEM structure}
+\item{N_obsfactors}{Number of factors used for measurent-error in life-history model}
+\item{beta_gv}{Predictive mean (in transformed space) among traits for every taxon in tree}
+\item{Cov_gvv}{Covariance among traits for every taxon in tree}
+\item{Use_REML}{Boolean, whether REML was used for model}
+\item{ParentChild_gz}{Record of taxonomic tree}
+\item{ParHat}{Parameter estimates and predictions}
+\item{g_i}{Associates every observation with a level of the taxonomic tree}
+\item{Y_ij}{Life-history parameters from FishBase}
+\item{Z_ik}{Taxonomy for each datum}
+\item{SR_obs}{Stock-recruit records from RAM Legacy stock-recruit database}
+\item{StockData}{Auxiliary information for every stock with stock-recruit information}
+\item{RAM}{Matrix specifying SEM parameters}
+\item{SEM_model}{Description of SEM path diagram}
+\item{tree}{Evolutionary tree in phylo format, for use in plotting, with order matching ParentChild_gz}
+...
+}
+}
 \description{
-Output from `Fit_model` applied to database scraped from www.FishBase.org
-using `rfishbase` as well as many other variables
+Output from \code{Fit_model} applied to database scraped from www.FishBase.org
+using \code{rfishbase} as well as many other variables
+}
+\details{
+\strong{Model output}
+\code{FishBase_and_Morphometrics$beta_gv} contains model output.
+Each row corresponds to a taxon or ancestral node, and each column corresponds
+to a predicted trait.  Note that log always refers to natural log.
+Several columns are labeled base, and this corresponds to the base level for
+each categorical trait.  Values are calculated as the mean when sampling from the
+predictive distribution for a given trait, and this allows us to approximate the
+back-transformed mean value.
+Columns (in respective order) are defined as:\tabular{lll}{
+   column \tab trait \tab source \cr
+   log(age_max) \tab log of maximum age (years) \tab FishBase \cr
+   trophic level \tab trophic level (dimensionless), where 1 is primary producers, etc. \tab FishBase \cr
+   log(aspect_ratio) \tab log of caudal fin height and length divided by area (dimensionless) \tab FishBase \cr
+   log(fecundity) \tab Annual eggs produced (number/year) \tab FishBase \cr
+   log(growth_coefficient) \tab von Bertalannffy growth coefficient (year^-1) \tab FishBase \cr
+   temperature \tab average temperature from portion of population sampled (celcius) \tab FishBase \cr
+   log(length_max) \tab log of maximum length (cm) \tab FishBase \cr
+   log(length_infinity) \tab log of von Bertalanffy asymptotic maximum length (cm) \tab FishBase \cr
+   log(length_maturity) \tab log length at 50\% maturity (cm) \tab FishBase \cr
+   log(age_maturity) \tab log age at 50\% sexual maturity (years) \tab FishBase \cr
+   log(natural mortality) \tab log of natural mortality rate M (year^-1) \tab FishBase \cr
+   log(weight_infinity) \tab log of asymptotic maximum weight (grams) \tab FishBase \cr
+   log(max_body_depth) \tab log maximum body depth (cm) \tab Morphometrics \cr
+   log(max_body_width) \tab log maximum body width (cm) \tab Morphometrics \cr
+   log(lower_jaw_length) \tab log length of lower jaw (cm) \tab Morphometrics \cr
+   log(min_caudal_pedoncule_depth) \tab log depth of caudal pedoncule (connecting caudal fin to body) \tab Morphometrics \cr
+   log(offspring_size) \tab log size of offspring (kg) \tab Morphometrics \cr
+   base \tab Probability of nonguarder level for spawning type category \tab FishBase \cr
+   spawning_typeguarders \tab Probability of guarder level for spawning type category \tab FishBase \cr
+   spawning_typebearers \tab Probability of live bearer level for spawning type category \tab FishBase \cr
+   base \tab Probability of demersal type for habitat category \tab FishBase \cr
+   habitatbathymetric \tab Probability of bathmetric type for habitat category \tab FishBase \cr
+   habitatbenthopelagic \tab Probability of benthopelagic type for habitat category \tab FishBase \cr
+   habitatreefassociated \tab Probability of reef-associated type for habitat category \tab FishBase \cr
+   habitatpelagic \tab Probability of pelagic type for habitat category \tab FishBase \cr
+   base \tab Probability of generalist type for feeding mode category \tab FishBase \cr
+   feeding_modemacrofauna \tab Probability of macrofauna type for feeding mode category \tab FishBase \cr
+   feeding_modeplanktivorous_or_other \tab Probability of planktivorous or other type for feeding mode category \tab FishBase \cr
+   base \tab Probability of fusiform or normal body type for body shape category \tab FishBase \cr
+   body_shapeelongated \tab Probability of elongated type for body shape category \tab FishBase \cr
+   body_shapeshort_and_or_deep \tab Probability of short and/or deep type for body shape category \tab FishBase \cr
+   body_shapeeellike \tab Probability of eel-like type for body shape category \tab FishBase \cr
+   body_shapeother \tab Probability of other type for body shape category \tab FishBase \cr
+}
 }
 \keyword{datasets}
