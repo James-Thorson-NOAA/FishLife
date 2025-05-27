@@ -82,7 +82,7 @@ where \code{start_time_elapsed = opt_previous$time_for_run}}
 }
 \value{
 the standard output from \code{\link[stats]{nlminb}}, except with additional diagnostics and timing info,
-        and a new slot containing the output from \code{\link[TMB]{sdreport}}
+and a new slot containing the output from \code{\link[TMB]{sdreport}}
 }
 \description{
 \code{fit_tmb} runs a TMB model and generates standard diagnostics

@@ -38,6 +38,7 @@ using \code{rfishbase} as well as many other variables
 }
 \details{
 \strong{Model output}
+
 \code{FishBase_and_Morphometrics$beta_gv} contains model output.
 Each row corresponds to a taxon or ancestral node, and each column corresponds
 to a predicted trait.  Note that log always refers to natural log.

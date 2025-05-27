@@ -52,7 +52,7 @@ and then parsed to control the set of path coefficients and variance-covariance 
 \item{Database}{Whether to use results for both adult and stock-recruit parameters, \code{Database="FishBase_and_RAM"}, or just adult parameters, \code{Database="FishBase"}}
 
 \item{tree}{phylogenetic structure, using class \code{\link[ape]{as.phylo}}.  If \code{tree=NULL}
-then argument \code{Z_ik} is instead converted to a tree using 
+then argument \code{Z_ik} is instead converted to a tree using
 \code{ape::as.phylo( ~Class/Order/Family/Genus/GenusSpecies, ... )} to convert it to a tree}
 
 \item{Y_ij}{a data frame of trait values (perhaps log-scaled) with rows for records, and tagged-columns for traits}
@@ -66,7 +66,7 @@ then argument \code{Z_ik} is instead converted to a tree using
 \item{N_obsfactors}{Number of factors in decomposotion of observation covariance (same format as \code{N_obsfactors})}
 
 \item{min_replicate_measurements}{specified threshold for the number of measurements for a given continuous traits,
-where any continuous trait having fewer replicated measurements for at least one taxon will have the 
+where any continuous trait having fewer replicated measurements for at least one taxon will have the
 measurement variance fixed at an arbitrarily low value, such that estimated traits are forced
 to approach the unreplicated measurements}
 
@@ -93,21 +93,21 @@ to approach the unreplicated measurements}
 \value{
 Tagged list containing objects from FishLife run (first 9 slots constitute list 'Estimate_database' for archiving results)
 \describe{
-  \item{tree}{The phylogenetic tree used for analysis, whether inputted or generated from taxonomy based on \code{Z_ik}}
-  \item{SEM_model}{The phylogenetic tree used for analysis, whether inputted or generated from taxonomy based on \code{Z_ik}}
-  \item{N_factors}{Number of factors used for evolution in life-history model}
-  \item{N_obsfactors}{Number of factors used for measurent-error in life-history model}
-  \item{Use_REML}{Boolean, whether REML was used for model}
-  \item{Cov_gjj}{Covariance among traits for every taxon in tree}
-  \item{ParentChild_gz}{Record of taxonomic tree}
-  \item{ParHat}{Parameter estimates and predictions}
-  \item{g_i}{Associates every observation with a level of the taxonomic tree}
-  \item{Y_ij}{Raw data}
-  \item{Z_ik}{Taxonomy for each datum}
-  \item{Obj}{The built TMB object}
-  \item{Opt}{Output from optimization}
-  \item{Report}{tagged list of report-file from TMB}
-  \item{ParHat_SE}{Estimated/predicted standard errors for fixed/random effects}
+\item{tree}{The phylogenetic tree used for analysis, whether inputted or generated from taxonomy based on \code{Z_ik}}
+\item{SEM_model}{The phylogenetic tree used for analysis, whether inputted or generated from taxonomy based on \code{Z_ik}}
+\item{N_factors}{Number of factors used for evolution in life-history model}
+\item{N_obsfactors}{Number of factors used for measurent-error in life-history model}
+\item{Use_REML}{Boolean, whether REML was used for model}
+\item{Cov_gjj}{Covariance among traits for every taxon in tree}
+\item{ParentChild_gz}{Record of taxonomic tree}
+\item{ParHat}{Parameter estimates and predictions}
+\item{g_i}{Associates every observation with a level of the taxonomic tree}
+\item{Y_ij}{Raw data}
+\item{Z_ik}{Taxonomy for each datum}
+\item{Obj}{The built TMB object}
+\item{Opt}{Output from optimization}
+\item{Report}{tagged list of report-file from TMB}
+\item{ParHat_SE}{Estimated/predicted standard errors for fixed/random effects}
 }
 }
 \description{

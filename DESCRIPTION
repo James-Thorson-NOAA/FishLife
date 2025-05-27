@@ -12,6 +12,7 @@ Imports:
     graphics,
     utils,
     stats,
+    methods,
     mvtnorm,
     shape,
     rfishbase,
