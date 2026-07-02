@@ -1,3 +1,10 @@
+# FishLife 3.2.0
+* Further update vignettes and docs
+* Improve logo
+
+# FishLife 3.1.0
+* Update vignettes
+
 # FishLife 3.0.1
 * Adding Zenodo DOI
 

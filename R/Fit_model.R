@@ -877,6 +877,7 @@ function( text = NULL,
 #' @param ... Not used
 #' @return NULL
 #' @method print FishLife
+#' @import methods
 #' @export
 print.FishLife <- function(x, ...)
 {

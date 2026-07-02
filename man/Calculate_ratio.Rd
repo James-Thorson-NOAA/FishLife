@@ -24,8 +24,8 @@ Calculate_ratio(
 \value{
 Matrix of exponentiated-differences (ratios) and log-standard deviations for projection
 \describe{
-  \item{median}{median difference for taxonomic group}
-  \item{N_obsfactors}{log-standard deviation of difference for taxonomic group}
+\item{median}{median difference for taxonomic group}
+\item{N_obsfactors}{log-standard deviation of difference for taxonomic group}
 }
 }
 \description{

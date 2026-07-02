@@ -148,7 +148,7 @@ knitr::kable( Table2017, digits=3)
 
 Finally, given this ongoing effort, it is natural to wonder whether output is consistent across database compilations, statistical assumptions, and associated model specification.  We therefore compare results for red snapper 
 
-```{r, echo=FALSE, results='asis'}
+```{r, echo=FALSE, results='asis', fig.width=6, fig.height=4}
 Full = rbind(
   data.frame( Table2017, "Year"=2017, "Param"=rownames(Table2017) ),
   data.frame( Table2020[1:8,], "Year"=2020, "Param"=rownames(Table2017) ),
@@ -164,3 +164,5 @@ ggplot(data=Full, aes(x=interaction(Year), y=Mean, color=Year)) +
                  width=0.25, position=position_dodge(0.9)) +
   facet_grid( rows=vars(Param), scales="free" )
 ```
+
+This comparison confirms that updates to the database in 2023 have resulted in some changes to predicted values even for relatively data-rich species.  
