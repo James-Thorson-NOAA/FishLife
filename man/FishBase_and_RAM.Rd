@@ -23,7 +23,7 @@ A tagged list containing data and predictions
 }
 }
 \usage{
-FishBase_and_RAM
+data(FishBase_and_RAM)
 }
 \description{
 Output from \code{Fit_model} applied to database scraped from www.FishBase.org

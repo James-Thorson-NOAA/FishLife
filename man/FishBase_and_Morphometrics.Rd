@@ -9,7 +9,7 @@ habitat, trophic, reproductive, and morphometric traits}
 An object of class \code{FishLife} of length 15.
 }
 \usage{
-FishBase_and_Morphometrics
+data(FishBase_and_Morphometrics)
 }
 \value{
 A tagged list containing data and predictions

@@ -3,6 +3,11 @@
 #' Output from `Fit_model` applied to database scraped from www.FishBase.org
 #' using `rfishbase`
 #'
+#' @details
+#' Length at maturity (Lmat) and total length (Loo) measurements are only included
+#' when measured as Total Length (TL), and excluding measurements using
+#' standard length (SL) or fork length (FL).
+#'
 #' @format A tagged list containing data and predictions
 #' \describe{
 #'   \item{N_factors}{Number of factors used for evolution in life-history model}

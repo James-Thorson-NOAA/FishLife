@@ -21,10 +21,15 @@ A tagged list containing data and predictions
 }
 }
 \usage{
-FishBase
+data(FishBase)
 }
 \description{
 Output from \code{Fit_model} applied to database scraped from www.FishBase.org
 using \code{rfishbase}
+}
+\details{
+Length at maturity (Lmat) and total length (Loo) measurements are only included
+when measured as Total Length (TL), and excluding measurements using
+standard length (SL) or fork length (FL).
 }
 \keyword{datasets}
